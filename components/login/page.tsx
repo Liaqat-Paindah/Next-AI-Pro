@@ -14,7 +14,7 @@ export default function Login() {
     <div>
       {data &&
         data.map((user: User, index: number) => (
-          <div className="" key={index}>
+          <div className="p-8" key={index}>
             <li>{user.name}</li>
             <li>{user.email}</li>
             <li>{user.role}</li>

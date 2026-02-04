@@ -18,7 +18,7 @@ export default function Home()
   const data = {Username:"Liaqat Paindah", Password:"admin123"}
   return (
     <>
-    <div className="main bg-gray-200 p-6 border border:1px solid green">
+    <div className="main  p-6 border border:1px solid green">
       Home Page
       <Card Username={data.Username} Password={data.Password}></Card>
 
