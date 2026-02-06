@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
-import Header from "@/components/navigation/header";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const inter = Inter({
@@ -29,7 +28,6 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Header></Header>
             {children}
           </QueryProvider>
         </ThemeProvider>
