@@ -1,6 +1,7 @@
 const sampleData = {
   products: [
     {
+      id: 'prod_polo_sporting_stretch_shirt',
       name: 'Polo Sporting Stretch Shirt',
       slug: 'polo-sporting-stretch-shirt',
       category: "Men's Dress Shirts",
@@ -16,8 +17,10 @@ const sampleData = {
       stock: 5,
       isFeatured: true,
       banner: 'banner-1.jpg',
+      sku: 'POLO-SS-001',
     },
     {
+      id: 'prod_brooks_brothers_long_sleeved_shirt',
       name: 'Brooks Brothers Long Sleeved Shirt',
       slug: 'brooks-brothers-long-sleeved-shirt',
       category: "Men's Dress Shirts",
@@ -33,8 +36,10 @@ const sampleData = {
       stock: 10,
       isFeatured: true,
       banner: 'banner-2.jpg',
+      sku: 'BB-LS-002',
     },
     {
+      id: 'prod_tommy_hilfiger_classic_fit_dress_shirt',
       name: 'Tommy Hilfiger Classic Fit Dress Shirt',
       slug: 'tommy-hilfiger-classic-fit-dress-shirt',
       category: "Men's Dress Shirts",
@@ -50,8 +55,10 @@ const sampleData = {
       stock: 0,
       isFeatured: false,
       banner: null,
+      sku: 'TH-CF-003',
     },
     {
+      id: 'prod_calvin_klein_slim_fit_stretch_shirt',
       name: 'Calvin Klein Slim Fit Stretch Shirt',
       slug: 'calvin-klein-slim-fit-stretch-shirt',
       category: "Men's Dress Shirts",
@@ -67,8 +74,10 @@ const sampleData = {
       stock: 10,
       isFeatured: false,
       banner: null,
+      sku: 'CK-SF-004',
     },
     {
+      id: 'prod_polo_ralph_lauren_oxford_shirt',
       name: 'Polo Ralph Lauren Oxford Shirt',
       slug: 'polo-ralph-lauren-oxford-shirt',
       category: "Men's Dress Shirts",
@@ -84,8 +93,10 @@ const sampleData = {
       stock: 6,
       isFeatured: false,
       banner: null,
+      sku: 'PRL-OX-005',
     },
     {
+      id: 'prod_polo_classic_pink_hoodie',
       name: 'Polo Classic Pink Hoodie',
       slug: 'polo-classic-pink-hoodie',
       category: "Men's Sweatshirts",
@@ -101,6 +112,7 @@ const sampleData = {
       stock: 8,
       isFeatured: true,
       banner: null,
+      sku: 'POLO-HD-006',
     },
   ],
 };
