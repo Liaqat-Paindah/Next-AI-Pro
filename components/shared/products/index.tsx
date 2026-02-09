@@ -13,7 +13,7 @@ const Products = () => {
   }
   return (
     <div>
-      <ProductList data={sample_data ?? []} title="New Title" limit={4} />
+      <ProductList data={sample_data ?? []} title="New Title" limit={10} />
     </div>
   );
 };

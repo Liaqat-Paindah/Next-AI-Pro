@@ -1,4 +1,4 @@
-import Loading from "@/components/Loading";
+import Loading from "@/app/(root)/loading";
 import LoginPage from "@/components/login/page"
 import { Suspense } from "react";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "@/components/Loading";
+import Loading from "@/app/(root)/loading";
 import { User } from "@/data/user";
 import { useUser } from "@/hooks/user";
 
