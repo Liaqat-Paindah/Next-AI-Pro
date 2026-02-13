@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import menuData from "./menuData";
-import { ModeToggle } from "./theme-toggle";
+import ThemeToggler from "./theme-toggle";
 
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
@@ -39,8 +39,6 @@ const Header = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-
-
   return (
     <>
       <header
@@ -48,7 +46,7 @@ const Header = () => {
           fixed top-0 left-0 w-full z-[9999] transition-all duration-500
           ${
             sticky
-              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl border-b border-[#D8F0F4]/20 shadow-[0_8px_32px_-6px_rgba(0,31,75,0.08)] dark:bg-primary/95 dark:border-[#6ABAE1]/20"
+              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl border-b border-[#D8F0F4]/20 dark:bg-gray-900 dark:border-[#6ABAE1]/20"
               : "py-2 md:py-3 lg:py-4 bg-transparent"
           }
         `}
@@ -197,7 +195,7 @@ const Header = () => {
             {/* Right Side Actions - More Compact */}
             <div className="flex items-center space-x-1.5 md:space-x-2 lg:space-x-3">
               <div className="relative scale-90 md:scale-100">
-                <ModeToggle />
+                <ThemeToggler />
               </div>
 
               <div className="hidden md:flex md:items-center md:space-x-1.5">
@@ -227,52 +225,60 @@ const Header = () => {
                   text-[#03396C] dark:text-[#D8F0F4]"
               >
                 <div className="relative w-4 h-4">
-                  <span className={`absolute top-0 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
-                    navbarOpen ? 'rotate-45 translate-y-1.5' : ''
-                  }`} />
-                  <span className={`absolute top-1.5 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
-                    navbarOpen ? 'opacity-0' : ''
-                  }`} />
-                  <span className={`absolute bottom-0 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
-                    navbarOpen ? '-rotate-45 -translate-y-1.5' : ''
-                  }`} />
+                  <span
+                    className={`absolute top-0 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
+                      navbarOpen ? "rotate-45 translate-y-1.5" : ""
+                    }`}
+                  />
+                  <span
+                    className={`absolute top-1.5 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
+                      navbarOpen ? "opacity-0" : ""
+                    }`}
+                  />
+                  <span
+                    className={`absolute bottom-0 left-0 w-4 h-0.5 bg-current rounded-sm transition-all duration-300 ${
+                      navbarOpen ? "-rotate-45 -translate-y-1.5" : ""
+                    }`}
+                  />
                 </div>
               </button>
             </div>
           </div>
-
           {/* Compact Mobile Menu */}
           <div
             className={`
-              fixed inset-x-3 top-16 z-50
-              lg:hidden transition-all duration-500 transform
-              ${
-                navbarOpen
-                  ? "visible opacity-100 translate-y-0"
-                  : "invisible opacity-0 -translate-y-4 pointer-events-none"
-              }
-            `}
+    fixed inset-x-3 top-16 z-50
+    lg:hidden transition-all duration-500 transform
+    ${
+      navbarOpen
+        ? "visible opacity-100 translate-y-0"
+        : "invisible opacity-0 -translate-y-4 pointer-events-none"
+    }
+  `}
           >
-            <div className="relative bg-white dark:bg-primary rounded-sm shadow-2xl border border-[#D8F0F4]/30 dark:border-[#6ABAE1]/30 overflow-hidden">
-              <div className="absolute inset-0 bg-linear-to-b from-[#D8F0F4]/20 to-transparent dark:from-[#6ABAE1]/10" />
+            <div className="relative bg-white dark:bg-gray-900 rounded-sm shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-gray-800/30" />
               <div className="relative p-3 max-h-[calc(100vh-80px)] overflow-y-auto">
                 <nav>
                   <ul className="space-y-0.5">
                     {menuData.map((menuItem, index) => (
-                      <li key={index} className="border-b border-[#D8F0F4]/30 dark:border-[#6ABAE1]/20 last:border-0">
+                      <li
+                        key={index}
+                        className="border-b border-gray-100 dark:border-gray-800 last:border-0"
+                      >
                         {menuItem.path ? (
                           <Link
                             href={menuItem.path as string}
                             onClick={() => setNavbarOpen(false)}
                             className={`
-                              flex items-center py-2.5 px-2 rounded-sm text-sm font-medium
-                              transition-all duration-300
-                              ${
-                                pathname === menuItem.path
-                                  ? "bg-linear-to-r from-[#6ABAE1]/20 to-[#03396C]/10 text-[#03396C] dark:text-[#D8F0F4]"
-                                  : "text-primary/70 hover:text-[#6ABAE1] dark:text-[#D8F0F4]/70 dark:hover:text-[#6ABAE1] hover:bg-[#D8F0F4]/40 dark:hover:bg-[#6ABAE1]/10"
-                              }
-                            `}
+                    flex items-center py-2.5 px-2 rounded-sm text-sm font-medium
+                    transition-all duration-300
+                    ${
+                      pathname === menuItem.path
+                        ? "bg-linear-to-r from-blue-100 to-blue-50 text-blue-900 dark:from-gray-800 dark:to-gray-900 dark:text-blue-400"
+                        : "text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-blue-400 hover:bg-blue-50/80 dark:hover:bg-gray-900/50"
+                    }
+                  `}
                           >
                             {menuItem.title}
                           </Link>
@@ -281,14 +287,14 @@ const Header = () => {
                             <button
                               onClick={() => handleSubmenu(index)}
                               className={`
-                                flex w-full items-center justify-between py-2 px-2 rounded-sm
-                                text-sm font-medium transition-all duration-300
-                                ${
-                                  openIndex === index
-                                    ? "bg-linear-to-r from-[#6ABAE1]/20 to-[#03396C]/10 text-[#03396C] dark:text-[#D8F0F4]"
-                                    : "text-primary/70 hover:text-[#6ABAE1] dark:text-[#D8F0F4]/70 dark:hover:text-[#6ABAE1]"
-                                }
-                              `}
+                      flex w-full items-center justify-between py-2 px-2 rounded-sm
+                      text-sm font-medium transition-all duration-300
+                      ${
+                        openIndex === index
+                          ? "bg-linear-to-r from-blue-100 to-blue-50 text-blue-900 dark:from-gray-800 dark:to-gray-900 dark:text-blue-400"
+                          : "text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-blue-400"
+                      }
+                    `}
                             >
                               {menuItem.title}
                               <svg
@@ -307,13 +313,13 @@ const Header = () => {
                             {menuItem.submenu && (
                               <div
                                 className={`
-                                  mt-1 ml-2 space-y-0.5 transition-all duration-300
-                                  ${
-                                    openIndex === index
-                                      ? "block opacity-100"
-                                      : "hidden opacity-0"
-                                  }
-                                `}
+                        mt-1 ml-2 space-y-0.5 transition-all duration-300
+                        ${
+                          openIndex === index
+                            ? "block opacity-100"
+                            : "hidden opacity-0"
+                        }
+                      `}
                               >
                                 {menuItem.submenu.map((subItem, subIndex) => (
                                   <Link
@@ -321,16 +327,16 @@ const Header = () => {
                                     href={subItem.path as string}
                                     onClick={() => setNavbarOpen(false)}
                                     className={`
-                                      flex items-center py-1.5 px-3 rounded-sm text-xs
-                                      transition-all duration-300 pl-5
-                                      ${
-                                        pathname === subItem.path
-                                          ? "text-[#03396C] dark:text-[#D8F0F4] bg-[#D8F0F4]/40 dark:bg-[#6ABAE1]/20"
-                                          : "text-primary/60 hover:text-[#6ABAE1] dark:text-[#D8F0F4]/60 dark:hover:text-[#6ABAE1] hover:bg-[#D8F0F4]/20"
-                                      }
-                                    `}
+                            flex items-center py-1.5 px-3 rounded-sm text-xs
+                            transition-all duration-300 pl-5
+                            ${
+                              pathname === subItem.path
+                                ? "text-blue-900 dark:text-blue-400 bg-blue-50 dark:bg-gray-900"
+                                : "text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-gray-900/30"
+                            }
+                          `}
                                   >
-                                    <span className="w-1 h-1 bg-[#6ABAE1] rounded-sm mr-2" />
+                                    <span className="w-1 h-1 bg-blue-500 rounded-full mr-2" />
                                     {subItem.title}
                                   </Link>
                                 ))}
@@ -347,11 +353,11 @@ const Header = () => {
                         href="/signin"
                         onClick={() => setNavbarOpen(false)}
                         className="flex w-full items-center justify-center px-4 py-2.5 rounded-sm
-                          text-sm font-medium text-[#03396C] dark:text-[#D8F0F4]
-                          border border-[#6ABAE1]/50 hover:border-[#6ABAE1]
-                          transition-all duration-300 hover:shadow-lg hover:shadow-[#6ABAE1]/20
-                          bg-linear-to-r from-transparent to-transparent
-                          hover:from-[#D8F0F4]/20 hover:to-transparent"
+                text-sm font-medium text-blue-900 dark:text-blue-400
+                border border-blue-200 hover:border-blue-500 dark:border-gray-700 dark:hover:border-primary
+                transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-primary/20
+                bg-linear-to-r from-transparent to-transparent
+                hover:from-blue-50 hover:to-transparent dark:hover:from-gray-800"
                       >
                         Sign In
                       </Link>
@@ -368,17 +374,17 @@ const Header = () => {
       {navbarOpen && (
         <div
           onClick={() => setNavbarOpen(false)}
-          className="fixed inset-0 z-40 bg-primary/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
+          className="fixed inset-0 z-40 bg-primary/40 backdrop-blur-sm dark:bg-gray-900 transition-opacity duration-300 lg:hidden"
         />
       )}
 
       {/* Dynamic Spacer - Smaller */}
-      <div 
+      <div
         className={`transition-all duration-500 ${
-          sticky 
-            ? "h-[52px] md:h-[60px] lg:h-[68px]" 
+          sticky
+            ? "h-[52px] md:h-[60px] lg:h-[68px]"
             : "h-[56px] md:h-[68px] lg:h-[76px]"
-        }`} 
+        }`}
       />
     </>
   );
