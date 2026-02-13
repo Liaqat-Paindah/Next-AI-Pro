@@ -1,3 +1,4 @@
+import Footer from "@/components/shared/navigation/footer";
 import Header from "@/components/shared/navigation/header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -11,6 +12,7 @@ export default function RootLayout({
       <Header></Header>
       {children}
       <Toaster />
+      <Footer></Footer>
     </div>
   );
 }
