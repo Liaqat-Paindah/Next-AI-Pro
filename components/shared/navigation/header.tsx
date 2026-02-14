@@ -200,7 +200,7 @@ const Header = () => {
 
               <div className="hidden md:flex md:items-center md:space-x-1.5">
                 <Link
-                  href="/signin"
+                  href="/auth/login"
                   className="relative px-3.5 py-1.5 lg:px-4 lg:py-2 text-xs lg:text-sm font-medium text-[#03396C] dark:text-[#D8F0F4] rounded-sm
                     border border-[#6ABAE1]/30 hover:border-[#6ABAE1] dark:border-[#D8F0F4]/30
                     transition-all duration-300 hover:shadow-lg hover:shadow-[#6ABAE1]/20
@@ -350,7 +350,7 @@ const Header = () => {
                     {/* Mobile Auth Button - Compact */}
                     <li className="pt-3">
                       <Link
-                        href="/signin"
+                        href="/auth/login"
                         onClick={() => setNavbarOpen(false)}
                         className="flex w-full items-center justify-center px-4 py-2.5 rounded-sm
                 text-sm font-medium text-blue-900 dark:text-blue-400

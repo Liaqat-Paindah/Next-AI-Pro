@@ -44,7 +44,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-white dark:bg-[#0A0F1C] border-t border-gray-100 dark:border-gray-800/50">
+    <footer className="relative   border-t border-gray-100 dark:border-gray-800/50">
       {/* Simple background - no gradients */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gray-50 dark:bg-gray-900/30 rounded-sm blur-3xl" />
