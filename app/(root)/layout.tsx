@@ -1,3 +1,5 @@
+import Footer from "@/components/shared/navigation/footer";
+import Header from "@/components/shared/navigation/header";
 
 export default function RootLayout({
   children,
@@ -6,7 +8,9 @@ export default function RootLayout({
 }) {
   return (
     <div className="w-full flex-1">
+      <Header></Header>
       {children}
+      <Footer></Footer>
     </div>
   );
 }

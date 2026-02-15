@@ -1,5 +1,3 @@
-
-
 import "server-only";
 
 import NextAuth from "next-auth";
@@ -14,7 +12,14 @@ declare module "next-auth" {
   }
 
   interface Session {
-    user: User & { _id?: string };
+    user: User & {
+      _id?: string;
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      phone?: string;
+      avatar?: string;
+    };
   }
 }
 
@@ -80,9 +85,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async session({ session, token }) {
       session.user._id = token._id as string;
+      session.user.email = token.email as string;
+      session.user.first_name = token.first_name as string;
+      session.user.last_name = token.last_name as string;
+      session.user.phone = token.phone as string;
+      session.user.avatar = token.avatar as string;
       return session;
     },
   },
 });
 
-export const { GET, POST } = handlers
+export const { GET, POST } = handlers;
