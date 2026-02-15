@@ -3,9 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import Footer from "@/components/shared/navigation/footer";
 import { Toaster } from "@/components/ui/sonner";
-import Header from "@/components/shared/navigation/header";
+import { SidebarProvider } from "@/components/providers/SidebarContext";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -34,10 +33,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Header></Header>
-            {children}
+                   <SidebarProvider>{children}</SidebarProvider>
+
             <Toaster />
-            <Footer></Footer>
           </ThemeProvider>
         </QueryProvider>
       </body>
