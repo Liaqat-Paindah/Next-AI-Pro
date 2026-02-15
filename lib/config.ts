@@ -1,18 +1,66 @@
+import mongoose from "mongoose";
 
-import mongoose from 'mongoose';
-const uri = "mongodb+srv://ayandah644_db_user:<db_password>@ayandahdb.0n9izsv.mongodb.net/?appName=AyandahDB";
+const MONGODB_URI =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://ayandah644_db_user:OXSX9snOLcfEyere@ayandahdb.0n9izsv.mongodb.net/?appName=AyandahDB";
 
-const clientOptions = { serverApi: { version: '1' as const, strict: true, deprecationErrors: true } };
+const clientOptions = {
+  serverApi: {
+    version: "1" as const,
+    strict: true,
+    deprecationErrors: true,
+  },
+};
 
-export async function run() {
-  try {
-    // Create a Mongoose client with a MongoClientOptions object to set the Stable API version
-    await mongoose.connect(uri, clientOptions);
-    await mongoose.connection?.db?.admin().command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await mongoose.disconnect();
-  }
+// Define the cache type
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
-run().catch(console.dir);
+
+// Declare global type
+declare global {
+  var mongoose: MongooseCache | undefined;
+}
+
+// Initialize cached connection with proper typing
+const cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+
+if (!global.mongoose) {
+  global.mongoose = { conn: null, promise: null };
+}
+
+export async function ConnectDB(): Promise<typeof mongoose> {
+  if (cached.conn) {
+    return cached.conn;
+  }
+  if (!cached.promise) {
+    console.log("🔄 Connecting to MongoDB...");
+    cached.promise = mongoose
+      .connect(MONGODB_URI, clientOptions)
+      .then((mongoose) => {
+        return mongoose;
+      })
+      .catch((error) => {
+        cached.promise = null;
+        throw error;
+      });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+    try {
+      await mongoose.connection.db?.admin().command({ ping: 1 });
+      console.log(
+        " Pinged your deployment. You successfully connected to MongoDB!",
+      );
+    } catch (pingError) {
+      console.warn(pingError);
+    }
+  } catch {
+    cached.promise = null;
+    throw new Error("Database connection failed");
+  }
+
+  return cached.conn;
+}
