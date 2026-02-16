@@ -26,6 +26,13 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+        const ExistPhone = await User.findOne({ phone });
+    if (ExistPhone) {
+      return NextResponse.json(
+        { message: "Phone number already in use" },
+        { status: 400 },
+      );
+    }
 
     // Create new user
     const newUser = new User({
