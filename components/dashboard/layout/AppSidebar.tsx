@@ -11,6 +11,7 @@ import {
   ChevronDown,
   LogOut,
   HelpCircle,
+  FileText,
 } from "lucide-react";
 
 type NavItem = {
@@ -25,13 +26,11 @@ const mainNavItems: NavItem[] = [
     icon: <LayoutDashboard className="w-4 h-4" />,
     name: "Dashboard",
     path: "/dashboard",
-
   },
-    {
-    icon: <LayoutDashboard className="w-4 h-4" />,
+  {
+    icon: <FileText className="w-4 h-4" />,
     name: "Application",
     path: "/application",
-
   },
   {
     icon: <User className="w-4 h-4" />,
@@ -44,7 +43,6 @@ const mainNavItems: NavItem[] = [
     path: "/settings",
   },
 ];
-
 
 const bottomNavItems: NavItem[] = [
   {
@@ -70,20 +68,22 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
+  // Auto-expand submenu if a child route is active
   useEffect(() => {
-    // Auto-expand submenu if a child route is active
     const allItems = [...mainNavItems];
     allItems.forEach((item) => {
       if (item.subItems) {
-        item.subItems.forEach((subItem) => {
-          if (isActive(subItem.path)) {
-            setOpenSubmenu(item.name);
-          }
-        });
+        const hasActiveSubItem = item.subItems.some((subItem) =>
+          isActive(subItem.path),
+        );
+        if (hasActiveSubItem) {
+          setOpenSubmenu(item.name);
+        }
       }
     });
   }, [pathname, isActive]);
 
+  // Update submenu height when opened
   useEffect(() => {
     if (openSubmenu && subMenuRefs.current[openSubmenu]) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -93,34 +93,41 @@ const AppSidebar: React.FC = () => {
     }
   }, [openSubmenu]);
 
+  const handleSubmenuToggle = (itemName: string) => {
+    setOpenSubmenu(openSubmenu === itemName ? null : itemName);
+  };
+
   const renderNavItems = (items: NavItem[]) => (
-    <ul className="space-y-1">
+    <nav className="space-y-1" aria-label="Sidebar navigation">
       {items.map((item) => (
-        <li key={item.name}>
+        <div key={item.name}>
           {item.subItems ? (
-            <div>
+            <div className="space-y-1">
               <button
-                onClick={() =>
-                  setOpenSubmenu(openSubmenu === item.name ? null : item.name)
-                }
+                onClick={() => handleSubmenuToggle(item.name)}
                 className={`
-                  flex items-center w-full px-3 py-2 text-sm font-medium rounded-lg
+                  flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg
                   transition-all duration-200 group
                   ${
                     openSubmenu === item.name
-                      ? "text-03396C bg-indigo-50 dark:bg-indigo-900/20"
+                      ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:text-primary-400"
                       : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                   }
-                  ${!isExpanded && !isHovered ? "justify-center" : "justify-between"}
+                  ${!isExpanded && !isHovered && !isMobileOpen ? "justify-center" : "justify-between"}
                 `}
+                aria-expanded={openSubmenu === item.name}
+                aria-controls={`submenu-${item.name}`}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={
+                    className={`
+                    transition-colors duration-200
+                    ${
                       openSubmenu === item.name
-                        ? "text-03396C"
-                        : "text-gray-500"
+                        ? "text-primary-600 dark:text-primary-400"
+                        : "text-gray-500 dark:text-gray-400"
                     }
+                  `}
                   >
                     {item.icon}
                   </span>
@@ -131,10 +138,14 @@ const AppSidebar: React.FC = () => {
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <ChevronDown
                     className={`
-                    w-4 h-4 transition-transform duration-200
-                    ${openSubmenu === item.name ? "rotate-180" : ""}
-                    ${openSubmenu === item.name ? "text-03396C" : "text-gray-400"}
-                  `}
+                      w-4 h-4 transition-transform duration-200
+                      ${openSubmenu === item.name ? "rotate-180" : ""}
+                      ${
+                        openSubmenu === item.name
+                          ? "text-primary-600 dark:text-primary-400"
+                          : "text-gray-400 dark:text-gray-500"
+                      }
+                    `}
                   />
                 )}
               </button>
@@ -144,6 +155,7 @@ const AppSidebar: React.FC = () => {
                   ref={(el) => {
                     subMenuRefs.current[item.name] = el;
                   }}
+                  id={`submenu-${item.name}`}
                   className="overflow-hidden transition-all duration-300"
                   style={{
                     height:
@@ -161,7 +173,7 @@ const AppSidebar: React.FC = () => {
                             block px-3 py-2 text-sm rounded-lg transition-all duration-200
                             ${
                               isActive(subItem.path)
-                                ? "text-03396C bg-indigo-50 dark:bg-indigo-900/20 font-medium"
+                                ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:text-primary-400 font-medium"
                                 : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                             }
                           `}
@@ -178,20 +190,25 @@ const AppSidebar: React.FC = () => {
             <Link
               href={item.path!}
               className={`
-                flex items-center px-3 py-2 text-sm font-medium rounded-lg
+                flex items-center px-3 py-2.5 text-sm font-medium rounded-lg
                 transition-all duration-200
                 ${
                   isActive(item.path!)
-                    ? "text-03396C bg-indigo-50 dark:bg-indigo-900/20"
+                    ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:text-primary-400"
                     : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
                 }
-                ${!isExpanded && !isHovered ? "justify-center" : "justify-start gap-3"}
+                ${!isExpanded && !isHovered && !isMobileOpen ? "justify-center" : "gap-3"}
               `}
             >
               <span
-                className={
-                  isActive(item.path!) ? "text-03396C" : "text-gray-500"
+                className={`
+                transition-colors duration-200
+                ${
+                  isActive(item.path!)
+                    ? "text-primary-600 dark:text-primary-400"
+                    : "text-gray-500 dark:text-gray-400"
                 }
+              `}
               >
                 {item.icon}
               </span>
@@ -200,16 +217,19 @@ const AppSidebar: React.FC = () => {
               )}
             </Link>
           )}
-        </li>
+        </div>
       ))}
-    </ul>
+    </nav>
   );
 
   return (
     <>
       {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" />
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          aria-hidden="true"
+        />
       )}
 
       <aside
@@ -218,44 +238,61 @@ const AppSidebar: React.FC = () => {
           border-r border-gray-200 dark:border-gray-800
           transition-all duration-300 ease-in-out z-50
           ${isExpanded || isMobileOpen ? "w-64" : isHovered ? "w-64" : "w-20"}
-          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          shadow-xl lg:shadow-none
         `}
         onMouseEnter={() => !isExpanded && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        aria-label="Main sidebar"
       >
-        {/* Logo */}
-        <div
-          className={`
-          h-16 flex items-center border-b border-gray-200 dark:border-gray-800
-          ${!isExpanded && !isHovered ? "justify-center" : "px-4"}
-        `}
-        >
-          <Link href="/" className="flex items-center">
+        {/* Logo Section */}
+        <div className="h-16 flex items-center border-b border-gray-200 dark:border-gray-800">
+          <Link
+            href="/"
+            className={`
+              flex items-center w-full
+              ${!isExpanded && !isHovered && !isMobileOpen ? "justify-center px-2" : "px-4"}
+            `}
+          >
             {isExpanded || isHovered || isMobileOpen ? (
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={120}
-                height={30}
-                className="dark:hidden"
-              />
+              <>
+                {/* Light mode logo */}
+                <Image
+                  src="/logo.png"
+                  alt="Nexus Digital"
+                  width={120}
+                  height={30}
+                  className="block dark:hidden"
+                  priority
+                />
+                {/* Dark mode logo */}
+                <Image
+                  src="/logo-dark.png"
+                  alt="Nexus Digital"
+                  width={120}
+                  height={30}
+                  className="hidden dark:block"
+                  priority
+                />
+              </>
             ) : (
               <Image
                 src="/fav.png"
-                alt="Logo"
+                alt="Nexus Digital"
                 width={28}
                 height={28}
+                className="dark:brightness-200"
+                priority
               />
             )}
           </Link>
         </div>
 
+        {/* Navigation Section */}
         <div className="flex flex-col h-[calc(100vh-4rem)] overflow-y-auto scrollbar-hide">
-          <div className="flex-1 py-4 px-3">
-            <div className="mb-6">{renderNavItems(mainNavItems)}</div>
-          </div>
-          <div className="py-4 px-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="flex-1 py-6 px-3">{renderNavItems(mainNavItems)}</div>
+
+          <div className="py-6 px-3 border-t border-gray-200 dark:border-gray-800">
             {renderNavItems(bottomNavItems)}
           </div>
         </div>

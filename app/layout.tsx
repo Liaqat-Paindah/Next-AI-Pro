@@ -5,6 +5,7 @@ import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/providers/SidebarContext";
+import Providers from "@/components/providers/SessionProvider";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -33,7 +34,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-                   <SidebarProvider>{children}</SidebarProvider>
+                   <SidebarProvider>
+                    <Providers>
+                      {children}
+                    </Providers>
+                   </SidebarProvider>
 
             <Toaster />
           </ThemeProvider>
