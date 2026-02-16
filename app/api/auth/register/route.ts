@@ -1,7 +1,6 @@
 import { ConnectDB } from "@/lib/config";
 import User from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs"; // Make sure to install: npm install bcryptjs
 
 export async function POST(req: NextRequest) {
   try {

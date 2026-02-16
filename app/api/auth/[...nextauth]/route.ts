@@ -9,6 +9,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 declare module "next-auth" {
   interface User {
     _id?: string; // or `string | undefined`
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    phone?: string;
+    avatar?: string;
   }
 
   interface Session {
@@ -57,28 +62,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
-
         const res = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(credentials),
         });
         const user = await res.json();
-
-        // If no error and we have user data, return it
-        if (res.ok && user) {
-          return user;
+        if (res.ok && user?.user) {
+          return {
+            _id: user.user._id,
+            email: user.user.email,
+            first_name: user.user.first_name,
+            last_name: user.user.last_name,
+            role: user.user.role,
+            avatar: user.user.avatar,
+          };
         }
-        // Return null if user data could not be retrieved
         return null;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user?._id) {
+      if (user) {
         token._id = user._id;
+        token.email = user.email;
+        token.first_name = user.first_name;
+        token.last_name = user.last_name;
+        token.phone = user.phone;
+        token.avatar = user.avatar;
       }
       return token;
     },
