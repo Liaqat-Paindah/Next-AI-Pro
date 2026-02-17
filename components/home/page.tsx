@@ -1,4 +1,14 @@
+import React from "react";
+import AyandahaDigitalCarousel from "./carousel";
+import NexusScholarships from "../scholarships/page";
 
-export default function HomeMain() {
-  return <div>Welcome to Home Page...!</div>;
-}
+const Home = () => {
+  return (
+    <div>
+      <AyandahaDigitalCarousel></AyandahaDigitalCarousel>
+      <NexusScholarships></NexusScholarships>
+    </div>
+  );
+};
+
+export default Home;
