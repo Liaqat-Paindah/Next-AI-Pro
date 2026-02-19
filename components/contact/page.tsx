@@ -142,7 +142,7 @@ const ContactInfoCard = ({
       <div className="absolute -inset-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur" />
 
       {/* Card - Smaller padding */}
-      <div className="relative bg-white dark:bg-[#0A0A0A] border border-gray-200 hover:dark:border-[#1c6fa5] dark:border-[#1A1A1A] rounded-sm p-4 h-full shadow-sm dark:shadow-sm dark:shadow-black/50">
+      <div className="relative bg-white dark:bg-[#011b2b] border border-gray-200 hover:dark:border-[#1c6fa5] dark:border-[#064e78] rounded-sm p-4 h-full shadow-sm dark:shadow-sm ">
         {/* Icon Container - Smaller */}
         <div className="relative mb-3">
           <motion.div
@@ -248,7 +248,7 @@ const FormInput = ({
             required={required}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#1A1A1A] rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors resize-none font-light"
+            className="w-full px-3 py-2 text-sm bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors resize-none font-light"
           />
         ) : (
           <input
@@ -260,7 +260,7 @@ const FormInput = ({
             required={required}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#1A1A1A] rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light"
+            className="w-full px-3 py-2 text-sm bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light"
           />
         )}
 
@@ -295,7 +295,7 @@ const SuccessModal = ({
         className="fixed inset-0 z-50 flex items-center justify-center px-4"
       >
         <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0  backdrop-blur-sm"
           onClick={onClose}
         />
 
@@ -303,7 +303,7 @@ const SuccessModal = ({
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
-          className="relative bg-white dark:bg-[#0A0A0A] rounded-sm p-6 max-w-md w-full border border-gray-200 dark:border-[#1A1A1A] shadow-sm dark:shadow-sm dark:shadow-black/50"
+          className="relative bg-white dark:bg-[#011b2b] rounded-sm p-6 max-w-md w-full border border-gray-200 dark:border-[#064e78] shadow-sm dark:shadow-sm "
         >
           {/* Digital Corner Markers */}
           <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-[#00A3FF] dark:border-[#00A3FF]" />
@@ -399,7 +399,7 @@ export default function AyandahaDigitalContact() {
       <DigitalCursor />
       <SuccessModal show={showSuccess} onClose={() => setShowSuccess(false)} />
 
-      <section className="relative w-full bg-white dark:bg-black overflow-hidden">
+      <section className="relative w-full   overflow-hidden">
         {/* Digital Grid Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,163,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,163,255,0.03)_1px,transparent_1px)] bg-size-32px_32px dark:bg-[linear-gradient(rgba(0,163,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,163,255,0.05)_1px,transparent_1px)]" />
@@ -507,7 +507,7 @@ export default function AyandahaDigitalContact() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#1A1A1A] rounded-sm p-5 md:p-6">
+              <div className="bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-5 md:p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <FormInput
                     label="FULL NAME"
@@ -591,7 +591,7 @@ export default function AyandahaDigitalContact() {
               {/* Map - Smaller */}
               <div className="relative group">
                 <div className="absolute bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm" />
-                <div className="relative bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-[#1A1A1A] rounded-sm p-3 h-105 shadow-sm dark:shadow-sm dark:shadow-black/50">
+                <div className="relative bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-3 h-105 shadow-sm dark:shadow-sm ">
                   <div className="w-full h-full bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 rounded-sm flex items-center justify-center">
                     <div className="text-center w-full h-full">
                       <iframe
