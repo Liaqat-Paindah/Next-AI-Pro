@@ -1,12 +1,12 @@
 import { Suspense } from "react";
-import HomeMain from "@/components/home/page";
+import OpportunitiesPage from "@/components/scholarships/scholarshipList";
 import Loading from "@/app/loading";
 
-export default function Home() {
+export default function Opportunities() {
   return (
     <div>
       <Suspense fallback={<Loading />}>
-        <HomeMain />
+        <OpportunitiesPage />
       </Suspense>
     </div>
   );
