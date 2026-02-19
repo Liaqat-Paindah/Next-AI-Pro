@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSchalorships } from "@/hooks/useSchalorshps";
-import Loading from "@/app/(root)/loading";
+import Loading from "@/app/loading";
 
 // Define TypeScript interface for scholarship data
 interface Scholarship {

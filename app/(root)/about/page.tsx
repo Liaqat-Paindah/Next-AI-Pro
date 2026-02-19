@@ -1,12 +1,12 @@
 import { Suspense } from "react";
-import HomeMain from "@/components/home/page";
+import ABoutUS from "@/components/about/page";
 import Loading from "@/app/loading";
 
 export default function Home() {
   return (
     <div>
       <Suspense fallback={<Loading />}>
-        <HomeMain />
+        <ABoutUS />
       </Suspense>
     </div>
   );
