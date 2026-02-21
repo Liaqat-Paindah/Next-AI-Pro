@@ -18,6 +18,22 @@ export const usescholarships = () => {
 
 
 
+export const usescholarshipsLimit = () => {
+  return useQuery({
+    queryKey: ["scholarships"],
+    queryFn: async () => {
+      const response = await fetch("/api/scholarships/limit");
+      if (!response.ok) {
+        throw new Error("Failed to fetch scholarships");
+      }
+      return response.json();
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  });
+};
+
+
 export const useSearchScholarship = (
   search: string,
   title?: string,
