@@ -497,10 +497,10 @@ export default function AyandahaDigitalTeam() {
               variants={textVariants}
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 font-mono leading-tight"
             >
-              Digital{" "}
+              Team{" "}
               <span className="relative">
                 <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
-                  Architects
+                  Members
                 </span>
                 <motion.span
                   className="absolute -bottom-2 left-0 w-full h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
