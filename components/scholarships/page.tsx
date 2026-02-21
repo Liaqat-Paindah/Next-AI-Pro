@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Loading from "@/app/loading";
-import { usescholarships } from "@/hooks/useSchalorships";
+import { usescholarshipsLimit } from "@/hooks/useSchalorships";
 
 // Define TypeScript interface for scholarship data
 interface Scholarship {
@@ -106,11 +106,7 @@ const ValueIndicator = ({ value }: { value: string }) => (
 
 // Main Component
 export default function NexusScholarships() {
-  const { data: scholarshipsData, isPending, error } = usescholarships();
-
-  console.log("Raw scholarships data:", scholarshipsData);
-  console.log("Loading state:", isPending);
-  console.log("Error state:", error);
+  const { data: scholarshipsData, isPending, error } = usescholarshipsLimit();
 
   // Ensure scholarships is always an array
   const scholarships = useMemo(() => {
@@ -132,9 +128,6 @@ export default function NexusScholarships() {
     ) {
       return scholarshipsData.scholarships;
     }
-
-    // If data is an object, try to convert it to array or return empty
-    console.warn("Unexpected scholarships data format:", scholarshipsData);
     return [];
   }, [scholarshipsData]);
 
@@ -303,12 +296,12 @@ export default function NexusScholarships() {
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="mb-6"
+          className="mb-6 text-center"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-[#005B96] via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Global Scholarships
+              <h1 className="text-2xl sm:text-3xl  text-center font-bold bg-linear-to-r from-[#005B96] via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Recent Global Scholarships
               </h1>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                 Access fully funded opportunities at world-renowned universities
