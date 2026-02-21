@@ -15,7 +15,7 @@ export const useScholarshipFilters = (scholarshipsData: unknown) => {
     countries: [],
     fields: [],
     // keep internal values lowercase to match processing below
-    types: ["fully funded", "partial", "paid", "self funded"],
+    types: ["Fully Funded", "Partial", "Paid", "Self Funded"],
   });
 
   // Process scholarships data with proper typing
@@ -99,7 +99,7 @@ export const useScholarshipFilters = (scholarshipsData: unknown) => {
         levels: uniqueLevels,
         countries: uniqueCountries,
         fields: uniqueFields,
-        types: ["fully funded", "partial", "paid", "self funded"],
+        types: ["Fully funded", "Partial", "Paid", "Self funded"],
       });
     } else {
     }
@@ -186,11 +186,11 @@ export const useScholarshipFilters = (scholarshipsData: unknown) => {
       filtersList.push({
         key: "type",
         label: `Type: ${
-          filters.type === "fully funded"
+          filters.type === "Fully funded"
             ? "Fully Funded"
-            : filters.type === "partial"
+            : filters.type === "Partial"
               ? "Partial"
-              : filters.type === "paid"
+              : filters.type === "Paid"
                 ? "Paid"
                 : "Self Funded"
         }`,
