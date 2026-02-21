@@ -449,7 +449,7 @@ export default function AyandahaDigitalContact() {
             >
               Let is Start Your{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
-                Digital Journey
+                 Journey
               </span>
             </motion.h1>
 

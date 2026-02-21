@@ -15,8 +15,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useSchalorships } from "@/hooks/useSchalorshps";
 import Loading from "@/app/loading";
+import { usescholarships } from "@/hooks/useSchalorships";
 
 // Define TypeScript interface for scholarship data
 interface Scholarship {
@@ -106,7 +106,7 @@ const ValueIndicator = ({ value }: { value: string }) => (
 
 // Main Component
 export default function NexusScholarships() {
-  const { data: scholarshipsData, isPending, error } = useSchalorships();
+  const { data: scholarshipsData, isPending, error } = usescholarships();
 
   console.log("Raw scholarships data:", scholarshipsData);
   console.log("Loading state:", isPending);
