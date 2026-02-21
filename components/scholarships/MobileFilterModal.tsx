@@ -67,7 +67,7 @@ export const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     <option value="">All Types</option>
                     {filterOptions.types.map((type) => (
                       <option key={type} value={type}>
-                        {type === 'fully funded' ? 'Fully Funded' : 'Partial'}
+                        {type}
                       </option>
                     ))}
                   </select>
