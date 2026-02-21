@@ -137,7 +137,7 @@ export const ServiceCard = ({
 
 export default function Services() {
   return (
-    <section className="w-full py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+    <section className="w-full py-4 sm:py-12 md:py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section - Focused on Services */}
         <motion.div
