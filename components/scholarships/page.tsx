@@ -233,8 +233,6 @@ export default function NexusScholarships() {
               <div className="relative bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-gray-700 rounded-sm p-3 sm:p-4 h-full flex flex-col">
                 {/* Top accent with corner markers */}
                 <div className="relative mb-2 sm:mb-3">
-                  <div className="absolute top-0 left-0 w-1.5 h-1.5 sm:w-2 sm:h-2 lg:w-3 lg:h-3 border-t-2 border-l-2 border-[#00A3FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute top-0 right-0 w-1.5 h-1.5 sm:w-2 sm:h-2 lg:w-3 lg:h-3 border-t-2 border-r-2 border-[#7000FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
                   {/* Header with badges */}
                   <div className="flex items-start justify-between gap-2">
