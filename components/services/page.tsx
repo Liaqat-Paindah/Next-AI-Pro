@@ -100,8 +100,6 @@ export const ServiceCard = ({
           </motion.div>
 
           {/* Corner markers */}
-          <div className="absolute top-0 left-0 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-l-2 border-[#00A3FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <div className="absolute top-0 right-0 w-2 h-2 sm:w-3 sm:h-3 border-t-2 border-r-2 border-[#7000FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2 line-clamp-2">{title}</h3>
