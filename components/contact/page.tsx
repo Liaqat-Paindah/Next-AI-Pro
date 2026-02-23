@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import { useState, useEffect } from "react";
 import {
   motion,
@@ -293,7 +293,10 @@ const SuccessModal = ({
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center px-4"
       >
-        <div className="absolute inset-0  backdrop-blur-sm" onClick={onClose} />
+        <div
+          className="absolute inset-0  backdrop-blur-sm"
+          onClick={onClose}
+        />
 
         <motion.div
           initial={{ scale: 0.9, y: 20 }}
@@ -445,7 +448,7 @@ export default function AyandahaDigitalContact() {
             >
               Let is Start Your{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
-                Journey
+                 Journey
               </span>
             </motion.h1>
 

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Loading from "@/app/loading";
-import { usescholarshipsLimit } from "@/hooks/useSchalorships";
+import { UsescholarshipsLimit } from "@/hooks/useSchalorships";
 
 // Define TypeScript interface for scholarship data
 interface Scholarship {
@@ -85,7 +85,7 @@ const ValueIndicator = ({ value }: { value: string }) => {
 
 // Main Component
 export default function NexusScholarships() {
-  const { data: scholarshipsData, isPending, error } = usescholarshipsLimit();
+  const { data: scholarshipsData, isPending, error } = UsescholarshipsLimit();
 
   // Ensure scholarships is always an array
   const scholarships = useMemo(() => {

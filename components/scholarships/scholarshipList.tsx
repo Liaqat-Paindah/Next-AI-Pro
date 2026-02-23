@@ -220,7 +220,7 @@ export default function NexusScholarships() {
             <span className="text-xs text-slate-500 dark:text-slate-400">
               Active filters:
             </span>
-            {activeFilters.map((filter:any) => (
+            {activeFilters.map((filter) => (
               <ActiveFilterTag
                 key={filter.key}
                 label={filter.label}
@@ -254,7 +254,7 @@ export default function NexusScholarships() {
             layout
             className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
           >
-            {filteredScholarships.map((scholarship: any) => (
+            {filteredScholarships.map((scholarship) => (
               <ScholarshipCard
                 key={scholarship._id}
                 scholarship={scholarship}

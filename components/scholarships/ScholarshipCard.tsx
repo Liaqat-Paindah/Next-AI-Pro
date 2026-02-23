@@ -1,9 +1,17 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, CalendarDays, Clock, Share2, ExternalLink, Star } from "lucide-react";
+import {
+  MapPin,
+  CalendarDays,
+  Clock,
+  Share2,
+  ExternalLink,
+  Star,
+} from "lucide-react";
 import { Scholarship } from "@/types/scholarship";
 import { ScholarshipBadge } from "./ScholarshipBadge";
 import { ValueIndicator } from "@/components/scholarships/ValueIndicator";
+import Link from "next/link";
 
 interface ScholarshipCardProps {
   scholarship: Scholarship;
@@ -47,9 +55,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
           >
             <Star
               className={`w-4 h-4 ${
-                isSaved
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-slate-400"
+                isSaved ? "fill-yellow-400 text-yellow-400" : "text-slate-400"
               }`}
             />
           </button>
@@ -93,9 +99,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
           </div>
           <div className="flex items-center gap-1 text-xs p-1.5 bg-slate-50 dark:bg-gray-800/50 rounded col-span-2 text-slate-600 dark:text-slate-400">
             <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" />
-            <span>
-              {daysRemaining} days left
-            </span>
+            <span>{daysRemaining} days left</span>
           </div>
         </div>
 
@@ -123,11 +127,14 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
 
         {/* Action buttons */}
         <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-slate-100 dark:border-gray-700">
-          <button className="flex-1 flex items-center justify-center gap-1 text-white text-xs font-medium py-2 px-2.5 rounded bg-linear-to-r from-[#005B96] to-[#005B96] hover:from-[#03396C] hover:to-[#005B96] transition-all">
+          <Link
+            href={`/opportunities/${scholarship._id}`}
+            className="flex-1 flex cursor-pointer items-center justify-center gap-1 text-white text-xs font-medium py-2 px-2.5 rounded bg-linear-to-r from-[#005B96] to-[#005B96] hover:from-[#03396C] hover:to-[#005B96] transition-all"
+          >
             Apply & Details
             <ExternalLink className="w-3 h-3" />
-          </button>
-          <button className="p-2 border border-slate-200 dark:border-gray-700 rounded hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors">
+          </Link>
+          <button className="p-2 border border-slate-200 cursor-pointer dark:border-gray-700 rounded hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors">
             <Share2 className="w-3 h-3 text-slate-500 dark:text-slate-400" />
           </button>
         </div>
