@@ -16,6 +16,7 @@ import {
 import { motion } from "framer-motion";
 import Loading from "@/app/loading";
 import { UsescholarshipsLimit } from "@/hooks/useSchalorships";
+import Link from "next/link";
 
 // Define TypeScript interface for scholarship data
 interface Scholarship {
@@ -37,8 +38,8 @@ const textVariants = {
   visible: (custom: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: custom * 0.2, duration: 0.6 }
-  })
+    transition: { delay: custom * 0.2, duration: 0.6 },
+  }),
 };
 
 // Scholarship Badge
@@ -46,10 +47,7 @@ const ScholarshipBadge = ({ type }: { type: string }) => {
   const isFull = type === "fully funded";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-    >
+    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
       <motion.div
         whileHover={{ scale: 1.02 }}
         className={`
@@ -70,8 +68,9 @@ const ScholarshipBadge = ({ type }: { type: string }) => {
 
 // Value Indicator with capitalized level
 const ValueIndicator = ({ value }: { value: string }) => {
-  const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-  
+  const capitalizedValue =
+    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+
   return (
     <motion.div
       whileHover={{ scale: 1.01, x: 2 }}
@@ -210,8 +209,8 @@ export default function NexusScholarships() {
             variants={textVariants}
             className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-light px-2 sm:px-4"
           >
-            Access fully funded opportunities at world-renowned universities
-            and transform your educational future with our digital platform.
+            Access fully funded opportunities at world-renowned universities and
+            transform your educational future with our digital platform.
           </motion.p>
         </motion.div>
 
@@ -233,7 +232,6 @@ export default function NexusScholarships() {
               <div className="relative bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-gray-700 rounded-sm p-3 sm:p-4 h-full flex flex-col">
                 {/* Top accent with corner markers */}
                 <div className="relative mb-2 sm:mb-3">
-                  
                   {/* Header with badges */}
                   <div className="flex items-start justify-between gap-2">
                     <ScholarshipBadge type={scholarship.type} />
@@ -281,7 +279,9 @@ export default function NexusScholarships() {
                 <div className="grid grid-cols-2 gap-1 sm:gap-1.5 mb-2 sm:mb-3">
                   <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-600 dark:text-gray-400">
                     <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
-                    <span className="truncate text-xs">{scholarship.country}</span>
+                    <span className="truncate text-xs">
+                      {scholarship.country}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-600 dark:text-gray-400">
                     <CalendarDays className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
@@ -291,7 +291,9 @@ export default function NexusScholarships() {
                   </div>
                   <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm col-span-2 text-gray-600 dark:text-gray-400">
                     <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
-                    <span className="text-xs">{daysRemaining(scholarship.deadline)} days remaining</span>
+                    <span className="text-xs">
+                      {daysRemaining(scholarship.deadline)} days remaining
+                    </span>
                   </div>
                 </div>
 
@@ -300,12 +302,15 @@ export default function NexusScholarships() {
 
                 {/* Action Buttons - Responsive */}
                 <div className="flex items-center gap-1 sm:gap-1.5 mt-1 sm:mt-2 pt-1.5 sm:pt-2 border-t border-gray-100 dark:border-gray-800">
-                  <button className="flex-1 flex items-center justify-center gap-1 text-white text-xs font-medium py-1.5 sm:py-2 px-2 sm:px-2.5 rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] hover:from-[#0096f0] hover:to-[#6600e6] transition-all">
-                    Apply Now
+                  <Link
+                    href={`/opportunities/${scholarship._id}`}
+                    className="flex-1 flex items-center justify-center gap-1 cursor-pointer text-white text-xs font-medium py-1.5 sm:py-2 px-2 sm:px-2.5 rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] hover:from-[#0096f0] hover:to-[#6600e6] transition-all"
+                  >
+                    Details
                     <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                  </button>
-                  <button 
-                    className="p-1.5 sm:p-2 border border-gray-200 dark:border-gray-700 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  </Link>
+                  <button
+                    className="p-1.5 sm:p-2 border border-gray-200 cursor-pointer dark:border-gray-700 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     aria-label="Share scholarship"
                   >
                     <Share2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-500 dark:text-gray-400" />

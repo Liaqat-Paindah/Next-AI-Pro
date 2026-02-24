@@ -510,9 +510,6 @@ const StatCard = ({ icon, label, value }: StatCardProps) => {
   );
 };
 
-
-
-
 const ScholarshipDetails = () => {
   const params = useParams();
   const id = params?.id;
@@ -697,13 +694,15 @@ const ScholarshipDetails = () => {
                 {scholarship.title}
               </h1>
               <div className="flex justify-end items-center gap-2 w-full">
- 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Link
-                    href={'/login'}
+                    href={"/auth/login"}
                     className="flex items-center justify-center gap-2 bg-linear-to-r from-[#6ABAE1] to-purple-600 text-white px-4 py-2 rounded-sm text-sm  hover:shadow-sm transition-all group"
                   >
-                    Apply Now
+                    Register Now
                     <Icons.External className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </motion.div>
