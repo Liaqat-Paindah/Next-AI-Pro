@@ -169,10 +169,6 @@ const Footer = () => {
         />
       </div>
 
-      {/* Gradient orbs */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#00A3FF]/5 dark:bg-[#00A3FF]/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#7000FF]/5 dark:bg-[#7000FF]/5 rounded-full blur-3xl" />
-
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
           variants={containerVariants}
