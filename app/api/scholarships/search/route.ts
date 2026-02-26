@@ -12,8 +12,9 @@ export async function GET(req: Request) {
     const level = searchParams.get("level");
     const country = searchParams.get("country"); // country
     const fieldOfStudy = searchParams.get("fieldOfStudy");
-
-    let query: any = {};
+    /* eslint-disable */
+    const query: any = {};
+    /* eslint-enable */
     if (type) query.type = type;
     if (level) query.level = level;
     if (fieldOfStudy) query.fieldOfStudy = { $in: [fieldOfStudy] };
@@ -40,11 +41,11 @@ export async function GET(req: Request) {
       },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || "Internal Server Error",
+        message: "Internal Server Error",
       },
       { status: 500 },
     );
