@@ -2,18 +2,12 @@ import mongoose from "mongoose";
 
 const ScholarshipApplicationSchema = new mongoose.Schema(
   {
-    // =========================
-    // System Fields
-    // =========================
-    applicationId: { type: String, unique: true, required: true },
     userId: { type: String }, // Link to user account
     status: {
       type: String,
       enum: ["draft", "submitted", "under_review", "approved", "rejected"],
       default: "draft",
     },
-    completionPercentage: { type: Number, default: 0 },
-    notes: String,
 
     personal: {
       age: {
@@ -35,13 +29,13 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         enum: ["Single", "Married"],
       },
 
-      first_Name: {
+      firstName: {
         type: String,
         required: true,
         trim: true,
       },
 
-      last_name: {
+      lastName: {
         type: String,
         required: true,
         trim: true,
@@ -88,19 +82,62 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
-    education: [
-      {
-        degree: String, // Bachelor, Master, PhD, etc.
-        fieldOfStudy: String,
-        universityName: String,
-        gpa: Number,
-        academicRank: String,
-        graduationYear: Number,
-        educationGapExplanation: String, // Optional gap explanation
-        thesisTopic: String,
-        majorSubjects: [String],
-      },
-    ],
+
+
+
+
+
+
+
+
+
+
+
+
+    
+education: [
+  {
+    level: {
+      type: String,
+      enum: ["Master", "Bachelor", "PHD", "HighSchool"],
+      required: true,
+    },
+    fieldOfStudy: { type: String, required: true },
+    institutionName: { type: String, required: true },
+    gpa: { type: Number, required: true },
+    academicRank: { type: String }, // Optional rank
+    startDate: { type: Date, required: true },
+    graduationDate: { type: Date, required: true },
+    educationGapExplanation: { type: String }, // optional
+    thesisTopic: { type: String }, // optional
+    thesisFileUrl: { type: String }, // optional
+    diplomaFileUrl: { type: String }, // optional
+    transcriptFileUrl: { type: String }, // optional
+    finalExamYear: { type: Number }, // for high school: KanKoor year
+    finalExamScore: { type: Number }, // for high school: KanKoor score
+    majorSubjects: [String], // optional
+  },
+],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // =========================
     // 2. Research Activities
@@ -280,7 +317,5 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model(
-  "ScholarshipApplication",
-  ScholarshipApplicationSchema,
-);
+export default mongoose.models.ScholarshipApplication || 
+       mongoose.model("ScholarshipApplication", ScholarshipApplicationSchema);

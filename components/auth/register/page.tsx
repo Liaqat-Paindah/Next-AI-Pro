@@ -105,7 +105,7 @@ export default function RegisterForm() {
 
           if (signInResult?.ok) {
             toast.success("Account created successfully!");
-            router.push("/dashboard");
+            router.push("/dashboard/application");
           }
         } else {
           toast.error(data.message || "Registration failed");
