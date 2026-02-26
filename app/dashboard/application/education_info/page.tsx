@@ -1,13 +1,13 @@
 import Loading from "@/app/loading";
 import React from "react";
 import { Suspense } from "react";
-import Personal from "@/components/dashboard/application/Personal_info";
+import Education from "@/components/dashboard/application/Education_info";
 
 const Application = () => {
   return (
     <div>
       <Suspense fallback={<Loading />}>
-        <Personal />
+        <Education />
       </Suspense>
     </div>
   );

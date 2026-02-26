@@ -2,18 +2,12 @@ import mongoose from "mongoose";
 
 const ScholarshipApplicationSchema = new mongoose.Schema(
   {
-    // =========================
-    // System Fields
-    // =========================
-    applicationId: { type: String, unique: true, required: true },
     userId: { type: String }, // Link to user account
     status: {
       type: String,
       enum: ["draft", "submitted", "under_review", "approved", "rejected"],
       default: "draft",
     },
-    completionPercentage: { type: Number, default: 0 },
-    notes: String,
 
     personal: {
       age: {
@@ -35,13 +29,13 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         enum: ["Single", "Married"],
       },
 
-      first_Name: {
+      firstName: {
         type: String,
         required: true,
         trim: true,
       },
 
-      last_name: {
+      lastName: {
         type: String,
         required: true,
         trim: true,
@@ -88,6 +82,19 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
+
+
+
+
+
+
+
+
+
+
+
+
+    
     education: [
       {
         degree: String, // Bachelor, Master, PhD, etc.
@@ -280,7 +287,5 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
   },
 );
 
-export default mongoose.model(
-  "ScholarshipApplication",
-  ScholarshipApplicationSchema,
-);
+export default mongoose.models.ScholarshipApplication || 
+       mongoose.model("ScholarshipApplication", ScholarshipApplicationSchema);

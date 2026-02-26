@@ -264,10 +264,8 @@ export default function Personal() {
     if (status === "authenticated" && UserSession?.user) {
       setValue("phone", UserSession.user.phone || "");
       setValue("email", UserSession.user.email || "");
-      setValue("first_Name", UserSession.user.first_name || "");
+      setValue("first_name", UserSession.user.first_name || "");
       setValue("last_name", UserSession.user.last_name || "");
-
-      
     }
   }, [status, UserSession, setValue]);
 
@@ -281,7 +279,6 @@ export default function Personal() {
   const submit = (data: PersonalInfoFormData) => {
     mutation.mutate(data);
   };
-
   return (
     <>
       <DigitalCursor />
@@ -340,11 +337,11 @@ export default function Personal() {
                   <FormInput
                     label="First Name"
                     type="text"
-                    id="first_Name"
+                    id="first_name"
                     placeholder="Enter your first name"
                     required
                     register={register}
-                    error={errors.first_Name}
+                    error={errors.first_name}
                     icon={<Icons.User className="w-4 h-4" />}
                   />
 
@@ -506,7 +503,7 @@ export default function Personal() {
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 mt-6  border-gray-200 dark:border-[#064e78]">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 mt-6   dark:border-[#064e78]">
                   <motion.button
                     type="button"
                     onClick={() => router.back()}
@@ -515,7 +512,7 @@ export default function Personal() {
                     className="flex-1 relative group"
                   >
                     <div className="absolute -inset-0.5 bg-linear-to-r from-gray-400 to-gray-600 rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500 " />
-                    <div className="relative px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-[#064e78]">
+                    <div className="relative px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2  dark:border-[#064e78]">
                       <span>Back</span>
                     </div>
                   </motion.button>
@@ -540,7 +537,7 @@ export default function Personal() {
                             }}
                             className="w-4 h-4 border-white border-t-transparent rounded-sm"
                           />
-                          <span>SAVING...</span>
+                          <span>Continue...</span>
                         </>
                       ) : (
                         <>
