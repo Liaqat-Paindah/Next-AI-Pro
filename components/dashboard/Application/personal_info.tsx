@@ -163,6 +163,7 @@ const FormInput = ({
   required,
   register,
   error,
+  disabled,
   icon,
 }: FormInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -194,9 +195,12 @@ const FormInput = ({
             {...register(id)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            disabled={disabled}
             className={`w-full ${icon ? "pl-10" : "px-3"} py-2.5 text-sm bg-white dark:bg-[#011b2b] border ${
               error ? "border-red-500" : "border-gray-200 dark:border-[#064e78]"
-            } rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light appearance-none`}
+            } rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light appearance-none ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {placeholder && <option value="">{placeholder}</option>}
             {id === "gender" && (
@@ -220,22 +224,50 @@ const FormInput = ({
             placeholder={placeholder}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            disabled={disabled}
             className={`w-full ${icon ? "pl-10" : "px-3"} py-2.5 text-sm bg-white dark:bg-[#011b2b] border ${
               error ? "border-red-500" : "border-gray-200 dark:border-[#064e78]"
-            } rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light`}
+            } rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           />
         )}
 
         {/* Digital Underline Effect */}
-        <motion.div
-          className="absolute -bottom-px left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
-          initial={{ width: "0%" }}
-          animate={{ width: isFocused ? "100%" : "0%" }}
-          transition={{ duration: 0.3 }}
-        />
+        {!disabled && (
+          <motion.div
+            className="absolute -bottom-px left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
+            initial={{ width: "0%" }}
+            animate={{ width: isFocused ? "100%" : "0%" }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
       </div>
 
       {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
+    </motion.div>
+  );
+};
+
+// Static Email Display Component
+const StaticEmailDisplay = ({ email, icon }: { email: string; icon: React.ReactNode }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative"
+    >
+      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+        Email <span className="text-[#00A3FF] ml-1">*</span>
+      </label>
+      <div className="relative">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          {icon}
+        </div>
+        <div className="w-full pl-10 pr-3 py-2.5 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-[#064e78] rounded-sm text-gray-900 dark:text-white flex items-center">
+          {email}
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -279,16 +311,17 @@ export default function Personal() {
   const submit = (data: PersonalInfoFormData) => {
     mutation.mutate(data);
   };
+
   return (
     <>
       <DigitalCursor />
 
-      <section className="relative w-full min-h-screen overflow-hidden py-8">
+      <section className="relative w-full overflow-hidden py-2">
         {/* Digital Grid Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[linear-linear(rgba(0,163,255,0.03)_1px,transparent_1px),linear-linear(90deg,rgba(0,163,255,0.03)_1px,transparent_1px)] bg-size-32px_32px dark:bg-[linear-linear(rgba(0,163,255,0.05)_1px,transparent_1px),linear-linear(90deg,rgba(0,163,255,0.05)_1px,transparent_1px)]" />
+          <div className="" />
 
-          {/* linear Orbs */}
+          {/* Gradient Orbs */}
           <motion.div
             className="absolute top-20 left-10 w-96 h-96 bg-[#00A3FF]/10 dark:bg-[#00A3FF]/5 rounded-full blur-3xl"
             animate={{
@@ -318,7 +351,7 @@ export default function Personal() {
           />
         </div>
 
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative container">
           {/* Form Card */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -330,10 +363,11 @@ export default function Personal() {
               <form onSubmit={handleSubmit(submit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4 md:col-span-2">
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-white  tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
                       Personal Details
                     </h3>
                   </div>
+                  
                   <FormInput
                     label="First Name"
                     type="text"
@@ -489,21 +523,18 @@ export default function Personal() {
                     icon={<Icons.Phone className="w-4 h-4" />}
                   />
 
-                  <FormInput
-                    label="Email"
-                    type="email"
-                    id="email"
-                    placeholder="Enter your email"
-                    required
-                    register={register}
-                    error={errors.email}
-                    disabled={true}
+                  {/* Static Email Display - Non-editable */}
+                  <StaticEmailDisplay 
+                    email={UserSession?.user?.email || ""} 
                     icon={<Icons.Mail className="w-4 h-4" />}
                   />
+                  
+                  {/* Hidden input to submit email with form */}
+                  <input type="hidden" {...register("email")} value={UserSession?.user?.email || ""} />
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 mt-6   dark:border-[#064e78]">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-gray-200 dark:border-[#064e78]">
                   <motion.button
                     type="button"
                     onClick={() => router.back()}
@@ -511,8 +542,8 @@ export default function Personal() {
                     whileTap={{ scale: 0.98 }}
                     className="flex-1 relative group"
                   >
-                    <div className="absolute -inset-0.5 bg-linear-to-r from-gray-400 to-gray-600 rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500 " />
-                    <div className="relative px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2  dark:border-[#064e78]">
+                    <div className="absolute -inset-0.5  rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
+                    <div className="relative px-4 py-2  dark:bg-[#076094] text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2  dark:border-[#5fb7e9]">
                       <span>Back</span>
                     </div>
                   </motion.button>
@@ -524,7 +555,7 @@ export default function Personal() {
                     whileTap={{ scale: 0.98 }}
                     className="flex-1 relative group"
                   >
-                    <div className="absolute -inset-0.5 bg-linear-to-r  rounded-sm opacity-75 group-hover:opacity-100 " />
+                    <div className="absolute -inset-0.5  rounded-sm opacity-75 group-hover:opacity-100" />
                     <div className="relative px-4 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm font-medium text-sm flex items-center justify-center gap-2">
                       {mutation.isPending ? (
                         <>
@@ -535,7 +566,7 @@ export default function Personal() {
                               repeat: Infinity,
                               ease: "linear",
                             }}
-                            className="w-4 h-4 border-white border-t-transparent rounded-sm"
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                           />
                           <span>Continue...</span>
                         </>

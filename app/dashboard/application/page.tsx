@@ -1,7 +1,7 @@
 import Loading from "@/app/loading";
 import React from "react";
 import { Suspense } from "react";
-import Personal from "@/components/dashboard/application/Personal_info";
+import Personal from "@/components/dashboard/application/personal_info";
 
 const Application = () => {
   return (

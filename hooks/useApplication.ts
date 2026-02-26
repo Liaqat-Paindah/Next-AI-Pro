@@ -19,8 +19,8 @@ export const UsePersonalInformation = () => {
       toast.success("Personal information has been successfully saved");
       router.push("/dashboard/application/education_info");
     },
-    onError: (error) => {
-      toast.error(`Failed to save personal information, ${error}`);
+    onError: () => {
+      toast.error(`Failed to save personal information`);
     },
   });
 };
