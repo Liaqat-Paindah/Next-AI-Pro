@@ -96,7 +96,7 @@ const updatedUser = await User.findOneAndUpdate(
       application = await Applications.create(
         [
           {
-            userId: updatedUser._id,
+            userId: updatedUser._id.toString(),
             status: "draft",
             personal: {
               firstName: first_name,

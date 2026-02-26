@@ -1,12 +1,12 @@
 import { z } from "zod";
+import type { FieldError, FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import type { ReactNode } from "react";
 
 export const personalInfoSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   fatherName: z.string().min(1, "Father name is required"),
-  age: z
-    .number({ message: "Age is required" })
-    .min(1, "Age must be at least 1"),
+  age: z.number({ message: "Age is required" }).min(1, "Age must be at least 1"),
   gender: z.string().min(1, "gender is required"),
   maritalStatus: z.string().min(1, "Marital Status is required"),
   birthDate: z.string().min(1, "Birth date is required"),
@@ -20,3 +20,119 @@ export const personalInfoSchema = z.object({
 });
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
+
+export const masterEducationSchema = z.object({
+  fieldOfStudy: z.string().min(1, "Field of study is required"),
+  institutionName: z.string().min(1, "Institution name is required"),
+  gpa: z.number().min(0).max(4, "GPA must be between 0 and 4"),
+  academicRank: z.string().optional(),
+  startDate: z.string().min(1, "Start date is required"),
+  graduationDate: z.string().min(1, "Graduation date is required"),
+  thesisTopic: z.string().optional(),
+  thesisFile: z.any().optional(),
+  diplomaFile: z.any().optional(),
+  transcriptFile: z.any().optional(),
+});
+
+export const bachelorEducationSchema = z.object({
+  fieldOfStudy: z.string().min(1, "Field of study is required"),
+  institutionName: z.string().min(1, "Institution name is required"),
+  gpa: z.number().min(0).max(4, "GPA must be between 0 and 4"),
+  academicRank: z.string().optional(),
+  startDate: z.string().min(1, "Start date is required"),
+  graduationDate: z.string().min(1, "Graduation date is required"),
+  diplomaFile: z.any().optional(),
+  transcriptFile: z.any().optional(),
+});
+
+export const highSchoolEducationSchema = z.object({
+  fieldOfStudy: z.string().min(1, "Field of study is required"),
+  institutionName: z.string().min(1, "Institution name is required"),
+  gpa: z.number().min(50, "Average Marks must be between 0 and 100"),
+  academicRank: z.string().optional(),
+  startDate: z.string().min(1, "Start date is required"),
+  graduationDate: z.string().min(1, "Graduation date is required"),
+  finalExamYear: z.number().optional(),
+  finalExamScore: z.number().optional(),
+  diplomaFile: z.any().optional(),
+  transcriptFile: z.any().optional(),
+});
+
+export const educationSchema = z
+  .object({
+    level: z.enum(["Master", "Bachelor", "PHD", "HighSchool"]),
+  })
+  .merge(masterEducationSchema)
+  .extend({
+    bachelorEducation: z.array(bachelorEducationSchema).optional(),
+    highSchoolEducation: z.array(highSchoolEducationSchema).optional(),
+  });
+
+export type EducationFormData = z.infer<typeof educationSchema>;
+export type MasterEducation = z.infer<typeof masterEducationSchema>;
+export type BachelorEducation = z.infer<typeof bachelorEducationSchema>;
+export type HighSchoolEducation = z.infer<typeof highSchoolEducationSchema>;
+
+export type FormSelectOption = {
+  value: string;
+  label: string;
+};
+
+export interface FormInputProps<T extends FieldValues> {
+  label: string;
+  type: string;
+  id: string;
+  placeholder?: string;
+  required?: boolean;
+  register: UseFormRegister<T>;
+  error?: FieldError;
+  disabled?: boolean;
+  icon?: ReactNode;
+  options?: FormSelectOption[];
+}
+
+export interface EducationSectionProps<TFields extends FieldValues> {
+  prefix: string;
+  register: UseFormRegister<EducationFormData>;
+  errors?: FieldErrors<TFields>;
+  onRemove?: () => void;
+}
+
+export interface MasterEducationProps extends EducationSectionProps<EducationFormData> {
+  showThesis?: boolean;
+}
+
+export type BachelorEducationProps = EducationSectionProps<BachelorEducation>;
+
+export type HighSchoolEducationProps = EducationSectionProps<HighSchoolEducation> & {
+  showFinalExam?: boolean;
+};
+
+export interface FileUploadProps {
+  id: string;
+  label: string;
+  accept?: Record<string, string[]>;
+  onFileAccepted: (file: File) => void;
+  onFileRemove?: () => void;
+  error?: string | { message?: string };
+  icon?: ReactNode;
+  currentFile?: File | null;
+}
+
+
+// In @/types/application
+export interface EducationFormDataField {
+  level: "PHD" | "Master" | "Bachelor" | "HighSchool";
+  masterEducation?: {
+    fieldOfStudy: string;
+    institutionName: string;
+    gpa: number;
+    startDate: string;
+    graduationDate: string;
+    thesisTitle?: string;
+    // other master fields
+  };
+  bachelorEducation?: BachelorEducation[];
+  highSchoolEducation?: HighSchoolEducation[];
+  // other fields
+}

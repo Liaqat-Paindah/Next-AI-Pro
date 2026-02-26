@@ -95,19 +95,49 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
 
 
     
-    education: [
-      {
-        degree: String, // Bachelor, Master, PhD, etc.
-        fieldOfStudy: String,
-        universityName: String,
-        gpa: Number,
-        academicRank: String,
-        graduationYear: Number,
-        educationGapExplanation: String, // Optional gap explanation
-        thesisTopic: String,
-        majorSubjects: [String],
-      },
-    ],
+education: [
+  {
+    level: {
+      type: String,
+      enum: ["Master", "Bachelor", "PHD", "HighSchool"],
+      required: true,
+    },
+    fieldOfStudy: { type: String, required: true },
+    institutionName: { type: String, required: true },
+    gpa: { type: Number, required: true },
+    academicRank: { type: String }, // Optional rank
+    startDate: { type: Date, required: true },
+    graduationDate: { type: Date, required: true },
+    educationGapExplanation: { type: String }, // optional
+    thesisTopic: { type: String }, // optional
+    thesisFileUrl: { type: String }, // optional
+    diplomaFileUrl: { type: String }, // optional
+    transcriptFileUrl: { type: String }, // optional
+    finalExamYear: { type: Number }, // for high school: KanKoor year
+    finalExamScore: { type: Number }, // for high school: KanKoor score
+    majorSubjects: [String], // optional
+  },
+],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // =========================
     // 2. Research Activities
