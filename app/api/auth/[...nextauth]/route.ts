@@ -14,6 +14,7 @@ declare module "next-auth" {
     last_name?: string;
     phone?: string;
     avatar?: string;
+    role?: string
   }
 
   interface Session {
@@ -74,6 +75,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: user.user.email,
             first_name: user.user.first_name,
             last_name: user.user.last_name,
+            phone: user.user.phone,
             role: user.user.role,
             avatar: user.user.avatar,
           };
@@ -91,6 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.last_name = user.last_name;
         token.phone = user.phone;
         token.avatar = user.avatar;
+        token.role = user.role;
       }
       return token;
     },

@@ -7,29 +7,84 @@ import { useState } from "react";
 // Icons component to match the Services pattern
 const Icons = {
   Location: ({ className }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+      />
     </svg>
   ),
   Email: ({ className }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
     </svg>
   ),
   Phone: ({ className }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+      />
     </svg>
   ),
   Check: ({ className }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M5 13l4 4L19 7"
+      />
     </svg>
   ),
   ArrowRight: ({ className }: { className?: string }) => (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M9 5l7 7-7 7"
+      />
     </svg>
   ),
 };
@@ -99,21 +154,20 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-white dark:bg-[#011b2b] border-t border-gray-200 dark:border-[#064e78] overflow-hidden">
+    <footer className="">
       {/* Digital grid background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
+      <div className=" inset-0 opacity-5">
+        <div
+          className=" inset-0"
+          style={{
+            backgroundImage: `
             linear-gradient(to right, #00A3FF 1px, transparent 1px),
             linear-gradient(to bottom, #7000FF 1px, transparent 1px)
           `,
-          backgroundSize: '50px 50px'
-        }} />
+            backgroundSize: "50px 50px",
+          }}
+        />
       </div>
-
-      {/* Gradient orbs */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#00A3FF]/5 dark:bg-[#00A3FF]/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#7000FF]/5 dark:bg-[#7000FF]/5 rounded-full blur-3xl" />
 
       <div className="container px-4 mx-auto relative z-10">
         <motion.div
@@ -158,18 +212,16 @@ const Footer = () => {
                 students to achieve their international education dreams through
                 expert guidance and comprehensive scholarship support.
               </p>
-
- 
             </motion.div>
 
             {/* Quick Links */}
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <h3 className="text-gray-900 dark:text-white font-semibold text-sm uppercase tracking-wider mb-5 relative inline-block">
                 Quick Links
-                <motion.div 
+                <motion.div
                   className="absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
                   initial={{ width: 0 }}
-                  whileInView={{ width: '100%' }}
+                  whileInView={{ width: "100%" }}
                   transition={{ delay: 0.3, duration: 0.5 }}
                 />
               </h3>
@@ -182,9 +234,13 @@ const Footer = () => {
                       onMouseLeave={() => setHoveredLink(null)}
                       className="group flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#00A3FF] dark:hover:text-[#00A3FF] text-sm transition-colors duration-200"
                     >
-                      <Icons.ArrowRight className={`w-3 h-3 transition-all duration-300 ${
-                        hoveredLink === link.name ? 'translate-x-1 opacity-100' : 'opacity-0'
-                      }`} />
+                      <Icons.ArrowRight
+                        className={`w-3 h-3 transition-all duration-300 ${
+                          hoveredLink === link.name
+                            ? "translate-x-1 opacity-100"
+                            : "opacity-0"
+                        }`}
+                      />
                       <span>{link.name}</span>
                     </Link>
                   </li>
@@ -196,10 +252,10 @@ const Footer = () => {
             <motion.div variants={itemVariants} className="lg:col-span-2">
               <h3 className="text-gray-900 dark:text-white font-semibold text-sm uppercase tracking-wider mb-5 relative inline-block">
                 Support
-                <motion.div 
+                <motion.div
                   className="absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
                   initial={{ width: 0 }}
-                  whileInView={{ width: '100%' }}
+                  whileInView={{ width: "100%" }}
                   transition={{ delay: 0.4, duration: 0.5 }}
                 />
               </h3>
@@ -212,9 +268,13 @@ const Footer = () => {
                       onMouseLeave={() => setHoveredLink(null)}
                       className="group flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-[#7000FF] dark:hover:text-[#7000FF] text-sm transition-colors duration-200"
                     >
-                      <Icons.ArrowRight className={`w-3 h-3 transition-all duration-300 ${
-                        hoveredLink === link.name ? 'translate-x-1 opacity-100' : 'opacity-0'
-                      }`} />
+                      <Icons.ArrowRight
+                        className={`w-3 h-3 transition-all duration-300 ${
+                          hoveredLink === link.name
+                            ? "translate-x-1 opacity-100"
+                            : "opacity-0"
+                        }`}
+                      />
                       <span>{link.name}</span>
                     </Link>
                   </li>
@@ -226,10 +286,10 @@ const Footer = () => {
             <motion.div variants={itemVariants} className="lg:col-span-4">
               <h3 className="text-gray-900 dark:text-white font-semibold text-sm uppercase tracking-wider mb-5 relative inline-block">
                 Contact Us
-                <motion.div 
+                <motion.div
                   className="absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
                   initial={{ width: 0 }}
-                  whileInView={{ width: '100%' }}
+                  whileInView={{ width: "100%" }}
                   transition={{ delay: 0.5, duration: 0.5 }}
                 />
               </h3>
@@ -245,7 +305,7 @@ const Footer = () => {
                   >
                     {/* Digital border effect on hover */}
                     <div className="absolute -inset-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-                    
+
                     <div className="relative flex items-start gap-3 p-2">
                       <div className="w-10 h-10 flex items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF]/10 to-[#7000FF]/10 border border-[#00A3FF]/30 text-[#00A3FF] dark:text-[#00A3FF] group-hover:scale-110 transition-transform duration-300">
                         {item.icon}
@@ -254,7 +314,7 @@ const Footer = () => {
                         <p className="text-[#00A3FF] dark:text-[#00A3FF] text-xs font-medium">
                           {item.label}
                         </p>
-                        {item.type === 'link' ? (
+                        {item.type === "link" ? (
                           <a
                             href={item.href}
                             className="text-gray-900 dark:text-white text-sm hover:text-[#7000FF] dark:hover:text-[#7000FF] transition-colors duration-200"
@@ -294,13 +354,14 @@ const Footer = () => {
               <div className="relative group">
                 <div className="absolute -inset-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
                 <p className="relative text-gray-600 dark:text-gray-400 text-xs text-center md:text-left px-3 py-1">
-                  © {currentYear} Ayandaha Educational Consultancy. All rights reserved.
+                  © {currentYear} Ayandaha Educational Consultancy. All rights
+                  reserved.
                 </p>
               </div>
 
               {/* Legal Links with digital style */}
               <div className="flex items-center gap-6">
-                {['Privacy', 'Terms', 'Cookies'].map((item, index) => (
+                {["Privacy", "Terms", "Cookies"].map((item) => (
                   <Link
                     key={item}
                     href={`/${item.toLowerCase()}-policy`}
@@ -312,7 +373,7 @@ const Footer = () => {
                     <motion.div
                       className="absolute bottom-0 left-0 h-px bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
                       initial={{ width: 0 }}
-                      whileHover={{ width: '100%' }}
+                      whileHover={{ width: "100%" }}
                       transition={{ duration: 0.3 }}
                     />
                   </Link>

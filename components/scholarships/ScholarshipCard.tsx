@@ -131,7 +131,7 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
             href={`/opportunities/${scholarship._id}`}
             className="flex-1 flex cursor-pointer items-center justify-center gap-1 text-white text-xs font-medium py-2 px-2.5 rounded bg-linear-to-r from-[#005B96] to-[#005B96] hover:from-[#03396C] hover:to-[#005B96] transition-all"
           >
-            Apply & Details
+             Details
             <ExternalLink className="w-3 h-3" />
           </Link>
           <button className="p-2 border border-slate-200 cursor-pointer dark:border-gray-700 rounded hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors">

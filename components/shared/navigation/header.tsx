@@ -200,7 +200,7 @@ const Header = () => {
 
               <div className="hidden md:flex md:items-center md:space-x-1.5">
                 <Link
-                  href="/auth/login"
+                  href="/auth/register"
                   className="relative px-3.5 py-1.5 lg:px-4 lg:py-2 text-xs lg:text-sm font-medium text-[#03396C] dark:text-[#D8F0F4] rounded-sm
                     border border-[#6ABAE1]/30 hover:border-[#6ABAE1] dark:border-[#D8F0F4]/30
                     transition-all duration-300 hover:shadow-lg hover:shadow-[#6ABAE1]/20
@@ -208,7 +208,7 @@ const Header = () => {
                     hover:from-[#D8F0F4]/20 hover:to-transparent
                     overflow-hidden group/btn"
                 >
-                  <span className="relative z-10">Sign In</span>
+                  <span className="relative z-10">Register</span>
                   <div className="absolute inset-0 bg-linear-to-r from-[#6ABAE1]/0 via-[#6ABAE1]/10 to-[#6ABAE1]/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
                 </Link>
               </div>

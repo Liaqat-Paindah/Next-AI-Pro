@@ -1,0 +1,286 @@
+import mongoose from "mongoose";
+
+const ScholarshipApplicationSchema = new mongoose.Schema(
+  {
+    // =========================
+    // System Fields
+    // =========================
+    applicationId: { type: String, unique: true, required: true },
+    userId: { type: String }, // Link to user account
+    status: {
+      type: String,
+      enum: ["draft", "submitted", "under_review", "approved", "rejected"],
+      default: "draft",
+    },
+    completionPercentage: { type: Number, default: 0 },
+    notes: String,
+
+    personal: {
+      age: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 100,
+      },
+
+      gender: {
+        type: String,
+        required: true,
+        enum: ["Male", "Female", "Other"],
+      },
+
+      maritalStatus: {
+        type: String,
+        required: true,
+        enum: ["Single", "Married"],
+      },
+
+      first_Name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      last_name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      fatherName: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      birthDate: {
+        type: Date,
+        required: true,
+      },
+
+      nationality: {
+        type: String,
+        required: true,
+      },
+
+      nationalId: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+      },
+
+      passportId: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+      },
+
+      dateofIssue: {
+        type: Date,
+        required: true,
+      },
+
+      dataofExpire: {
+        type: Date,
+        required: true,
+      },
+    },
+
+    education: [
+      {
+        degree: String, // Bachelor, Master, PhD, etc.
+        fieldOfStudy: String,
+        universityName: String,
+        gpa: Number,
+        academicRank: String,
+        graduationYear: Number,
+        educationGapExplanation: String, // Optional gap explanation
+        thesisTopic: String,
+        majorSubjects: [String],
+      },
+    ],
+
+    // =========================
+    // 2. Research Activities
+    // =========================
+    research: {
+      articles: [
+        { title: String, journal: String, link: String, hasDocument: Boolean },
+      ],
+      projects: [{ title: String, hasDocument: Boolean }],
+      conferences: [{ name: String, hasDocument: Boolean }],
+      awards: [{ title: String, hasDocument: Boolean }],
+      laboratoryActivities: [{ title: String, hasDocument: Boolean }],
+      researchSkills: [{ skill: String, hasDocument: Boolean }],
+    },
+
+    // =========================
+    // 3. Language Skills
+    // =========================
+    languages: {
+      nativeLanguage: String,
+      englishLevel: String,
+      otherLanguages: [
+        { language: String, level: String, hasDocument: Boolean },
+      ],
+    },
+
+    // =========================
+    // 4. Professional Skills
+    // =========================
+    skills: {
+      computerSkills: [{ skill: String, hasDocument: Boolean }],
+      communicationSkills: String,
+      mediaProductionSkills: String,
+      teamworkSkills: String,
+      problemSolvingSkills: String,
+      timeManagementSkills: String,
+      presentationSkills: String,
+    },
+
+    // =========================
+    // 5. Work Experience
+    // =========================
+    experience: {
+      jobs: [
+        {
+          position: String,
+          organization: String,
+          duration: String,
+          hasDocument: Boolean,
+        },
+      ],
+      internships: [{ title: String, hasDocument: Boolean }],
+      volunteerActivities: [{ title: String, hasDocument: Boolean }],
+      socialActivities: [{ title: String, hasDocument: Boolean }],
+      awarenessPrograms: [{ title: String, hasDocument: Boolean }],
+      mediaActivities: [{ title: String, hasDocument: Boolean }],
+      leadershipActivities: [{ title: String, hasDocument: Boolean }],
+      certificates: [{ title: String, hasDocument: Boolean }],
+    },
+
+    // =========================
+    // 6. Health Status
+    // =========================
+    health: {
+      specialDiseases: String,
+      disabilityNeeds: String,
+    },
+
+    // =========================
+    // 7. Financial Status
+    // =========================
+    financial: {
+      familyIncome: Number,
+      canPayTuition: Boolean,
+      canPayTravel: Boolean,
+    },
+
+    // =========================
+    // 9. Hobbies & Interests
+    // =========================
+    hobbies: {
+      sports: [String],
+      freeTimeActivities: String,
+    },
+
+    // =========================
+    // 10. Goals & Vision
+    // =========================
+    goals: {
+      purposeOfStudy: String,
+      futurePlan: String,
+    },
+
+    // =========================
+    // 11. Study Preferences
+    // =========================
+    preferences: {
+      preferredFields: [String],
+      preferredCountries: [String],
+      preferredUniversities: [String],
+      preferredStudyLevel: String, // Bachelor, Master, PhD
+    },
+
+    // =========================
+    // 12. Supporting Documents
+    // =========================
+    supportingDocuments: {
+      sop: Boolean,
+      recommendationLetter: Boolean,
+      cv: Boolean,
+      researchProposal: Boolean,
+      portfolio: Boolean,
+    },
+
+    // =========================
+    // 13. Identity Documents
+    // =========================
+    identityDocuments: {
+      tazkira: Boolean,
+      passport: Boolean,
+    },
+
+    // =========================
+    // 14. Contact Information
+    // =========================
+    contact: {
+      permanentAddress: String,
+      currentAddress: String,
+      detailedAddress: String,
+      phone: String,
+      whatsapp: String,
+      email: String,
+      relativePhone: String,
+    },
+
+    // =========================
+    // 15. Study Type
+    // =========================
+    studyType: {
+      scholarshipOnly: Boolean,
+      privateStudyOption: Boolean,
+    },
+
+    // =========================
+    // 16. Distinction / Unique Skills
+    // =========================
+    distinction: {
+      specialSkills: String,
+      achievements: String,
+    },
+
+    // =========================
+    // 17. Optional: History & Review
+    // =========================
+    history: [{ action: String, date: Date, user: String }],
+
+    review: [
+      {
+        reviewerName: String,
+        score: Number,
+        comments: String,
+        decisionDate: Date,
+      },
+    ],
+
+    files: {
+      cvUrl: String,
+      sopUrl: String,
+      passportUrl: String,
+      tazkiraUrl: String,
+      portfolioUrl: String,
+      researchProposalUrl: String,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export default mongoose.model(
+  "ScholarshipApplication",
+  ScholarshipApplicationSchema,
+);
