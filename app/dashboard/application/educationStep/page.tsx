@@ -1,7 +1,7 @@
 import Loading from "@/app/loading";
 import React from "react";
 import { Suspense } from "react";
-import Education from "@/components/dashboard/application/educationStep";
+import Education from "@/components/dashboard/application/EducationStep";
 
 const Application = () => {
   return (
