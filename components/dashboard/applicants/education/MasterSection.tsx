@@ -68,7 +68,6 @@ const Icons = {
 export const MasterEducation = ({
   prefix,
   register,
-  errors,
   onRemove,
   showThesis = true,
 }: MasterEducationProps) => {
@@ -110,7 +109,6 @@ export const MasterEducation = ({
           placeholder="Enter your field of study"
           required
           register={register}
-          error={errors?.fieldOfStudy}
           icon={<Icons.Book className="w-4 h-4" />}
         />
 
@@ -121,7 +119,6 @@ export const MasterEducation = ({
           placeholder="Enter institution name"
           required
           register={register}
-          error={errors?.institutionName}
           icon={<Icons.University className="w-4 h-4" />}
         />
 
@@ -132,7 +129,6 @@ export const MasterEducation = ({
           placeholder="Enter Average Marks"
           required
           register={register}
-          error={errors?.gpa}
           icon={<Icons.Education className="w-4 h-4" />}
         />
 
@@ -142,7 +138,6 @@ export const MasterEducation = ({
           id={`${prefix}.academicRank`}
           placeholder="Enter academic rank (optional)"
           register={register}
-          error={errors?.academicRank}
         />
 
         <FormInput
@@ -152,7 +147,6 @@ export const MasterEducation = ({
           placeholder=""
           required
           register={register}
-          error={errors?.startDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
@@ -163,7 +157,6 @@ export const MasterEducation = ({
           placeholder=""
           required
           register={register}
-          error={errors?.graduationDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
@@ -175,7 +168,6 @@ export const MasterEducation = ({
               id={`${prefix}.thesisTopic`}
               placeholder="Enter thesis topic (optional)"
               register={register}
-              error={errors?.thesisTopic}
             />
 
             <FileUpload
@@ -189,7 +181,6 @@ export const MasterEducation = ({
                   target: { name: `${prefix}.thesisFile`, value: file },
                 });
               }}
-              error={errors?.thesisFile?.message}
               icon={<Icons.Education className="w-4 h-4" />}
             />
           </>
@@ -205,7 +196,6 @@ export const MasterEducation = ({
               target: { name: `${prefix}.diplomaFile`, value: file },
             });
           }}
-          error={errors?.diplomaFile?.message}
           icon={<Icons.Education className="w-4 h-4" />}
         />
 
@@ -219,7 +209,6 @@ export const MasterEducation = ({
               target: { name: `${prefix}.transcriptFile`, value: file },
             });
           }}
-          error={errors?.transcriptFile?.message}
           icon={<Icons.Education className="w-4 h-4" />}
         />
       </div>
