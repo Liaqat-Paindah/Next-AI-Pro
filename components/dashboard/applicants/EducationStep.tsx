@@ -1,4 +1,3 @@
-// app/education/page.tsx
 "use client";
 
 import Loading from "@/app/loading";
@@ -14,12 +13,13 @@ import {
   BachelorEducation,
   HighSchoolEducation,
   EducationFormDataField,
+  MasterEducation,
 } from "@/types/application";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 // Import components
 import { FormInput } from "./education/FormInput";
-import { MasterEducation } from "./education/MasterSection";
+import { MasterEducation as MasterSection } from "./education/MasterSection";
 import { BachelorEducation as BachelorSection } from "./education/BachelorSection";
 import { HighSchoolEducation as HighSchoolSection } from "./education/HighSchoolSection";
 
@@ -61,6 +61,17 @@ const Icons = {
       <polyline points="12 5 19 12 12 19" />
     </svg>
   ),
+  Check: ({ className = "w-4 h-4" }) => (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ),
 };
 
 // Digital Cursor Component
@@ -91,11 +102,28 @@ const DigitalCursor = () => {
   );
 };
 
-// Education level options
+// Education level options with clear descriptions
 const educationLevelOptions = [
-  { value: "PHD", label: "PHD" },
-  { value: "Master", label: "Master" },
-  { value: "Bachelor", label: "Bachelor" },
+  {
+    value: "PHD",
+    label: "PhD (Doctor of Philosophy)",
+    description: "Doctoral degree program with research focus",
+  },
+  {
+    value: "Master",
+    label: "Master's Degree",
+    description: "Postgraduate degree (MA, MSc, MBA, etc.)",
+  },
+  {
+    value: "Bachelor",
+    label: "Bachelor's Degree",
+    description: "Undergraduate degree (BA, BSc, BEng, etc.)",
+  },
+  {
+    value: "HighSchool",
+    label: "High School Diploma",
+    description: "Secondary education completion",
+  },
 ];
 
 // Default empty education object
@@ -123,10 +151,26 @@ const createEmptyHighSchool = (): HighSchoolEducation => ({
   transcriptFile: undefined,
 });
 
+const createEmptyMaster = (): MasterEducation => ({
+  fieldOfStudy: "",
+  institutionName: "",
+  gpa: 0,
+  academicRank: "",
+  startDate: "",
+  graduationDate: "",
+  thesisTopic: "",
+  thesisFile: undefined,
+  diplomaFile: undefined,
+  transcriptFile: undefined,
+});
+
 export default function EducationInfo() {
   const router = useRouter();
-  const { status } = useSession();
+  const { data: userSession, status } = useSession();
   const mutation = UseEducationInformation();
+
+  // State to track if level is selected
+  const [levelSelected, setLevelSelected] = useState(false);
 
   // State to control section visibility
   const [showMaster, setShowMaster] = useState(false);
@@ -147,49 +191,88 @@ export default function EducationInfo() {
   } = useForm<EducationFormData>({
     resolver: zodResolver(educationSchema),
     defaultValues: {
-      level: undefined, // No default selection
-      bachelorEducation: [],
-      highSchoolEducation: [],
+      level: undefined,
     },
   });
 
   const selectedLevel = watch("level");
 
-  useEffect(() => {
-    if (!selectedLevel) {
+// Effect to handle level selection and show appropriate sections
+useEffect(() => {
+  if (!selectedLevel) {
+    setLevelSelected(false);
+    setShowMaster(false);
+    setShowBachelor(false);
+    setShowHighSchool(false);
+    setBachelorCount(0);
+    setHighSchoolCount(0);
+    
+    // Clear all education data - FIXED: Don't set undefined for masterEducation
+    setValue("bachelorEducation", []);
+    setValue("highSchoolEducation", []);
+    return;
+  }
+
+  setLevelSelected(true);
+
+  // Reset counts and clear previous data
+  setBachelorCount(0);
+  setHighSchoolCount(0);
+  setValue("bachelorEducation", []);
+  setValue("highSchoolEducation", []);
+
+  // Set up sections based on selected level
+  switch (selectedLevel) {
+    case "PHD":
+      setShowMaster(true);
+      setShowBachelor(true);
+      setShowHighSchool(true);
+      // Initialize master education for PhD
+      setValue("masterEducation", createEmptyMaster());
+      // Initialize one bachelor education by default for PhD
+      setValue("bachelorEducation", [createEmptyBachelor()]);
+      setBachelorCount(1);
+      // Initialize one high school education by default
+      setValue("highSchoolEducation", [createEmptyHighSchool()]);
+      setHighSchoolCount(1);
+      break;
+
+    case "Master":
+      setShowMaster(true);
+      setShowBachelor(true);
+      setShowHighSchool(true);
+      // Initialize master education for Master's
+      setValue("masterEducation", createEmptyMaster());
+      // Initialize one bachelor education by default for Master
+      setValue("bachelorEducation", [createEmptyBachelor()]);
+      setBachelorCount(1);
+      // Initialize one high school education by default
+      setValue("highSchoolEducation", [createEmptyHighSchool()]);
+      setHighSchoolCount(1);
+      break;
+
+    case "Bachelor":
+      setShowMaster(false);
+      setShowBachelor(true);
+      setShowHighSchool(true);
+      // Initialize one bachelor education by default
+      setValue("bachelorEducation", [createEmptyBachelor()]);
+      setBachelorCount(1);
+      // Initialize one high school education by default
+      setValue("highSchoolEducation", [createEmptyHighSchool()]);
+      setHighSchoolCount(1);
+      break;
+
+    case "HighSchool":
       setShowMaster(false);
       setShowBachelor(false);
-      setShowHighSchool(false);
-      return;
-    }
-    switch (selectedLevel) {
-      case "PHD":
-        setShowMaster(true);
-        setShowBachelor(true);
-        setShowHighSchool(true);
-        break;
-
-      case "Master":
-        setShowMaster(false); // Don't show Master section for Master level
-        setShowBachelor(true);
-        setShowHighSchool(true);
-        break;
-
-      case "Bachelor":
-        setShowMaster(false);
-        setShowBachelor(false);
-        setShowHighSchool(true);
-        setBachelorCount(0);
-        setValue("bachelorEducation", []);
-        break;
-
-      default:
-        // Default case
-        setShowMaster(false);
-        setShowBachelor(false);
-        setShowHighSchool(false);
-    }
-  }, [selectedLevel, setValue]);
+      setShowHighSchool(true);
+      // Initialize one high school education by default
+      setValue("highSchoolEducation", [createEmptyHighSchool()]);
+      setHighSchoolCount(1);
+      break;
+  }
+}, [selectedLevel, setValue]);
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
@@ -202,37 +285,33 @@ export default function EducationInfo() {
   if (status !== "authenticated") {
     return null;
   }
+
   const onSubmit = (data: EducationFormData) => {
-    // Build submission data based on selected level
     const submissionData: EducationFormDataField = {
       level: data.level,
+      userId: userSession.user._id as string,
     };
 
-    if (selectedLevel === "PHD") {
-      const masterData = {
-        fieldOfStudy: data.fieldOfStudy, // Adjust based on your actual field names
-        institutionName: data.institutionName,
-        gpa: data.gpa,
-        startDate: data.startDate,
-        graduationDate: data.graduationDate,
-      };
-      if (masterData.fieldOfStudy || masterData.institutionName) {
-        submissionData.masterEducation = masterData;
-      }
-    }
-    if (
-      (selectedLevel === "PHD" || selectedLevel === "Master") &&
-      data.bachelorEducation &&
-      data.bachelorEducation.length > 0
-    ) {
+    // Add level-specific fields based on the selected level
+    if (data.level === "PHD") {
+      submissionData.masterEducation = data.masterEducation;
       submissionData.bachelorEducation = data.bachelorEducation;
-    }
-    if (data.highSchoolEducation && data.highSchoolEducation.length > 0) {
+      submissionData.highSchoolEducation = data.highSchoolEducation;
+    } else if (data.level === "Master") {
+      submissionData.masterEducation = data.masterEducation;
+      submissionData.bachelorEducation = data.bachelorEducation;
+      submissionData.highSchoolEducation = data.highSchoolEducation;
+    } else if (data.level === "Bachelor") {
+      if (data.bachelorEducation && data.bachelorEducation.length > 0) {
+        submissionData.bachelorEducation = data.bachelorEducation;
+      }
+      submissionData.highSchoolEducation = data.highSchoolEducation;
+    } else if (data.level === "HighSchool") {
       submissionData.highSchoolEducation = data.highSchoolEducation;
     }
 
     console.log("Submission Data:", submissionData);
-    mutation.mutate(submissionData as EducationFormData);
+    mutation.mutate(submissionData);
   };
 
   const addBachelorEducation = () => {
@@ -268,6 +347,14 @@ export default function EducationInfo() {
     setHighSchoolCount((prev) => prev - 1);
   };
 
+  // Get selected level label for display
+  const getSelectedLevelLabel = () => {
+    const level = educationLevelOptions.find(
+      (opt) => opt.value === selectedLevel,
+    );
+    return level ? level.label : selectedLevel;
+  };
+
   return (
     <>
       <DigitalCursor />
@@ -275,7 +362,6 @@ export default function EducationInfo() {
       <section className="relative w-full overflow-hidden py-2">
         {/* Digital Grid Background */}
         <div className="absolute inset-0">
-          {/* linear Orbs */}
           <motion.div
             className="absolute top-20 left-10 w-96 h-96 bg-[#00A3FF]/10 dark:bg-[#00A3FF]/5 rounded-full blur-3xl"
             animate={{
@@ -314,142 +400,210 @@ export default function EducationInfo() {
             className="max-w-4xl mx-auto"
           >
             <div className="bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-6 md:p-8 relative">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                {/* Header */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2">
                     Education Information
                   </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Please select your highest level of education first, then
+                    provide the required details for each level.
+                  </p>
                 </div>
 
-                {/* Main Education Level */}
-                <FormInput
-                  label="Select Proposed Field of Study"
-                  type="select"
-                  id="level"
-                  placeholder="Select Select Proposed Field of Study"
-                  required
-                  register={register}
-                  error={errors.level}
-                  icon={<Icons.Education className="w-4 h-4" />}
-                  options={educationLevelOptions}
-                />
-
-                {/* Master Education Section - shown when PHD or Master is selected */}
-                {showMaster && (
-                  <MasterEducation
-                    prefix=""
+                {/* Education Level Selection - Always Visible */}
+                <div className="bg-gray-50 dark:bg-[#022b40] p-6 rounded-sm border border-gray-200 dark:border-[#064e78]">
+                  <FormInput
+                    label="Highest Level of Education *"
+                    type="select"
+                    id="level"
+                    placeholder="Select your highest education level"
+                    required
                     register={register}
-                    errors={errors}
-                    showThesis={true}
+                    error={errors.level}
+                    icon={<Icons.Education className="w-4 h-4" />}
+                    options={educationLevelOptions}
                   />
-                )}
+                </div>
 
-                {/* Bachelor Education Sections - shown when PHD or Master is selected */}
-                {showBachelor && (
+                {/* Level Selected Confirmation */}
+                {levelSelected && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="space-y-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                        Bachelor Education
-                      </h4>
-                      <motion.button
-                        type="button"
-                        onClick={addBachelorEducation}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
-                      >
-                        <Icons.Add className="w-4 h-4" />
-                        Add Bachelor
-                      </motion.button>
-                    </div>
-
-                    {bachelorCount > 0 &&
-                      Array.from({ length: bachelorCount }).map((_, index) => (
-                        <BachelorSection
-                          key={`bachelor-${index}`}
-                          prefix={`bachelorEducation.${index}`}
-                          onRemove={
-                            bachelorCount > 1
-                              ? () => removeBachelorEducation(index)
-                              : undefined
-                          }
-                          register={register}
-                          errors={errors.bachelorEducation?.[index]}
-                        />
-                      ))}
-
-                    {bachelorCount === 0 && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                        No bachelor education added. Click `Add Bachelor` to add
-                        your bachelor degree information.
-                      </p>
-                    )}
+                    <Icons.Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Selected Level: <strong>{getSelectedLevelLabel()}</strong>{" "}
+                      - Please complete the{" "}
+                      {selectedLevel === "PHD"
+                        ? "PhD"
+                        : selectedLevel === "Master"
+                          ? "Master's"
+                          : selectedLevel === "Bachelor"
+                            ? "Bachelor's"
+                            : "High School"}{" "}
+                      details below
+                    </span>
                   </motion.div>
                 )}
 
-                {/* High School Education Sections - shown for all levels when level is selected */}
-                {selectedLevel && showHighSchool && (
+                {/* Dynamic Education Sections - Based on Selected Level */}
+                {levelSelected && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="space-y-4"
+                    transition={{ delay: 0.2 }}
+                    className="space-y-8"
                   >
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                        High School Education
-                      </h4>
-                      <motion.button
-                        type="button"
-                        onClick={addHighSchoolEducation}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
-                      >
-                        <Icons.Add className="w-4 h-4" />
-                        Add High School
-                      </motion.button>
-                    </div>
 
-                    {highSchoolCount > 0 &&
-                      Array.from({ length: highSchoolCount }).map(
-                        (_, index) => (
-                          <HighSchoolSection
-                            key={`highschool-${index}`}
-                            prefix={`highSchoolEducation.${index}`}
-                            onRemove={
-                              highSchoolCount > 1
-                                ? () => removeHighSchoolEducation(index)
-                                : undefined
-                            }
+
+                    {/* Master Education Section - shown for PHD and Master */}
+                    {showMaster &&
+                      (selectedLevel === "PHD" ||
+                        selectedLevel === "Master") && (
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {selectedLevel === "PHD"
+                              ? "PhD Program Details"
+                              : "Master's Program Details"}
+                          </h4>
+                          <MasterSection
+                            prefix="masterEducation"
                             register={register}
-                            errors={errors.highSchoolEducation?.[index]}
-                            showFinalExam={true}
+                            errors={errors}
+                            showThesis={
+                              selectedLevel === "Master" ||
+                              selectedLevel === "PHD"
+                            }
                           />
-                        ),
+                        </div>
                       )}
 
-                    {highSchoolCount === 0 && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                        No high school education added. Click `Add High School`
-                        to add your high school information.
-                      </p>
+                    {/* Bachelor Education Sections */}
+                    {showBachelor && (
+                      <motion.div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            Bachelor Degree Information
+                          </h4>
+                          {(selectedLevel === "PHD" ||
+                            selectedLevel === "Master" ||
+                            selectedLevel === "Bachelor") && (
+                            <motion.button
+                              type="button"
+                              onClick={addBachelorEducation}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
+                            >
+                              <Icons.Add className="w-4 h-4" />
+                              Add Another Bachelor Degree
+                            </motion.button>
+                          )}
+                        </div>
+
+                        {bachelorCount > 0 ? (
+                          Array.from({ length: bachelorCount }).map(
+                            (_, index) => (
+                              <BachelorSection
+                                key={`bachelor-${index}`}
+                                prefix={`bachelorEducation.${index}`}
+                                onRemove={
+                                  bachelorCount > 1
+                                    ? () => removeBachelorEducation(index)
+                                    : undefined
+                                }
+                                register={register}
+                              />
+                            ),
+                          )
+                        ) : (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            No bachelor degrees added. Click Add Bachelor Degree to add your information.
+                          </p>
+                        )}
+                      </motion.div>
                     )}
+
+                    {/* High School Education Sections */}
+                    {showHighSchool && (
+                      <motion.div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            High School Education Information
+                          </h4>
+                          <motion.button
+                            type="button"
+                            onClick={addHighSchoolEducation}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
+                          >
+                            <Icons.Add className="w-4 h-4" />
+                            Add Another High School
+                          </motion.button>
+                        </div>
+
+                        {highSchoolCount > 0 ? (
+                          Array.from({ length: highSchoolCount }).map(
+                            (_, index) => (
+                              <HighSchoolSection
+                                key={`highschool-${index}`}
+                                prefix={`highSchoolEducation.${index}`}
+                                onRemove={
+                                  highSchoolCount > 1
+                                    ? () => removeHighSchoolEducation(index)
+                                    : undefined
+                                }
+                                register={register}
+                                errors={errors.highSchoolEducation?.[index]}
+                                showFinalExam={true}
+                              />
+                            ),
+                          )
+                        ) : (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            No high school education added. Click Add High School to add your information.
+                          </p>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Level-specific help text */}
+                    <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-sm">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        <strong>Note:</strong> You are providing details for{" "}
+                        {getSelectedLevelLabel()}.
+                        {selectedLevel === "PHD" &&
+                          " Please include your Master's, Bachelor's, and High School education details."}
+                        {selectedLevel === "Master" &&
+                          " Please include your Bachelor's and High School education details."}
+                        {selectedLevel === "Bachelor" &&
+                          " Please include your Bachelor's and High School education details."}
+                        {selectedLevel === "HighSchool" &&
+                          " Please provide your High School education details."}
+                      </p>
+                    </div>
                   </motion.div>
                 )}
 
                 {/* No Level Selected Message */}
-                {!selectedLevel && (
+                {!levelSelected && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-center py-8"
+                    className="text-center py-12 bg-gray-50 dark:bg-[#022b40] rounded-sm"
                   >
-                    <p className="text-gray-700 text-sm dark:text-gray-400">
-                      Please select your education level to continue.
+                    <Icons.Education className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-600 mb-3" />
+                    <p className="text-gray-600 text-sm dark:text-gray-400">
+                      Please select your highest level of education to continue
+                      with the application.
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                      The form will adapt based on your selection
                     </p>
                   </motion.div>
                 )}
@@ -463,7 +617,6 @@ export default function EducationInfo() {
                     whileTap={{ scale: 0.98 }}
                     className="flex-1 relative group"
                   >
-                    <div className="absolute -inset-0.5 rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
                     <div className="relative px-4 py-2 dark:bg-[#076094] text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2 dark:border-[#5fb7e9]">
                       <span>Back</span>
                     </div>
@@ -471,12 +624,13 @@ export default function EducationInfo() {
 
                   <motion.button
                     type="submit"
-                    disabled={mutation.isPending || !selectedLevel}
-                    whileHover={{ scale: selectedLevel ? 1.02 : 1 }}
-                    whileTap={{ scale: selectedLevel ? 0.98 : 1 }}
-                    className={`flex-1 relative group ${!selectedLevel ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={mutation.isPending || !levelSelected}
+                    whileHover={{ scale: levelSelected ? 1.02 : 1 }}
+                    whileTap={{ scale: levelSelected ? 0.98 : 1 }}
+                    className={`flex-1 relative group ${
+                      !levelSelected ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
-                    <div className="absolute -inset-0.5 rounded-sm opacity-75 group-hover:opacity-100" />
                     <div className="relative px-4 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm font-medium text-sm flex items-center justify-center gap-2">
                       {mutation.isPending ? (
                         <>

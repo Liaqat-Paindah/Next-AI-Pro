@@ -1,12 +1,19 @@
 import { z } from "zod";
-import type { FieldError, FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import type {
+  FieldError,
+  FieldErrors,
+  FieldValues,
+  UseFormRegister,
+} from "react-hook-form";
 import type { ReactNode } from "react";
 
 export const personalInfoSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   fatherName: z.string().min(1, "Father name is required"),
-  age: z.number({ message: "Age is required" }).min(1, "Age must be at least 1"),
+  age: z
+    .number({ message: "Age is required" })
+    .min(1, "Age must be at least 1"),
   gender: z.string().min(1, "gender is required"),
   maritalStatus: z.string().min(1, "Marital Status is required"),
   birthDate: z.string().min(1, "Birth date is required"),
@@ -21,10 +28,13 @@ export const personalInfoSchema = z.object({
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
+
+
+
 export const masterEducationSchema = z.object({
   fieldOfStudy: z.string().min(1, "Field of study is required"),
   institutionName: z.string().min(1, "Institution name is required"),
-  gpa: z.number().min(0).max(4, "GPA must be between 0 and 4"),
+  gpa: z.number().min(50, "Average Marks must be between 0 and 100"),
   academicRank: z.string().optional(),
   startDate: z.string().min(1, "Start date is required"),
   graduationDate: z.string().min(1, "Graduation date is required"),
@@ -37,7 +47,7 @@ export const masterEducationSchema = z.object({
 export const bachelorEducationSchema = z.object({
   fieldOfStudy: z.string().min(1, "Field of study is required"),
   institutionName: z.string().min(1, "Institution name is required"),
-  gpa: z.number().min(0).max(4, "GPA must be between 0 and 4"),
+  gpa: z.number().min(50, "Average Marks must be between 0 and 100"),
   academicRank: z.string().optional(),
   startDate: z.string().min(1, "Start date is required"),
   graduationDate: z.string().min(1, "Graduation date is required"),
@@ -58,15 +68,33 @@ export const highSchoolEducationSchema = z.object({
   transcriptFile: z.any().optional(),
 });
 
-export const educationSchema = z
-  .object({
-    level: z.enum(["Master", "Bachelor", "PHD", "HighSchool"]),
-  })
-  .merge(masterEducationSchema)
-  .extend({
+export const educationSchema = z.discriminatedUnion("level", [
+  // PHD schema
+  z.object({
+    level: z.literal("PHD"),
+    masterEducation: masterEducationSchema,
+    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // Master schema
+  z.object({
+    level: z.literal("Master"),
+    masterEducation: masterEducationSchema,
+    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // Bachelor schema
+  z.object({
+    level: z.literal("Bachelor"),
     bachelorEducation: z.array(bachelorEducationSchema).optional(),
-    highSchoolEducation: z.array(highSchoolEducationSchema).optional(),
-  });
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // HighSchool schema
+  z.object({
+    level: z.literal("HighSchool"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+]);
 
 export type EducationFormData = z.infer<typeof educationSchema>;
 export type MasterEducation = z.infer<typeof masterEducationSchema>;
@@ -104,9 +132,10 @@ export interface MasterEducationProps extends EducationSectionProps<EducationFor
 
 export type BachelorEducationProps = EducationSectionProps<BachelorEducation>;
 
-export type HighSchoolEducationProps = EducationSectionProps<HighSchoolEducation> & {
-  showFinalExam?: boolean;
-};
+export type HighSchoolEducationProps =
+  EducationSectionProps<HighSchoolEducation> & {
+    showFinalExam?: boolean;
+  };
 
 export interface FileUploadProps {
   id: string;
@@ -119,20 +148,10 @@ export interface FileUploadProps {
   currentFile?: File | null;
 }
 
-
-// In @/types/application
 export interface EducationFormDataField {
+  userId: string;
   level: "PHD" | "Master" | "Bachelor" | "HighSchool";
-  masterEducation?: {
-    fieldOfStudy: string;
-    institutionName: string;
-    gpa: number;
-    startDate: string;
-    graduationDate: string;
-    thesisTitle?: string;
-    // other master fields
-  };
+  masterEducation?: MasterEducation;
   bachelorEducation?: BachelorEducation[];
   highSchoolEducation?: HighSchoolEducation[];
-  // other fields
 }

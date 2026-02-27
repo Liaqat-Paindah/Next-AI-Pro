@@ -99,7 +99,7 @@ export const HighSchoolEducation = ({
           label="Average Marks"
           type="number"
           id={`${prefix}.gpa`}
-          placeholder="Enter GPA"
+          placeholder="Enter Average Marks"
           required
           register={register}
           error={errors?.gpa}

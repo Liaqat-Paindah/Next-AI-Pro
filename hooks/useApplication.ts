@@ -1,4 +1,4 @@
-import { EducationFormData, PersonalInfoFormData } from "@/types/application";
+import {  EducationFormDataField, PersonalInfoFormData } from "@/types/application";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,7 @@ export const UseEducationInformation = () => {
   const router = useRouter();
   return useMutation({
     mutationKey: ["UsePersonalInformation"],
-    mutationFn: async (data: EducationFormData) => {
+    mutationFn: async (data: EducationFormDataField) => {
       const response = await axios.post(`/api/application/education`, data);
       if (!response.data) {
         throw new Error("Failed to create applicant information");
