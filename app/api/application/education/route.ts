@@ -1,143 +1,38 @@
 import { ConnectDB } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
-import User from "@/models/User";
 import Applications from "@/models/Applications";
-import { PersonalInfoFormData } from "@/types/application";
 
 export async function POST(req: NextRequest) {
   await ConnectDB();
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const body = await req.json();
-    const formData: PersonalInfoFormData = body;
-    console.log("Received formData:", formData);
 
-    // Validate required fields
-    if (!formData?.email) {
-      return NextResponse.json(
-        { success: false, message: "Email is required" },
-        { status: 400 }
-      );
-    }
+    const { userId, proposedLevel, education } = body;
+    console.log("the user id is", userId);
+    console.log("the proposedLevel id is", proposedLevel);
+    console.log("the education id is", education);
 
-    const {
-      email,
-      first_name,
-      last_name,
-      fatherName,
-      age,
-      gender,
-      maritalStatus,
-      birthDate,
-      nationality,
-      nationalId,
-      passportId,
-      dateofIssue,
-      dataofExpire,
-      phone,
-    } = formData;
-
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    // Update user basic info
- const emailNormalized = email.trim().toLowerCase();
-const updatedUser = await User.findOneAndUpdate(
-  { email: emailNormalized },
-  { $set: { first_name, last_name, phone } },
-  { returnDocument: "after", session, runValidators: true }
-);
-    if (!updatedUser) {
-      return NextResponse.json(
-        { success: false, message: "Failed to update user" },
-        { status: 500 }
-      );
-    }
-
-    // Check if an application already exists for this user
-    const existingApplication = await Applications.findOne({
-      userId: updatedUser._id.toString(),
-    }).session(session);
-
-    let application;
-    if (existingApplication) {
-      // Update existing application
-      existingApplication.personal = {
-        firstName: first_name,
-        lastName: last_name,
-        fatherName,
-        age,
-        gender,
-        maritalStatus,
-        birthDate,
-        nationality,
-        nationalId,
-        passportId,
-        dateofIssue,
-        dataofExpire,
-      };
-      existingApplication.contact = {
-        phone,
-        email,
-      };
-      application = await existingApplication.save({ session });
-    } else {
-      // Create new application
-      application = await Applications.create(
-        [
-          {
-            userId: updatedUser._id.toString(),
-            status: "draft",
-            personal: {
-              firstName: first_name,
-              lastName: last_name,
-              fatherName,
-              age,
-              gender,
-              maritalStatus,
-              birthDate,
-              nationality,
-              nationalId,
-              passportId,
-              dateofIssue,
-              dataofExpire,
-            },
-            contact: {
-              phone,
-              email,
-            },
-          },
-        ],
-        { session }
-      );
-    }
-
-    await session.commitTransaction();
-    session.endSession();
+    const application = await Applications.findOneAndUpdate(
+      { userId },
+      {
+        level: proposedLevel,
+        education,
+      },
+      { new: true, upsert: true },
+    );
 
     return NextResponse.json({
       success: true,
-      application,
-      message: "Personal information saved successfully",
+      message: "Education saved successfully",
+      data: application,
     });
   } catch (error) {
-    console.error("Transaction error:", error);
-    await session.abortTransaction();
-    session.endSession();
+    console.error(error);
 
     return NextResponse.json(
-      { success: false, message: "Transaction failed", error },
-      { status: 500 }
+      { success: false, message: "Error saving education" },
+      { status: 500 },
     );
   }
 }

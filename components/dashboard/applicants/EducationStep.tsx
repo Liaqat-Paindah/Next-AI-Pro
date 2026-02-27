@@ -125,7 +125,7 @@ const createEmptyHighSchool = (): HighSchoolEducation => ({
 
 export default function EducationInfo() {
   const router = useRouter();
-  const { status } = useSession();
+  const {data:userSession, status } = useSession();
   const mutation = UseEducationInformation();
 
   // State to control section visibility
@@ -206,6 +206,7 @@ export default function EducationInfo() {
     // Build submission data based on selected level
     const submissionData: EducationFormDataField = {
       level: data.level,
+      userId: userSession.user._id as string
     };
 
     if (selectedLevel === "PHD") {
@@ -232,7 +233,7 @@ export default function EducationInfo() {
     }
 
     console.log("Submission Data:", submissionData);
-    mutation.mutate(submissionData as EducationFormData);
+    mutation.mutate(submissionData as EducationFormDataField);
   };
 
   const addBachelorEducation = () => {
