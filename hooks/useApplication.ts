@@ -38,7 +38,7 @@ export const UseEducationInformation = () => {
     },
     onSuccess: () => {
       toast.success("Educational information has been successfully saved");
-      router.push("/dashboard/application/educationStep");
+      router.push("/dashboard/applicants/educationStep");
     },
     onError: () => {
       toast.error(`Failed to save personal information`);

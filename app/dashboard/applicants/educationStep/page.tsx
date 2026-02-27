@@ -1,16 +1,16 @@
 import Loading from "@/app/loading";
 import React from "react";
 import { Suspense } from "react";
-import Personal from "@/components/dashboard/application/PersonalStep";
+import Education from "@/components/dashboard/application/EducationStep";
 
-const Application = () => {
+const ApplicationEducation = () => {
   return (
     <div>
       <Suspense fallback={<Loading />}>
-        <Personal />
+        <Education />
       </Suspense>
     </div>
   );
 };
 
-export default Application;
+export default ApplicationEducation;
