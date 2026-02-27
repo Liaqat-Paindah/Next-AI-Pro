@@ -28,6 +28,9 @@ export const personalInfoSchema = z.object({
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
+
+
+
 export const masterEducationSchema = z.object({
   fieldOfStudy: z.string().min(1, "Field of study is required"),
   institutionName: z.string().min(1, "Institution name is required"),
@@ -65,15 +68,33 @@ export const highSchoolEducationSchema = z.object({
   transcriptFile: z.any().optional(),
 });
 
-export const educationSchema = z
-  .object({
-    level: z.enum(["Master", "Bachelor", "PHD", "HighSchool"]),
-  })
-  .merge(masterEducationSchema)
-  .extend({
+export const educationSchema = z.discriminatedUnion("level", [
+  // PHD schema
+  z.object({
+    level: z.literal("PHD"),
+    masterEducation: masterEducationSchema,
+    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // Master schema
+  z.object({
+    level: z.literal("Master"),
+    masterEducation: masterEducationSchema,
+    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // Bachelor schema
+  z.object({
+    level: z.literal("Bachelor"),
     bachelorEducation: z.array(bachelorEducationSchema).optional(),
-    highSchoolEducation: z.array(highSchoolEducationSchema).optional(),
-  });
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+  // HighSchool schema
+  z.object({
+    level: z.literal("HighSchool"),
+    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+  }),
+]);
 
 export type EducationFormData = z.infer<typeof educationSchema>;
 export type MasterEducation = z.infer<typeof masterEducationSchema>;
@@ -127,20 +148,10 @@ export interface FileUploadProps {
   currentFile?: File | null;
 }
 
-// In @/types/application
 export interface EducationFormDataField {
-  userId:string ,
+  userId: string;
   level: "PHD" | "Master" | "Bachelor" | "HighSchool";
-  masterEducation?: {
-    fieldOfStudy: string;
-    institutionName: string;
-    gpa: number;
-    startDate: string;
-    graduationDate: string;
-    thesisTitle?: string;
-    // other master fields
-  };
+  masterEducation?: MasterEducation;
   bachelorEducation?: BachelorEducation[];
   highSchoolEducation?: HighSchoolEducation[];
-  // other fields
 }
