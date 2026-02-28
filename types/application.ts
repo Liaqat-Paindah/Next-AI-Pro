@@ -28,9 +28,6 @@ export const personalInfoSchema = z.object({
 
 export type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
 
-
-
-
 export const masterEducationSchema = z.object({
   fieldOfStudy: z.string().min(1, "Field of study is required"),
   institutionName: z.string().min(1, "Institution name is required"),
@@ -49,6 +46,9 @@ export const bachelorEducationSchema = z.object({
   institutionName: z.string().min(1, "Institution name is required"),
   gpa: z.number().min(50, "Average Marks must be between 0 and 100"),
   academicRank: z.string().optional(),
+  academic_gap: z.string().min(1, "Academic Gap is required"),
+  thesisTopic: z.string().optional(),
+  thesisFile: z.any().optional(),
   startDate: z.string().min(1, "Start date is required"),
   graduationDate: z.string().min(1, "Graduation date is required"),
   diplomaFile: z.any().optional(),
@@ -60,6 +60,7 @@ export const highSchoolEducationSchema = z.object({
   institutionName: z.string().min(1, "Institution name is required"),
   gpa: z.number().min(50, "Average Marks must be between 0 and 100"),
   academicRank: z.string().optional(),
+  academic_gap: z.string().min(1, "Academic Gap is required"),
   startDate: z.string().min(1, "Start date is required"),
   graduationDate: z.string().min(1, "Graduation date is required"),
   finalExamYear: z.number().optional(),
@@ -73,26 +74,38 @@ export const educationSchema = z.discriminatedUnion("level", [
   z.object({
     level: z.literal("PHD"),
     masterEducation: masterEducationSchema,
-    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
-    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+    bachelorEducation: z
+      .array(bachelorEducationSchema)
+      .min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z
+      .array(highSchoolEducationSchema)
+      .min(1, "High school education is required"),
   }),
   // Master schema
   z.object({
     level: z.literal("Master"),
     masterEducation: masterEducationSchema,
-    bachelorEducation: z.array(bachelorEducationSchema).min(1, "At least one bachelor education is required"),
-    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+    bachelorEducation: z
+      .array(bachelorEducationSchema)
+      .min(1, "At least one bachelor education is required"),
+    highSchoolEducation: z
+      .array(highSchoolEducationSchema)
+      .min(1, "High school education is required"),
   }),
   // Bachelor schema
   z.object({
     level: z.literal("Bachelor"),
     bachelorEducation: z.array(bachelorEducationSchema).optional(),
-    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+    highSchoolEducation: z
+      .array(highSchoolEducationSchema)
+      .min(1, "High school education is required"),
   }),
   // HighSchool schema
   z.object({
     level: z.literal("HighSchool"),
-    highSchoolEducation: z.array(highSchoolEducationSchema).min(1, "High school education is required"),
+    highSchoolEducation: z
+      .array(highSchoolEducationSchema)
+      .min(1, "High school education is required"),
   }),
 ]);
 

@@ -106,22 +106,22 @@ const DigitalCursor = () => {
 const educationLevelOptions = [
   {
     value: "PHD",
-    label: "PhD (Doctor of Philosophy)",
+    label: "PHD ",
     description: "Doctoral degree program with research focus",
   },
   {
     value: "Master",
-    label: "Master's Degree",
+    label: "Master",
     description: "Postgraduate degree (MA, MSc, MBA, etc.)",
   },
   {
     value: "Bachelor",
-    label: "Bachelor's Degree",
+    label: "Bachelor",
     description: "Undergraduate degree (BA, BSc, BEng, etc.)",
   },
   {
     value: "HighSchool",
-    label: "High School Diploma",
+    label: "High School ",
     description: "Secondary education completion",
   },
 ];
@@ -131,6 +131,7 @@ const createEmptyBachelor = (): BachelorEducation => ({
   fieldOfStudy: "",
   institutionName: "",
   gpa: 0,
+  academic_gap: "",
   academicRank: "",
   startDate: "",
   graduationDate: "",
@@ -142,6 +143,7 @@ const createEmptyHighSchool = (): HighSchoolEducation => ({
   fieldOfStudy: "",
   institutionName: "",
   gpa: 0,
+  academic_gap: "",
   academicRank: "",
   startDate: "",
   graduationDate: "",
@@ -197,82 +199,82 @@ export default function EducationInfo() {
 
   const selectedLevel = watch("level");
 
-// Effect to handle level selection and show appropriate sections
-useEffect(() => {
-  if (!selectedLevel) {
-    setLevelSelected(false);
-    setShowMaster(false);
-    setShowBachelor(false);
-    setShowHighSchool(false);
-    setBachelorCount(0);
-    setHighSchoolCount(0);
-    
-    // Clear all education data - FIXED: Don't set undefined for masterEducation
-    setValue("bachelorEducation", []);
-    setValue("highSchoolEducation", []);
-    return;
-  }
-
-  setLevelSelected(true);
-
-  // Reset counts and clear previous data
-  setBachelorCount(0);
-  setHighSchoolCount(0);
-  setValue("bachelorEducation", []);
-  setValue("highSchoolEducation", []);
-
-  // Set up sections based on selected level
-  switch (selectedLevel) {
-    case "PHD":
-      setShowMaster(true);
-      setShowBachelor(true);
-      setShowHighSchool(true);
-      // Initialize master education for PhD
-      setValue("masterEducation", createEmptyMaster());
-      // Initialize one bachelor education by default for PhD
-      setValue("bachelorEducation", [createEmptyBachelor()]);
-      setBachelorCount(1);
-      // Initialize one high school education by default
-      setValue("highSchoolEducation", [createEmptyHighSchool()]);
-      setHighSchoolCount(1);
-      break;
-
-    case "Master":
-      setShowMaster(true);
-      setShowBachelor(true);
-      setShowHighSchool(true);
-      // Initialize master education for Master's
-      setValue("masterEducation", createEmptyMaster());
-      // Initialize one bachelor education by default for Master
-      setValue("bachelorEducation", [createEmptyBachelor()]);
-      setBachelorCount(1);
-      // Initialize one high school education by default
-      setValue("highSchoolEducation", [createEmptyHighSchool()]);
-      setHighSchoolCount(1);
-      break;
-
-    case "Bachelor":
-      setShowMaster(false);
-      setShowBachelor(true);
-      setShowHighSchool(true);
-      // Initialize one bachelor education by default
-      setValue("bachelorEducation", [createEmptyBachelor()]);
-      setBachelorCount(1);
-      // Initialize one high school education by default
-      setValue("highSchoolEducation", [createEmptyHighSchool()]);
-      setHighSchoolCount(1);
-      break;
-
-    case "HighSchool":
+  // Effect to handle level selection and show appropriate sections
+  useEffect(() => {
+    if (!selectedLevel) {
+      setLevelSelected(false);
       setShowMaster(false);
       setShowBachelor(false);
-      setShowHighSchool(true);
-      // Initialize one high school education by default
-      setValue("highSchoolEducation", [createEmptyHighSchool()]);
-      setHighSchoolCount(1);
-      break;
-  }
-}, [selectedLevel, setValue]);
+      setShowHighSchool(false);
+      setBachelorCount(0);
+      setHighSchoolCount(0);
+
+      // Clear all education data - FIXED: Don't set undefined for masterEducation
+      setValue("bachelorEducation", []);
+      setValue("highSchoolEducation", []);
+      return;
+    }
+
+    setLevelSelected(true);
+
+    // Reset counts and clear previous data
+    setBachelorCount(0);
+    setHighSchoolCount(0);
+    setValue("bachelorEducation", []);
+    setValue("highSchoolEducation", []);
+
+    // Set up sections based on selected level
+    switch (selectedLevel) {
+      case "PHD":
+        setShowMaster(true);
+        setShowBachelor(true);
+        setShowHighSchool(true);
+        // Initialize master education for PhD
+        setValue("masterEducation", createEmptyMaster());
+        // Initialize one bachelor education by default for PhD
+        setValue("bachelorEducation", [createEmptyBachelor()]);
+        setBachelorCount(1);
+        // Initialize one high school education by default
+        setValue("highSchoolEducation", [createEmptyHighSchool()]);
+        setHighSchoolCount(1);
+        break;
+
+      case "Master":
+        setShowMaster(true);
+        setShowBachelor(true);
+        setShowHighSchool(true);
+        // Initialize master education for Master's
+        setValue("masterEducation", createEmptyMaster());
+        // Initialize one bachelor education by default for Master
+        setValue("bachelorEducation", [createEmptyBachelor()]);
+        setBachelorCount(1);
+        // Initialize one high school education by default
+        setValue("highSchoolEducation", [createEmptyHighSchool()]);
+        setHighSchoolCount(1);
+        break;
+
+      case "Bachelor":
+        setShowMaster(false);
+        setShowBachelor(true);
+        setShowHighSchool(true);
+        // Initialize one bachelor education by default
+        setValue("bachelorEducation", [createEmptyBachelor()]);
+        setBachelorCount(1);
+        // Initialize one high school education by default
+        setValue("highSchoolEducation", [createEmptyHighSchool()]);
+        setHighSchoolCount(1);
+        break;
+
+      case "HighSchool":
+        setShowMaster(false);
+        setShowBachelor(false);
+        setShowHighSchool(true);
+        // Initialize one high school education by default
+        setValue("highSchoolEducation", [createEmptyHighSchool()]);
+        setHighSchoolCount(1);
+        break;
+    }
+  }, [selectedLevel, setValue]);
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
@@ -402,20 +404,16 @@ useEffect(() => {
             <div className="bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-6 md:p-8 relative">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Header */}
-                <div className="space-y-4">
+                <div className="">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2">
                     Education Information
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Please select your highest level of education first, then
-                    provide the required details for each level.
-                  </p>
                 </div>
 
                 {/* Education Level Selection - Always Visible */}
-                <div className="bg-gray-50 dark:bg-[#022b40] p-6 rounded-sm border border-gray-200 dark:border-[#064e78]">
+                <div className=" dark:bg-[#022b40] dark:border-[#064e78]">
                   <FormInput
-                    label="Highest Level of Education *"
+                    label="Highest Level of Education"
                     type="select"
                     id="level"
                     placeholder="Select your highest education level"
@@ -458,8 +456,6 @@ useEffect(() => {
                     transition={{ delay: 0.2 }}
                     className="space-y-8"
                   >
-
-
                     {/* Master Education Section - shown for PHD and Master */}
                     {showMaster &&
                       (selectedLevel === "PHD" ||
@@ -467,7 +463,7 @@ useEffect(() => {
                         <div className="space-y-4">
                           <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                             {selectedLevel === "PHD"
-                              ? "PhD Program Details"
+                              ? "PHD Program Details"
                               : "Master's Program Details"}
                           </h4>
                           <MasterSection
@@ -522,7 +518,8 @@ useEffect(() => {
                           )
                         ) : (
                           <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            No bachelor degrees added. Click Add Bachelor Degree to add your information.
+                            No bachelor degrees added. Click Add Bachelor Degree
+                            to add your information.
                           </p>
                         )}
                       </motion.div>
@@ -566,7 +563,8 @@ useEffect(() => {
                           )
                         ) : (
                           <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            No high school education added. Click Add High School to add your information.
+                            No high school education added. Click Add High
+                            School to add your information.
                           </p>
                         )}
                       </motion.div>
