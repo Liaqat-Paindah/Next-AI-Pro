@@ -1,29 +1,14 @@
-// components/education/HighSchoolEducation.tsx
+// components/education/MasterEducation.tsx
 "use client";
 
 import { motion } from "framer-motion";
 import type { Path } from "react-hook-form";
 import { FormInput } from "./FormInput";
 import { FileUpload } from "@/components/shared/drop_zone";
-import {
-  HighSchoolEducationProps,
-  EducationFormData,
-} from "@/types/application";
+import { MasterEducationProps, EducationFormData } from "@/types/application";
 
 // Icons
 const Icons = {
-  Clock: ({ className }: { className?: string }) => (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  ),
   Book: ({ className }: { className?: string }) => (
     <svg
       className={className}
@@ -80,13 +65,12 @@ const Icons = {
   ),
 };
 
-export const HighSchoolEducation = ({
+export const PHDEducation = ({
   prefix,
   register,
-  errors,
   onRemove,
-  showFinalExam = true,
-}: HighSchoolEducationProps) => {
+  showThesis = true,
+}: MasterEducationProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -114,7 +98,7 @@ export const HighSchoolEducation = ({
       )}
 
       <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
-        High School Education
+        PHD Education
       </h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,21 +106,19 @@ export const HighSchoolEducation = ({
           label="Field of Study"
           type="text"
           id={`${prefix}.fieldOfStudy`}
-          placeholder="Example:General"
+          placeholder="Enter your field of study"
           required
           register={register}
-          error={errors?.fieldOfStudy}
           icon={<Icons.Book className="w-4 h-4" />}
         />
 
         <FormInput
-          label="School Name"
+          label="Institution Name"
           type="text"
           id={`${prefix}.institutionName`}
           placeholder="Enter institution name"
           required
           register={register}
-          error={errors?.institutionName}
           icon={<Icons.University className="w-4 h-4" />}
         />
 
@@ -147,7 +129,6 @@ export const HighSchoolEducation = ({
           placeholder="Enter Average Marks"
           required
           register={register}
-          error={errors?.gpa}
           icon={<Icons.Education className="w-4 h-4" />}
         />
 
@@ -157,7 +138,6 @@ export const HighSchoolEducation = ({
           id={`${prefix}.academicRank`}
           placeholder="Enter academic rank (optional)"
           register={register}
-          error={errors?.academicRank}
         />
 
         <FormInput
@@ -167,7 +147,6 @@ export const HighSchoolEducation = ({
           placeholder=""
           required
           register={register}
-          error={errors?.startDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
@@ -178,40 +157,31 @@ export const HighSchoolEducation = ({
           placeholder=""
           required
           register={register}
-          error={errors?.graduationDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
-        <FormInput
-          label="Academic Gap Since Last Graduation"
-          type="text"
-          id={`${prefix}.academic_gap`}
-          placeholder="1 year and 6 months"
-          required
-          register={register}
-          error={errors?.academic_gap}
-          icon={<Icons.Clock className="w-4 h-4" />}
-        />
-        {showFinalExam && (
+        {showThesis && (
           <>
             <FormInput
-              label="Kankor Exam Year"
-              type="number"
-              id={`${prefix}.finalExamYear`}
-              placeholder="Enter Kankor exam year"
-              required
+              label="Thesis Topic"
+              type="text"
+              id={`${prefix}.thesisTopic`}
+              placeholder="Enter thesis topic (optional)"
               register={register}
-              error={errors?.finalExamYear}
             />
 
-            <FormInput
-              label="Kankor Exam Score"
-              type="number"
-              id={`${prefix}.finalExamScore`}
-              placeholder="Enter Kankor exam score"
-              required
-              register={register}
-              error={errors?.finalExamScore}
+            <FileUpload
+              id={`${prefix}.thesisFile`}
+              label="Upload Thesis File"
+              onFileAccepted={(file) => {
+                // Handle file upload
+                register(
+                  `${prefix}.thesisFile` as Path<EducationFormData>,
+                ).onChange({
+                  target: { name: `${prefix}.thesisFile`, value: file },
+                });
+              }}
+              icon={<Icons.Education className="w-4 h-4" />}
             />
           </>
         )}
@@ -226,7 +196,6 @@ export const HighSchoolEducation = ({
               target: { name: `${prefix}.diplomaFile`, value: file },
             });
           }}
-          error={errors?.diplomaFile?.message}
           icon={<Icons.Education className="w-4 h-4" />}
         />
 
@@ -240,7 +209,6 @@ export const HighSchoolEducation = ({
               target: { name: `${prefix}.transcriptFile`, value: file },
             });
           }}
-          error={errors?.transcriptFile?.message}
           icon={<Icons.Education className="w-4 h-4" />}
         />
       </div>
