@@ -23,6 +23,7 @@ import { MasterEducation as MasterSection } from "./education/MasterSection";
 import { BachelorEducation as BachelorSection } from "./education/BachelorSection";
 import { HighSchoolEducation as HighSchoolSection } from "./education/HighSchoolSection";
 
+
 // Icons
 const Icons = {
   Education: ({ className = "w-4 h-4" }) => (

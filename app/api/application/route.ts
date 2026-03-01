@@ -2,8 +2,9 @@ import { ConnectDB } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import User from "@/models/User";
-import Applications from "@/models/Applications";
+
 import { PersonalInfoFormData } from "@/types/application";
+import Applications from "@/models/Applications";
 
 export async function POST(req: NextRequest) {
   await ConnectDB();
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (!formData?.email) {
       return NextResponse.json(
         { success: false, message: "Email is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -46,21 +47,21 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // Update user basic info
- const emailNormalized = email.trim().toLowerCase();
-const updatedUser = await User.findOneAndUpdate(
-  { email: emailNormalized },
-  { $set: { first_name, last_name, phone } },
-  { returnDocument: "after", session, runValidators: true }
-);
+    const emailNormalized = email.trim().toLowerCase();
+    const updatedUser = await User.findOneAndUpdate(
+      { email: emailNormalized },
+      { $set: { first_name, last_name, phone } },
+      { returnDocument: "after", session, runValidators: true },
+    );
     if (!updatedUser) {
       return NextResponse.json(
         { success: false, message: "Failed to update user" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -118,7 +119,7 @@ const updatedUser = await User.findOneAndUpdate(
             },
           },
         ],
-        { session }
+        { session },
       );
     }
 
@@ -137,7 +138,28 @@ const updatedUser = await User.findOneAndUpdate(
 
     return NextResponse.json(
       { success: false, message: "Transaction failed", error },
-      { status: 500 }
+      { status: 500 },
     );
+  }
+}
+
+export async function GET() {
+  try {
+    await ConnectDB();
+
+    const Applicationss = await Applications.find().sort({ createdAt: -1 });
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: Applicationss,
+        message: "Applicationss retrieved successfully",
+      },
+      { status: 200 },
+    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

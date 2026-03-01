@@ -160,7 +160,7 @@ export const FileUpload = ({
 
         {/* Digital Underline Effect */}
         <motion.div
-          className="absolute -bottom-px left-0 h-0.5 bg-gradient-to-r from-[#00A3FF] to-[#7000FF]"
+          className="absolute -bottom-px left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
           initial={{ width: "0%" }}
           animate={{ width: isFocused ? "100%" : "0%" }}
           transition={{ duration: 0.3 }}
