@@ -15,9 +15,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const formData: PersonalInfoFormData = body;
-    console.log("Received formData:", formData);
-
-    // Validate required fields
     if (!formData?.email) {
       return NextResponse.json(
         { success: false, message: "Email is required" },

@@ -19,7 +19,7 @@ interface EducationInput {
   majorSubjects?: string[];
 }
 
-type EducationLevel = "HighSchool" | "Bachelor" | "Master" | "PHD";
+type EducationLevel = "High School" | "Bachelor" | "Master" | "PHD";
 
 interface EducationItemDB {
   level: EducationLevel;
@@ -64,7 +64,10 @@ export async function POST(req: NextRequest) {
 
     const educationArray: EducationItemDB[] = [];
 
-    const processEducation = (items: EducationInput[], eduLevel: EducationLevel) => {
+    const processEducation = (
+      items: EducationInput[],
+      eduLevel: EducationLevel,
+    ) => {
       items.forEach((edu) => {
         const startDate = new Date(edu.startDate);
         const graduationDate = new Date(edu.graduationDate);
@@ -76,7 +79,9 @@ export async function POST(req: NextRequest) {
           gpa: edu.gpa,
           academicRank: edu.academicRank,
           startDate: isNaN(startDate.getTime()) ? null : startDate,
-          graduationDate: isNaN(graduationDate.getTime()) ? null : graduationDate,
+          graduationDate: isNaN(graduationDate.getTime())
+            ? null
+            : graduationDate,
           educationGapExplanation: edu.educationGapExplanation,
           thesisTopic: edu.thesisTopic,
           thesisFileUrl: edu.thesisFileUrl,
@@ -89,8 +94,10 @@ export async function POST(req: NextRequest) {
       });
     };
 
-    if (highSchoolEducation?.length) processEducation(highSchoolEducation, "HighSchool");
-    if (bachelorEducation?.length) processEducation(bachelorEducation, "Bachelor");
+    if (highSchoolEducation?.length)
+      processEducation(highSchoolEducation, "High School");
+    if (bachelorEducation?.length)
+      processEducation(bachelorEducation, "Bachelor");
 
     if (phdEducation) {
       if (Array.isArray(phdEducation)) {
@@ -111,7 +118,7 @@ export async function POST(req: NextRequest) {
     const application = await Applications.findOneAndUpdate(
       { userId },
       { level, education: educationArray },
-      { upsert: true, returnDocument: "after", runValidators: true }
+      { upsert: true, returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({
@@ -122,8 +129,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { success: false, message: "Error saving education", error: (error as Error).message },
-      { status: 500 }
+      {
+        success: false,
+        message: "Error saving education",
+        error: (error as Error).message,
+      },
+      { status: 500 },
     );
   }
 }

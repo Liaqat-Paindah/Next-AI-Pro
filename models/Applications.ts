@@ -99,7 +99,7 @@ education: [
   {
     level: {
       type: String,
-      enum: ["Master", "Bachelor", "PHD", "HighSchool"],
+      enum: ["Master", "Bachelor", "PHD", "High School"],
       required: true,
     },
     fieldOfStudy: { type: String, required: true },
@@ -113,8 +113,8 @@ education: [
     thesisFileUrl: { type: String }, // optional
     diplomaFileUrl: { type: String }, // optional
     transcriptFileUrl: { type: String }, // optional
-    finalExamYear: { type: Number }, // for high school: KanKoor year
-    finalExamScore: { type: Number }, // for high school: KanKoor score
+    finalExamYear: { type: Number }, // for High_School: KanKoor year
+    finalExamScore: { type: Number }, // for High_School: KanKoor score
     majorSubjects: [String], // optional
   },
 ],
