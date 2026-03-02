@@ -68,6 +68,7 @@ export const FormInput = <T extends FieldValues>({
             id={id as string}
             {...register(fieldId, type === "number" ? { valueAsNumber: true } : {})}
             placeholder={placeholder}
+            required
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             disabled={disabled}

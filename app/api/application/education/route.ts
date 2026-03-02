@@ -19,7 +19,7 @@ interface EducationInput {
   majorSubjects?: string[];
 }
 
-type EducationLevel = "HighSchool" | "Bachelor" | "Master";
+type EducationLevel = "High School" | "Bachelor" | "Master" | "PHD";
 
 interface EducationItemDB {
   level: EducationLevel;
@@ -41,10 +41,11 @@ interface EducationItemDB {
 
 interface RequestBody {
   userId: string;
-  level: EducationLevel | "PHD";
+  level: EducationLevel;
   highSchoolEducation?: EducationInput[];
   bachelorEducation?: EducationInput[];
   masterEducation?: EducationInput | EducationInput[];
+  phdEducation?: EducationInput | EducationInput[];
 }
 
 export async function POST(req: NextRequest) {
@@ -52,11 +53,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const body: RequestBody = await req.json();
-    const { userId, level, highSchoolEducation, bachelorEducation, masterEducation } = body;
+    const {
+      userId,
+      level,
+      highSchoolEducation,
+      bachelorEducation,
+      masterEducation,
+      phdEducation,
+    } = body;
 
     const educationArray: EducationItemDB[] = [];
 
-    const processEducation = (items: EducationInput[], eduLevel: EducationLevel) => {
+    const processEducation = (
+      items: EducationInput[],
+      eduLevel: EducationLevel,
+    ) => {
       items.forEach((edu) => {
         const startDate = new Date(edu.startDate);
         const graduationDate = new Date(edu.graduationDate);
@@ -68,7 +79,9 @@ export async function POST(req: NextRequest) {
           gpa: edu.gpa,
           academicRank: edu.academicRank,
           startDate: isNaN(startDate.getTime()) ? null : startDate,
-          graduationDate: isNaN(graduationDate.getTime()) ? null : graduationDate,
+          graduationDate: isNaN(graduationDate.getTime())
+            ? null
+            : graduationDate,
           educationGapExplanation: edu.educationGapExplanation,
           thesisTopic: edu.thesisTopic,
           thesisFileUrl: edu.thesisFileUrl,
@@ -81,8 +94,18 @@ export async function POST(req: NextRequest) {
       });
     };
 
-    if (highSchoolEducation?.length) processEducation(highSchoolEducation, "HighSchool");
-    if (bachelorEducation?.length) processEducation(bachelorEducation, "Bachelor");
+    if (highSchoolEducation?.length)
+      processEducation(highSchoolEducation, "High School");
+    if (bachelorEducation?.length)
+      processEducation(bachelorEducation, "Bachelor");
+
+    if (phdEducation) {
+      if (Array.isArray(phdEducation)) {
+        processEducation(phdEducation, "PHD");
+      } else {
+        processEducation([phdEducation], "PHD");
+      }
+    }
 
     if (masterEducation) {
       if (Array.isArray(masterEducation)) {
@@ -95,7 +118,7 @@ export async function POST(req: NextRequest) {
     const application = await Applications.findOneAndUpdate(
       { userId },
       { level, education: educationArray },
-      { upsert: true, returnDocument: "after", runValidators: true }
+      { upsert: true, returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({
@@ -106,8 +129,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { success: false, message: "Error saving education", error: (error as Error).message },
-      { status: 500 }
+      {
+        success: false,
+        message: "Error saving education",
+        error: (error as Error).message,
+      },
+      { status: 500 },
     );
   }
 }

@@ -82,62 +82,32 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-    
-education: [
-  {
-    level: {
-      type: String,
-      enum: ["Master", "Bachelor", "PHD", "HighSchool"],
-      required: true,
-    },
-    fieldOfStudy: { type: String, required: true },
-    institutionName: { type: String, required: true },
-    gpa: { type: Number, required: true },
-    academicRank: { type: String }, // Optional rank
-    startDate: { type: Date, required: true },
-    graduationDate: { type: Date, required: true },
-    educationGapExplanation: { type: String }, // optional
-    thesisTopic: { type: String }, // optional
-    thesisFileUrl: { type: String }, // optional
-    diplomaFileUrl: { type: String }, // optional
-    transcriptFileUrl: { type: String }, // optional
-    finalExamYear: { type: Number }, // for high school: KanKoor year
-    finalExamScore: { type: Number }, // for high school: KanKoor score
-    majorSubjects: [String], // optional
-  },
-],
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    education: [
+      {
+        level: {
+          type: String,
+          enum: ["Master", "Bachelor", "PHD", "High School"],
+          required: true,
+        },
+        fieldOfStudy: { type: String, required: true },
+        institutionName: { type: String, required: true },
+        gpa: { type: Number, required: true },
+        academicRank: { type: String }, // Optional rank
+        startDate: { type: Date, required: true },
+        graduationDate: { type: Date, required: true },
+        educationGapExplanation: { type: String }, // optional
+        thesisTopic: { type: String }, // optional
+        thesisFileUrl: { type: String }, // optional
+        diplomaFileUrl: { type: String }, // optional
+        transcriptFileUrl: { type: String }, // optional
+        finalExamYear: { type: Number }, // for High_School: KanKoor year
+        finalExamScore: { type: Number }, // for High_School: KanKoor score
+        majorSubjects: [String], // optional
+        diplomaFile: { type: String }, // Store relative path
+        transcriptFile: { type: String },
+        thesisFile: { type: String },
+      },
+    ],
 
     // =========================
     // 2. Research Activities
@@ -317,5 +287,5 @@ education: [
   },
 );
 
-export default mongoose.models.ScholarshipApplication || 
-       mongoose.model("ScholarshipApplication", ScholarshipApplicationSchema);
+export default mongoose.models.ScholarshipApplication ||
+  mongoose.model("ScholarshipApplication", ScholarshipApplicationSchema);

@@ -23,8 +23,8 @@ interface Personal {
   nationality: string;
   nationalId: string;
   passportId: string;
-  dateOfIssue: string;
-  dateOfExpire: string;
+  dateofIssue: string;
+  dataofExpire: string;
 }
 
 interface Props {
@@ -59,24 +59,23 @@ const capitalizeText = (text: string | number): string => {
     .join(" ");
 };
 
-// Date formatting with validation
-const formatDate = (date: string): string => {
+const formatDate = (date?: string | null): string => {
   if (!date) return "N/A";
 
-  try {
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime()) || dateObj.getFullYear() <= 1) return "N/A";
-    return dateObj.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return "N/A";
-  }
+  // Replace timezone offset with Z to ensure proper parsing
+  const cleanedDate = date.replace(/\+00:00$/, "Z");
+  const dateObj = new Date(cleanedDate);
+
+  if (isNaN(dateObj.getTime()) || dateObj.getFullYear() <= 1) return "N/A";
+
+  return dateObj.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
-// Loading Skeleton Component
+
 const PersonalInfoSkeleton = () => (
   <motion.div
     initial={{ opacity: 0 }}
@@ -198,7 +197,6 @@ const InfoItem = ({
 
 const PersonalInfo = ({ personal, isLoading = false, onError }: Props) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -350,14 +348,15 @@ const PersonalInfo = ({ personal, isLoading = false, onError }: Props) => {
                     />
                     <InfoItem
                       label="Passport Issue Date"
-                      value={formatDate(personal.dateOfIssue)}
+                      value={formatDate(personal.dateofIssue)}
                       id="issue-date"
                     />
                     <InfoItem
                       label="Passport Expiry Date"
-                      value={formatDate(personal.dateOfExpire)}
+                      value={formatDate(personal.dataofExpire)}
                       id="expiry-date"
                     />
+                    
                   </div>
                 </motion.div>
               </div>
