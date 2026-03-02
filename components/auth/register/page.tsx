@@ -627,7 +627,7 @@ export default function RegisterForm() {
               <div className="space-y-6">
                 {/* First Time Tip - Using same structure as other items */}
                 <div className="flex gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full  dark:bg-blue-900/30 flex items-center justify-center bg-primary/10 dark:text-gray-700">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Info className="h-4 w-4" />
                   </div>
                   <div>

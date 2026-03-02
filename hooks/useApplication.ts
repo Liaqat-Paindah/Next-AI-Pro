@@ -1,5 +1,8 @@
-import {  EducationFormDataField, PersonalInfoFormData } from "@/types/application";
-import { useMutation } from "@tanstack/react-query";
+import {
+  EducationFormDataField,
+  PersonalInfoFormData,
+} from "@/types/application";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -17,7 +20,7 @@ export const UsePersonalInformation = () => {
     },
     onSuccess: () => {
       toast.success("Personal information has been successfully saved");
-      router.push("/dashboard/application/education_info");
+      router.push("/dashboard/applicants/educationStep");
     },
     onError: () => {
       toast.error(`Failed to save personal information`);
@@ -43,5 +46,20 @@ export const UseEducationInformation = () => {
     onError: () => {
       toast.error(`Failed to save personal information`);
     },
+  });
+};
+
+export const UseGetApplicants = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["UseGetApplicants"],
+    queryFn: async () => {
+      const response = await axios.get(`/api/application/${id}`);
+      if (!response.data) {
+        throw new Error("Failed to fetch Applicantion");
+      }
+      return response.data;
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 };

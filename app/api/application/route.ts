@@ -143,23 +143,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  try {
-    await ConnectDB();
-
-    const Applicationss = await Applications.find().sort({ createdAt: -1 });
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: Applicationss,
-        message: "Applicationss retrieved successfully",
-      },
-      { status: 200 },
-    );
-  } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-    return NextResponse.json({ success: false, message }, { status: 500 });
-  }
-}

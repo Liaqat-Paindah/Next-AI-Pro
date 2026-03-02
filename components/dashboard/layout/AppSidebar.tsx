@@ -30,7 +30,7 @@ const mainNavItems: NavItem[] = [
   {
     icon: <FileText className="w-4 h-4" />,
     name: "Application",
-    path: "/application",
+    path: "/dashboard/applicants",
   },
   {
     icon: <User className="w-4 h-4" />,
