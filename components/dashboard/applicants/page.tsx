@@ -28,14 +28,15 @@ const Application = () => {
     return <div>Something went wrong.</div>;
   }
 
-
-if (!application?.personal) {
-  return <div>No personal information found.</div>;
-}
+  if (!application?.personal) {
+    return <div>No personal information found.</div>;
+  }
 
   return (
-    <div className="">
-      <PersonalInfo  personal={application?.personal} />
+    <div>
+      <div className="py-1">
+        <PersonalInfo personal={application?.personal} />
+      </div>
     </div>
   );
 };

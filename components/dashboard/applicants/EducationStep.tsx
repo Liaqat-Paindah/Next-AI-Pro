@@ -6,9 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  educationSchema,
   EducationFormData,
   BachelorEducation,
   HighSchoolEducation,
@@ -19,6 +17,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 // Import components
 import { FormInput } from "./education/FormInput";
+import { PHDEducation as PHDSection } from "./education/PHDSection";
 import { MasterEducation as MasterSection } from "./education/MasterSection";
 import { BachelorEducation as BachelorSection } from "./education/BachelorSection";
 import { HighSchoolEducation as HighSchoolSection } from "./education/HighSchoolSection";
@@ -167,6 +166,10 @@ const createEmptyMaster = (): MasterEducation => ({
   transcriptFile: undefined,
 });
 
+const createEmptyPhd = (): MasterEducation => ({
+  ...createEmptyMaster(),
+});
+
 export default function EducationInfo() {
   const router = useRouter();
   const { data: userSession, status } = useSession();
@@ -176,6 +179,7 @@ export default function EducationInfo() {
   const [levelSelected, setLevelSelected] = useState(false);
 
   // State to control section visibility
+  const [showPhd, setShowPhd] = useState(false);
   const [showMaster, setShowMaster] = useState(false);
   const [showBachelor, setShowBachelor] = useState(false);
   const [showHighSchool, setShowHighSchool] = useState(false);
@@ -192,7 +196,6 @@ export default function EducationInfo() {
     setValue,
     getValues,
   } = useForm<EducationFormData>({
-    resolver: zodResolver(educationSchema),
     defaultValues: {
       level: undefined,
     },
@@ -204,6 +207,7 @@ export default function EducationInfo() {
   useEffect(() => {
     if (!selectedLevel) {
       setLevelSelected(false);
+      setShowPhd(false);
       setShowMaster(false);
       setShowBachelor(false);
       setShowHighSchool(false);
@@ -227,9 +231,12 @@ export default function EducationInfo() {
     // Set up sections based on selected level
     switch (selectedLevel) {
       case "PHD":
+        setShowPhd(true);
         setShowMaster(true);
         setShowBachelor(true);
         setShowHighSchool(true);
+        // Initialize PhD education
+        setValue("phdEducation", createEmptyPhd());
         // Initialize master education for PhD
         setValue("masterEducation", createEmptyMaster());
         // Initialize one bachelor education by default for PhD
@@ -241,6 +248,7 @@ export default function EducationInfo() {
         break;
 
       case "Master":
+        setShowPhd(false);
         setShowMaster(true);
         setShowBachelor(true);
         setShowHighSchool(true);
@@ -255,6 +263,7 @@ export default function EducationInfo() {
         break;
 
       case "Bachelor":
+        setShowPhd(false);
         setShowMaster(false);
         setShowBachelor(true);
         setShowHighSchool(true);
@@ -267,6 +276,7 @@ export default function EducationInfo() {
         break;
 
       case "HighSchool":
+        setShowPhd(false);
         setShowMaster(false);
         setShowBachelor(false);
         setShowHighSchool(true);
@@ -297,6 +307,7 @@ export default function EducationInfo() {
 
     // Add level-specific fields based on the selected level
     if (data.level === "PHD") {
+      submissionData.phdEducation = data.phdEducation;
       submissionData.masterEducation = data.masterEducation;
       submissionData.bachelorEducation = data.bachelorEducation;
       submissionData.highSchoolEducation = data.highSchoolEducation;
@@ -457,24 +468,27 @@ export default function EducationInfo() {
                     transition={{ delay: 0.2 }}
                     className="space-y-8"
                   >
+                    {/* PHD Education Section */}
+                    {showPhd && selectedLevel === "PHD" && (
+                      <div className="space-y-4">
+                        <PHDSection
+                          prefix="phdEducation"
+                          register={register}
+                          showThesis={true}
+                        />
+                      </div>
+                    )}
+
                     {/* Master Education Section - shown for PHD and Master */}
                     {showMaster &&
                       (selectedLevel === "PHD" ||
                         selectedLevel === "Master") && (
                         <div className="space-y-4">
-                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                            {selectedLevel === "PHD"
-                              ? "PHD Program Details"
-                              : "Master's Program Details"}
-                          </h4>
                           <MasterSection
                             prefix="masterEducation"
                             register={register}
                             errors={errors}
-                            showThesis={
-                              selectedLevel === "Master" ||
-                              selectedLevel === "PHD"
-                            }
+                            showThesis={true}
                           />
                         </div>
                       )}
@@ -483,9 +497,6 @@ export default function EducationInfo() {
                     {showBachelor && (
                       <motion.div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                            Bachelor Degree Information
-                          </h4>
                           {(selectedLevel === "PHD" ||
                             selectedLevel === "Master" ||
                             selectedLevel === "Bachelor") && (
@@ -530,9 +541,6 @@ export default function EducationInfo() {
                     {showHighSchool && (
                       <motion.div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                            High School Education Information
-                          </h4>
                           <motion.button
                             type="button"
                             onClick={addHighSchoolEducation}
@@ -541,7 +549,7 @@ export default function EducationInfo() {
                             className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
                           >
                             <Icons.Add className="w-4 h-4" />
-                            Add Another High School
+                            Add Baccalaureate Details
                           </motion.button>
                         </div>
 
@@ -577,7 +585,7 @@ export default function EducationInfo() {
                         <strong>Note:</strong> You are providing details for{" "}
                         {getSelectedLevelLabel()}.
                         {selectedLevel === "PHD" &&
-                          " Please include your Master's, Bachelor's, and High School education details."}
+                          " Please include your PhD, Master's, Bachelor's, and High School education details."}
                         {selectedLevel === "Master" &&
                           " Please include your Bachelor's and High School education details."}
                         {selectedLevel === "Bachelor" &&

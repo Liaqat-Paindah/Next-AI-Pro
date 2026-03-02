@@ -19,7 +19,7 @@ interface EducationInput {
   majorSubjects?: string[];
 }
 
-type EducationLevel = "HighSchool" | "Bachelor" | "Master";
+type EducationLevel = "HighSchool" | "Bachelor" | "Master" | "PHD";
 
 interface EducationItemDB {
   level: EducationLevel;
@@ -41,10 +41,11 @@ interface EducationItemDB {
 
 interface RequestBody {
   userId: string;
-  level: EducationLevel | "PHD";
+  level: EducationLevel;
   highSchoolEducation?: EducationInput[];
   bachelorEducation?: EducationInput[];
   masterEducation?: EducationInput | EducationInput[];
+  phdEducation?: EducationInput | EducationInput[];
 }
 
 export async function POST(req: NextRequest) {
@@ -52,7 +53,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body: RequestBody = await req.json();
-    const { userId, level, highSchoolEducation, bachelorEducation, masterEducation } = body;
+    const {
+      userId,
+      level,
+      highSchoolEducation,
+      bachelorEducation,
+      masterEducation,
+      phdEducation,
+    } = body;
 
     const educationArray: EducationItemDB[] = [];
 
@@ -83,6 +91,14 @@ export async function POST(req: NextRequest) {
 
     if (highSchoolEducation?.length) processEducation(highSchoolEducation, "HighSchool");
     if (bachelorEducation?.length) processEducation(bachelorEducation, "Bachelor");
+
+    if (phdEducation) {
+      if (Array.isArray(phdEducation)) {
+        processEducation(phdEducation, "PHD");
+      } else {
+        processEducation([phdEducation], "PHD");
+      }
+    }
 
     if (masterEducation) {
       if (Array.isArray(masterEducation)) {

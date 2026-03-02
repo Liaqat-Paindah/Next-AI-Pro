@@ -73,6 +73,7 @@ export const educationSchema = z.discriminatedUnion("level", [
   // PHD schema
   z.object({
     level: z.literal("PHD"),
+    phdEducation: masterEducationSchema,
     masterEducation: masterEducationSchema,
     bachelorEducation: z
       .array(bachelorEducationSchema)
@@ -111,6 +112,7 @@ export const educationSchema = z.discriminatedUnion("level", [
 
 export type EducationFormData = z.infer<typeof educationSchema>;
 export type MasterEducation = z.infer<typeof masterEducationSchema>;
+export type PhdEducation = MasterEducation;
 export type BachelorEducation = z.infer<typeof bachelorEducationSchema>;
 export type HighSchoolEducation = z.infer<typeof highSchoolEducationSchema>;
 
@@ -164,6 +166,7 @@ export interface FileUploadProps {
 export interface EducationFormDataField {
   userId: string;
   level: "PHD" | "Master" | "Bachelor" | "HighSchool";
+  phdEducation?: PhdEducation;
   masterEducation?: MasterEducation;
   bachelorEducation?: BachelorEducation[];
   highSchoolEducation?: HighSchoolEducation[];
