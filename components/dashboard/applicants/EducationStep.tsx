@@ -324,7 +324,6 @@ export default function EducationInfo() {
       submissionData.highSchoolEducation = data.highSchoolEducation;
     }
 
-    console.log("Submission Data:", submissionData);
     mutation.mutate(submissionData);
   };
 
