@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import AcademicArticles from "./academicActivities/Articles";
 
-const AcademicActivitiesStep = () => {
+const AcademicStep = () => {
   return (
-    <div>AcademicActivitiesStep</div>
-  )
-}
+    <div>
+      <AcademicArticles></AcademicArticles>
+    </div>
+  );
+};
 
-export default AcademicActivitiesStep
+export default AcademicStep;

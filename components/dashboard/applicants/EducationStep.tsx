@@ -324,7 +324,6 @@ export default function EducationInfo() {
       submissionData.highSchoolEducation = data.highSchoolEducation;
     }
 
-    console.log("Submission Data:", submissionData);
     mutation.mutate(submissionData);
   };
 
@@ -423,7 +422,7 @@ export default function EducationInfo() {
                 </div>
 
                 {/* Education Level Selection - Always Visible */}
-                <div className=" dark:bg-[#022b40] dark:border-[#064e78]">
+                <div className=" ">
                   <FormInput
                     label="Highest Level of Education"
                     type="select"

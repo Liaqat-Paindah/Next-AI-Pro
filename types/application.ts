@@ -171,3 +171,17 @@ export interface EducationFormDataField {
   bachelorEducation?: BachelorEducation[];
   highSchoolEducation?: HighSchoolEducation[];
 }
+
+// Articales
+
+export interface Article {
+  title: string;
+  apaReference: string;
+  link: string;
+}
+
+export interface AcademicArticlesPayload {
+  hasAcademicArticles: "Yes" | "No";
+  academicArticles: Article[];
+  userId:string
+}
