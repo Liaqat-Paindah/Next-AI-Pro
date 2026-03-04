@@ -1,4 +1,5 @@
 import {
+  AcademicArticlesPayload,
   EducationFormDataField,
   PersonalInfoFormData,
 } from "@/types/application";
@@ -30,7 +31,7 @@ export const UsePersonalInformation = () => {
 
 export const UseEducationInformation = () => {
   const router = useRouter();
-  
+
   return useMutation({
     mutationKey: ["UsePersonalInformation"],
     mutationFn: async (data: EducationFormDataField) => {
@@ -88,13 +89,19 @@ export const UseEducationInformation = () => {
 
       if (data.masterEducation) {
         const prefix = "masterEducation";
-        appendText(`${prefix}[fieldOfStudy]`, data.masterEducation.fieldOfStudy);
+        appendText(
+          `${prefix}[fieldOfStudy]`,
+          data.masterEducation.fieldOfStudy,
+        );
         appendText(
           `${prefix}[institutionName]`,
           data.masterEducation.institutionName,
         );
         appendText(`${prefix}[gpa]`, data.masterEducation.gpa);
-        appendText(`${prefix}[academicRank]`, data.masterEducation.academicRank);
+        appendText(
+          `${prefix}[academicRank]`,
+          data.masterEducation.academicRank,
+        );
         appendText(`${prefix}[startDate]`, data.masterEducation.startDate);
         appendText(
           `${prefix}[graduationDate]`,
@@ -133,7 +140,7 @@ export const UseEducationInformation = () => {
       }
 
       const response = await axios.post(`/api/application/education`, formData);
-      
+
       if (!response.data) {
         throw new Error("Failed to create applicant information");
       }
@@ -144,7 +151,7 @@ export const UseEducationInformation = () => {
       router.push("/dashboard/applicants/academicActivitiesStep");
     },
     onError: (error) => {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
       toast.error(`Failed to save educational information`);
     },
   });
@@ -162,5 +169,29 @@ export const UseGetApplicants = (id: string | undefined) => {
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
+  });
+};
+
+export const UseAcademicArticles = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationKey: ["UseAcademicArticles"],
+    mutationFn: async (data: AcademicArticlesPayload) => {
+      const response = await axios.post(
+        "/api/application/academicActivities",
+        data,
+      );
+      if (!response.data) {
+        throw new Error("Failed to save academic articles");
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Academic articles saved successfully");
+      router.push("/dashboard/applicants/educationStep");
+    },
+    onError: () => {
+      toast.error("Failed to save academic articles");
+    },
   });
 };
