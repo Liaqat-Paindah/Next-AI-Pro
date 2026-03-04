@@ -4,12 +4,7 @@ import Applications from "@/models/Applications";
 import fs from "fs";
 import path from "path";
 
-// Tell Next.js this route should not parse the body
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+
 
 // File upload utility
 async function saveFile(file: File, subDir: string): Promise<string> {
