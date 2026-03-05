@@ -246,7 +246,6 @@ export const UseResearchProjects = () => {
   });
 };
 
-
 export const UseConferences = () => {
   const router = useRouter();
 
@@ -257,10 +256,7 @@ export const UseConferences = () => {
       formData.append("hasConferences", data.hasConferences);
       formData.append("userId", data.userId || "");
       if (data.hasConferences === "Yes") {
-        formData.append(
-          "projectsCount",
-          data.Conferences.length.toString(),
-        );
+        formData.append("projectsCount", data.Conferences.length.toString());
 
         data.Conferences.forEach((project, index) => {
           formData.append(`projects[${index}][title]`, project.title);
@@ -270,7 +266,7 @@ export const UseConferences = () => {
         });
       }
       const response = await axios.post(
-        "/api/application/Conferences",
+        "/api/application/conferences",
         formData,
         {
           headers: {
