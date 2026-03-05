@@ -1,5 +1,6 @@
 import { ConferencesPayload } from "@/components/dashboard/applicants/academicActivities/conferences";
 import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/academicActivities/laboratoryActivities";
+import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import {
   AcademicArticlesPayload,
@@ -332,10 +333,55 @@ export const UseLaboratoryActivities = () => {
     },
     onSuccess: () => {
       toast.success("Laboratory activities saved successfully");
-      router.push("/dashboard/applicants/laboratoryActivities");
+      router.push("/dashboard/applicants/researchSkills");
     },
     onError: () => {
       toast.error("Failed to save laboratory activities");
+    },
+  });
+};
+
+export const UseResearchSkills = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseResearchSkills"],
+    mutationFn: async (data: ResearchSkillsPayload) => {
+      const formData = new FormData();
+      formData.append("hasResearchSkills", data.hasResearchSkills);
+      formData.append("userId", data.userId || "");
+      if (data.hasResearchSkills === "Yes") {
+        formData.append("skillsCount", data.researchSkills.length.toString());
+
+        data.researchSkills.forEach((skill, index) => {
+          formData.append(`skills[${index}][title]`, skill.title);
+          if (skill.file) {
+            formData.append(`skills[${index}][file]`, skill.file); // must be File object
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/researchSkills",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save research skills");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Research skills saved successfully");
+      router.push("/dashboard/applicants"); // Update this route as needed
+    },
+    onError: () => {
+      toast.error("Failed to save research skills");
     },
   });
 };
