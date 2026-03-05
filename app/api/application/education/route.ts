@@ -4,8 +4,6 @@ import Applications from "@/models/Applications";
 import fs from "fs";
 import path from "path";
 
-
-
 // File upload utility
 async function saveFile(file: File, subDir: string): Promise<string> {
   const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", subDir);
@@ -381,7 +379,7 @@ export async function POST(req: NextRequest) {
     const application = await Applications.findOneAndUpdate(
       { userId },
       { level, education: educationArray },
-      { upsert: true, new: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({

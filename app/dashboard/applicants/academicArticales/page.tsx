@@ -1,7 +1,7 @@
 import Loading from "@/app/loading";
 import React from "react";
 import { Suspense } from "react";
-import AcademicActivitiesStep from "@/components/dashboard/applicants/AcademicStep";
+import AcademicActivitiesStep from "@/components/dashboard/applicants/academicActivities/Articles";
 
 const AcademicActivities = () => {
   return (
