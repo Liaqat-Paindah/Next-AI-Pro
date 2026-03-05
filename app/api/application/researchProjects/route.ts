@@ -56,7 +56,13 @@ export async function POST(req: Request) {
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
-      { research: payload },
+      {
+        "research.hasProjects": hasResearchProjects === "Yes",
+        "research.projects": payload.researchProjects.map((p) => ({
+          title: p.title,
+          fileUrl: p.file,
+        })),
+      },
       { returnDocument: "after", runValidators: true },
     );
 
