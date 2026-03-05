@@ -178,7 +178,7 @@ export const UseAcademicArticles = () => {
     mutationKey: ["UseAcademicArticles"],
     mutationFn: async (data: AcademicArticlesPayload) => {
       const response = await axios.post(
-        "/api/application/academicArticales",
+        "/api/application/academicActivities",
         data,
       );
       if (!response.data) {
@@ -190,8 +190,8 @@ export const UseAcademicArticles = () => {
       toast.success("Academic articles saved successfully");
       router.push("/dashboard/applicants/researchProjects");
     },
-    onError: () => {
-      toast.error("Failed to save academic articles");
+    onError: (error) => {
+      toast.error(`Failed to save academic articles ${error}`);
     },
   });
 };
