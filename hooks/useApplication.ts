@@ -1,4 +1,7 @@
+import { AcademicAwardsPayload } from "@/components/dashboard/applicants/academicActivities/academicAwards";
 import { ConferencesPayload } from "@/components/dashboard/applicants/academicActivities/conferences";
+import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/academicActivities/laboratoryActivities";
+import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import {
   AcademicArticlesPayload,
@@ -283,10 +286,148 @@ export const UseConferences = () => {
     },
     onSuccess: () => {
       toast.success("conference or seminars saved successfully");
-      router.push("/dashboard/applicants/conferences");
+      router.push("/dashboard/applicants/laboratoryActivities");
     },
     onError: () => {
       toast.error("Failed to save conference or seminars");
+    },
+  });
+};
+
+export const UseLaboratoryActivities = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseLaboratoryActivities"],
+    mutationFn: async (data: LaboratoryActivitiesPayload) => {
+      const formData = new FormData();
+      formData.append("hasLaboratoryActivities", data.hasLaboratoryActivities);
+      formData.append("userId", data.userId || "");
+      if (data.hasLaboratoryActivities === "Yes") {
+        formData.append(
+          "activitiesCount",
+          data.laboratoryActivities.length.toString(),
+        );
+
+        data.laboratoryActivities.forEach((activity, index) => {
+          formData.append(`activities[${index}][title]`, activity.title);
+          if (activity.file) {
+            formData.append(`activities[${index}][file]`, activity.file);
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/laboratoryActivities",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save laboratory activities");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Laboratory activities saved successfully");
+      router.push("/dashboard/applicants/researchSkills");
+    },
+    onError: () => {
+      toast.error("Failed to save laboratory activities");
+    },
+  });
+};
+
+export const UseResearchSkills = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseResearchSkills"],
+    mutationFn: async (data: ResearchSkillsPayload) => {
+      const formData = new FormData();
+      formData.append("hasResearchSkills", data.hasResearchSkills);
+      formData.append("userId", data.userId || "");
+      if (data.hasResearchSkills === "Yes") {
+        formData.append("skillsCount", data.researchSkills.length.toString());
+
+        data.researchSkills.forEach((skill, index) => {
+          formData.append(`skills[${index}][title]`, skill.title);
+          if (skill.file) {
+            formData.append(`skills[${index}][file]`, skill.file); // must be File object
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/researchSkills",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save research skills");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Research skills saved successfully");
+      router.push("/dashboard/applicants/academicAwards"); // Update this route as needed
+    },
+    onError: () => {
+      toast.error("Failed to save research skills");
+    },
+  });
+};
+
+export const UseAcademicAwards = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseAcademicAwards"],
+    mutationFn: async (data: AcademicAwardsPayload) => {
+      const formData = new FormData();
+      formData.append("hasAcademicAwards", data.hasAcademicAwards);
+      formData.append("userId", data.userId || "");
+      if (data.hasAcademicAwards === "Yes") {
+        formData.append("awardsCount", data.academicAwards.length.toString());
+
+        data.academicAwards.forEach((award, index) => {
+          formData.append(`awards[${index}][title]`, award.title);
+          if (award.file) {
+            formData.append(`awards[${index}][file]`, award.file); // must be File object
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/academicAwards",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save academic awards");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Academic awards saved successfully");
+      router.push("/dashboard/applicants"); // Update this route as needed
+    },
+    onError: () => {
+      toast.error("Failed to save academic awards");
     },
   });
 };
