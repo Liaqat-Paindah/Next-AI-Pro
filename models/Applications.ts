@@ -113,9 +113,9 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       hasArticles: { type: Boolean, default: false },
       hasProjects: { type: Boolean, default: false },
       hasConferences: { type: Boolean, default: false },
-      hasAwards: { type: Boolean, default: false },
       hasLabs: { type: Boolean, default: false },
       hasResearchSkills: { type: Boolean, default: false },
+      hasAcademicAwards: { type: Boolean, default: false },
 
       articles: [
         {
@@ -145,7 +145,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
           fileUrl: { type: String },
         },
       ],
-      awards: [
+      academicAwards: [
         {
           title: { type: String },
           fileUrl: { type: String },
