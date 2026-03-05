@@ -1,40 +1,73 @@
 import { ConnectDB } from "@/lib/config";
 import { NextResponse } from "next/server";
-import { Article } from "@/types/application";
 import Applications from "@/models/Applications";
+import { saveFile } from "@/lib/file_upload";
+
+interface ResearchProject {
+  title: string;
+  file: string | null; // store file path
+}
+
+export interface ResearchProjectsPayload {
+  hasResearchProjects: "Yes" | "No";
+  researchProjects: ResearchProject[];
+  userId: string;
+}
 
 export async function POST(req: Request) {
   try {
     await ConnectDB();
-    const body = await req.json();
-    const { hasAcademicArticles, academicArticles, userId } = body;
-    const researchData = {
-      hasArticles: hasAcademicArticles === "Yes",
-      articles: Array.isArray(academicArticles)
-        ? academicArticles.map((article: Article) => ({
-            title: article.title,
-            citation: article.apaReference,
-            link: article.link,
-          }))
-        : [],
+
+    const formData = await req.formData();
+    const userId = formData.get("userId") as string;
+    const hasResearchProjects = formData.get("hasResearchProjects") as
+      | "Yes"
+      | "No";
+
+    if (!userId) {
+      return NextResponse.json({
+        status: 400,
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const payload: ResearchProjectsPayload = {
+      hasResearchProjects,
+      userId,
+      researchProjects: [],
     };
 
-    const newApplication = await Applications.findOneAndUpdate(
+    if (hasResearchProjects === "Yes") {
+      const projectsCount = Number(formData.get("projectsCount") || 0);
+
+      for (let i = 0; i < projectsCount; i++) {
+        const title = formData.get(`projects[${i}][title]`) as string;
+        const file = formData.get(`projects[${i}][file]`) as File | null;
+
+        let filePath: string | null = null;
+        if (file && file instanceof File) {
+          filePath = await saveFile(file, `researchproject/${userId}`);
+        }
+
+        payload.researchProjects.push({ title, file: filePath });
+      }
+    }
+
+    const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
-      {
-        research: researchData,
-      },
+      { research: payload },
       { returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({
       status: 200,
       success: true,
-      data: newApplication,
-      message: "Application saved successfully",
+      data: updatedApplication,
+      message: "Research Projects saved successfully",
     });
   } catch (error) {
-    console.error("Error saving application:", error);
+    console.error("Error saving research projects:", error);
     return NextResponse.json({
       status: 500,
       success: false,
