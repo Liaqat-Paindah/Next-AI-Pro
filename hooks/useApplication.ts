@@ -1,4 +1,5 @@
 import { ConferencesPayload } from "@/components/dashboard/applicants/academicActivities/conferences";
+import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/academicActivities/laboratoryActivities";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import {
   AcademicArticlesPayload,
@@ -283,10 +284,58 @@ export const UseConferences = () => {
     },
     onSuccess: () => {
       toast.success("conference or seminars saved successfully");
-      router.push("/dashboard/applicants/conferences");
+      router.push("/dashboard/applicants/laboratoryActivities");
     },
     onError: () => {
       toast.error("Failed to save conference or seminars");
+    },
+  });
+};
+
+export const UseLaboratoryActivities = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseLaboratoryActivities"],
+    mutationFn: async (data: LaboratoryActivitiesPayload) => {
+      const formData = new FormData();
+      formData.append("hasLaboratoryActivities", data.hasLaboratoryActivities);
+      formData.append("userId", data.userId || "");
+      if (data.hasLaboratoryActivities === "Yes") {
+        formData.append(
+          "activitiesCount",
+          data.laboratoryActivities.length.toString(),
+        );
+
+        data.laboratoryActivities.forEach((activity, index) => {
+          formData.append(`activities[${index}][title]`, activity.title);
+          if (activity.file) {
+            formData.append(`activities[${index}][file]`, activity.file);
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/laboratoryActivities",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save laboratory activities");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Laboratory activities saved successfully");
+      router.push("/dashboard/applicants/laboratoryActivities");
+    },
+    onError: () => {
+      toast.error("Failed to save laboratory activities");
     },
   });
 };

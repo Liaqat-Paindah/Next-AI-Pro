@@ -109,75 +109,58 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     ],
 
-    
+    research: {
+      hasArticles: { type: Boolean, default: false },
+      hasProjects: { type: Boolean, default: false },
+      hasConferences: { type: Boolean, default: false },
+      hasLaboratoryActivities: { type: Boolean, default: false },
+      hasAwards: { type: Boolean, default: false },
+      hasLabs: { type: Boolean, default: false },
+      hasSkills: { type: Boolean, default: false },
 
+      articles: [
+        {
+          title: { type: String },
+          citation: { type: String }, // APA citation
+          link: { type: String },
+        },
+      ],
 
+      projects: [
+        {
+          title: { type: String },
+          fileUrl: { type: String }, // stored file path
+        },
+      ],
 
+      conferences: [
+        {
+          title: { type: String },
+          fileUrl: { type: String },
+        },
+      ],
 
-research: {
-  hasArticles: { type: Boolean, default: false },
-  hasProjects: { type: Boolean, default: false },
-  hasConferences: { type: Boolean, default: false },
-  hasAwards: { type: Boolean, default: false },
-  hasLabs: { type: Boolean, default: false },
-  hasSkills: { type: Boolean, default: false },
+      awards: [
+        {
+          title: { type: String },
+          fileUrl: { type: String },
+        },
+      ],
 
-  articles: [
-    {
-      title: { type: String },
-      citation: { type: String }, // APA citation
-      link: { type: String },
+      laboratoryActivities: [
+        {
+          title: { type: String },
+          fileUrl: { type: String },
+        },
+      ],
+
+      researchSkills: [
+        {
+          description: { type: String },
+          fileUrl: { type: String },
+        },
+      ],
     },
-  ],
-
-  projects: [
-    {
-      title: { type: String },
-      fileUrl: { type: String }, // stored file path
-    },
-  ],
-
-  conferences: [
-    {
-      title: { type: String },
-      fileUrl: { type: String },
-    },
-  ],
-
-  awards: [
-    {
-      fileUrl: { type: String },
-    },
-  ],
-
-  laboratoryActivities: [
-    {
-      fileUrl: { type: String },
-    },
-  ],
-
-  researchSkills: [
-    {
-      description: { type: String },
-      fileUrl: { type: String },
-    },
-  ],
-},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // =========================
     // 3. Language Skills
