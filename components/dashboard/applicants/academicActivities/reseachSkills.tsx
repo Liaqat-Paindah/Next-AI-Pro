@@ -48,7 +48,7 @@ const researchSkillsSchema = z
       if (!hasAtLeastOneValidSkill) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "At least one research skill with a title is required",
+          message: "At least one research skill with a description is required",
           path: ["researchSkills"],
         });
       }
@@ -435,7 +435,7 @@ const ResearchSkillsForm: React.FC<Props> = ({ onChange }) => {
 
                       <div className="grid grid-cols-1 gap-4">
                         <FormInput
-                          label="Research Skill Title"
+                          label="Research Skill Description"
                           type="text"
                           register={register(`researchSkills.${index}.title`)}
                           placeholder="e.g., Quantitative Analysis, Research Methodology, SPSS, etc."

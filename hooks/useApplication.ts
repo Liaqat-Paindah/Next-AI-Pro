@@ -378,7 +378,7 @@ export const UseResearchSkills = () => {
     },
     onSuccess: () => {
       toast.success("Research skills saved successfully");
-      router.push("/dashboard/applicants"); // Update this route as needed
+      router.push("/dashboard/applicants/academicAwards"); // Update this route as needed
     },
     onError: () => {
       toast.error("Failed to save research skills");
