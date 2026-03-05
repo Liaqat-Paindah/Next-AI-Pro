@@ -148,11 +148,11 @@ export const UseEducationInformation = () => {
     },
     onSuccess: () => {
       toast.success("Educational information has been successfully saved");
-      router.push("/dashboard/applicants/academicActivitiesStep");
+      router.push("/dashboard/applicants/academicArticales");
     },
     onError: (error) => {
       console.error("Upload error:", error);
-      toast.error(`Failed to save educational information`);
+      toast.error(`Failed to save educational information ${error}`);
     },
   });
 };
@@ -178,7 +178,33 @@ export const UseAcademicArticles = () => {
     mutationKey: ["UseAcademicArticles"],
     mutationFn: async (data: AcademicArticlesPayload) => {
       const response = await axios.post(
-        "/api/application/academicActivities",
+        "/api/application/academicArticales",
+        data,
+      );
+      if (!response.data) {
+        throw new Error("Failed to save academic articles");
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Academic articles saved successfully");
+      router.push("/dashboard/applicants/researchProjects");
+    },
+    onError: () => {
+      toast.error("Failed to save academic articles");
+    },
+  });
+};
+
+
+
+export const UseResearchProjects = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationKey: ["UseAcademicArticles"],
+    mutationFn: async (data: AcademicArticlesPayload) => {
+      const response = await axios.post(
+        "/api/application/researchProjects",
         data,
       );
       if (!response.data) {
