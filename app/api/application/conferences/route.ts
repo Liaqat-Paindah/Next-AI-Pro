@@ -3,14 +3,14 @@ import { NextResponse } from "next/server";
 import Applications from "@/models/Applications";
 import { saveFile } from "@/lib/file_upload";
 
-interface ResearchProject {
+interface Conference {
   title: string;
-  file: string | null; // store file path
+  file: string | null;
 }
 
-export interface ResearchProjectsPayload {
-  hasResearchProjects: "Yes" | "No";
-  researchProjects: ResearchProject[];
+export interface ConferencesPayload {
+  hasConferences: "Yes" | "No";
+  Conferences: Conference[];
   userId: string;
 }
 
@@ -19,10 +19,9 @@ export async function POST(req: Request) {
     await ConnectDB();
 
     const formData = await req.formData();
+
     const userId = formData.get("userId") as string;
-    const hasResearchProjects = formData.get("hasResearchProjects") as
-      | "Yes"
-      | "No";
+    const hasConferences = formData.get("hasConferences") as "Yes" | "No";
 
     if (!userId) {
       return NextResponse.json({
@@ -32,13 +31,13 @@ export async function POST(req: Request) {
       });
     }
 
-    const payload: ResearchProjectsPayload = {
-      hasResearchProjects,
+    const payload: ConferencesPayload = {
+      hasConferences,
       userId,
-      researchProjects: [],
+      Conferences: [],
     };
 
-    if (hasResearchProjects === "Yes") {
+    if (hasConferences === "Yes") {
       const projectsCount = Number(formData.get("projectsCount") || 0);
 
       for (let i = 0; i < projectsCount; i++) {
@@ -46,34 +45,39 @@ export async function POST(req: Request) {
         const file = formData.get(`projects[${i}][file]`) as File | null;
 
         let filePath: string | null = null;
+
         if (file && file instanceof File) {
-          filePath = await saveFile(file, `researchproject/${userId}`);
+          filePath = await saveFile(file, `conferences/${userId}`);
         }
 
-        payload.researchProjects.push({ title, file: filePath });
+        payload.Conferences.push({
+          title,
+          file: filePath,
+        });
       }
     }
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
       {
-        "research.hasProjects": hasResearchProjects === "Yes",
-        "research.projects": payload.researchProjects.map((p) => ({
-          title: p.title,
-          fileUrl: p.file,
+        "research.hasConferences": hasConferences === "Yes",
+        "research.conferences": payload.Conferences.map((c) => ({
+          title: c.title,
+          fileUrl: c.file,
         })),
       },
-      { returnDocument: "after", runValidators: true },
+      { returnDocument: "after", runValidators: true }
     );
 
     return NextResponse.json({
       status: 200,
       success: true,
       data: updatedApplication,
-      message: "Research Projects saved successfully",
+      message: "Conferences saved successfully",
     });
   } catch (error) {
-    console.error("Error saving research projects:", error);
+    console.error("Error saving conferences:", error);
+
     return NextResponse.json({
       status: 500,
       success: false,

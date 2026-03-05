@@ -1,3 +1,4 @@
+import { ConferencesPayload } from "@/components/dashboard/applicants/academicActivities/conferences";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import {
   AcademicArticlesPayload,
@@ -241,6 +242,51 @@ export const UseResearchProjects = () => {
     },
     onError: () => {
       toast.error("Failed to save Research Project");
+    },
+  });
+};
+
+export const UseConferences = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseConferences"],
+    mutationFn: async (data: ConferencesPayload) => {
+      const formData = new FormData();
+      formData.append("hasConferences", data.hasConferences);
+      formData.append("userId", data.userId || "");
+      if (data.hasConferences === "Yes") {
+        formData.append("projectsCount", data.Conferences.length.toString());
+
+        data.Conferences.forEach((project, index) => {
+          formData.append(`projects[${index}][title]`, project.title);
+          if (project.file) {
+            formData.append(`projects[${index}][file]`, project.file); // must be File object
+          }
+        });
+      }
+      const response = await axios.post(
+        "/api/application/conferences",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to save conference or seminars");
+      }
+
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("conference or seminars saved successfully");
+      router.push("/dashboard/applicants/conferences");
+    },
+    onError: () => {
+      toast.error("Failed to save conference or seminars");
     },
   });
 };
