@@ -1,3 +1,4 @@
+import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
@@ -196,28 +197,50 @@ export const UseAcademicArticles = () => {
   });
 };
 
-
-
 export const UseResearchProjects = () => {
   const router = useRouter();
+
   return useMutation({
-    mutationKey: ["UseAcademicArticles"],
-    mutationFn: async (data: AcademicArticlesPayload) => {
+    mutationKey: ["UseResearchProjects"],
+    mutationFn: async (data: ResearchProjectsPayload) => {
+      const formData = new FormData();
+      formData.append("hasResearchProjects", data.hasResearchProjects);
+      formData.append("userId", data.userId || "");
+      if (data.hasResearchProjects === "Yes") {
+        formData.append(
+          "projectsCount",
+          data.researchProjects.length.toString(),
+        );
+
+        data.researchProjects.forEach((project, index) => {
+          formData.append(`projects[${index}][title]`, project.title);
+          if (project.file) {
+            formData.append(`projects[${index}][file]`, project.file); // must be File object
+          }
+        });
+      }
       const response = await axios.post(
         "/api/application/researchProjects",
-        data,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
+
       if (!response.data) {
-        throw new Error("Failed to save academic articles");
+        throw new Error("Failed to save Research Project");
       }
+
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Academic articles saved successfully");
-      router.push("/dashboard/applicants/educationStep");
+      toast.success("Research Project saved successfully");
+      router.push("/dashboard/applicants/conferences");
     },
     onError: () => {
-      toast.error("Failed to save academic articles");
+      toast.error("Failed to save Research Project");
     },
   });
 };
