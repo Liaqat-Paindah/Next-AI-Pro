@@ -1,31 +1,7 @@
 import { ConnectDB } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 import Applications from "@/models/Applications";
-import fs from "fs";
-import path from "path";
-
-// File upload utility
-async function saveFile(file: File, subDir: string): Promise<string> {
-  const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", subDir);
-
-  // Create directory if it doesn't exist
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-  }
-
-  // Generate unique filename
-  const ext = path.extname(file.name);
-  const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}${ext}`;
-  const filePath = path.join(UPLOAD_DIR, fileName);
-
-  // Save file
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  fs.writeFileSync(filePath, buffer);
-
-  // Return URL path
-  return `/uploads/${subDir}/${fileName}`;
-}
+import { saveFile } from "@/lib/file_upload"; // Path to your Vercel Blob utility
 
 export async function POST(req: NextRequest) {
   await ConnectDB();
