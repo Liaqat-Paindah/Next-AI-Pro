@@ -160,9 +160,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
-
-
-  skills: {
+    skills: {
       computerSkills: {
         hasSkill: {
           type: Boolean,
@@ -208,29 +206,56 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
-
-
-
-
-
-
-
-
-
-
-
-    // =========================
-    // 3. Language Skills
-    // =========================
     languages: {
-      nativeLanguage: String,
-      englishLevel: String,
-      otherLanguages: [
-        { language: String, level: String, hasDocument: Boolean },
-      ],
+      nativeLanguage: {
+        type: String,
+        required: true,
+      },
+
+      english: {
+        level: {
+          type: String,
+          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
+          required: true,
+        },
+
+        test: {
+          type: String,
+          enum: ["None", "IELTS", "TOEFL", "Duolingo"],
+          default: "None",
+        },
+
+        score: {
+          type: String,
+        },
+
+        certificateUrl: {
+          type: String,
+        },
+      },
+
+      foreignLanguage: {
+        language: String,
+
+        level: {
+          type: String,
+          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
+        },
+      },
+
+      localLanguage: {
+        language: String,
+
+        level: {
+          type: String,
+          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
+        },
+      },
+
+      studiedLanguage: {
+        type: String,
+      },
     },
-
-
 
     // =========================
     // 5. Work Experience

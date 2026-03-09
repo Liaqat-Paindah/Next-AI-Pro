@@ -4,6 +4,7 @@ import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/a
 import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import { SkillsPayload } from "@/components/dashboard/applicants/skills/page";
+import { LanguageFormData } from "@/schema/languageSchema";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
@@ -468,12 +469,76 @@ export const UseSkills = () => {
     },
 
     onSuccess: () => {
-      toast.success("Skills saved successfully");
-      router.push("/dashboard/applicants");
+      toast.success("Professional Skills saved successfully");
+      router.push("/dashboard/applicants/language");
     },
 
     onError: (error) => {
       toast.error(`${error}` || "Failed to save Professional Skills");
+    },
+  });
+};
+
+
+
+export const useLanguage = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useLanguage"],
+
+    mutationFn: async (data: LanguageFormData) => {
+      const formData = new FormData();
+
+      formData.append("userId", data.userId);
+      formData.append("englishLevel", data.englishLevel);
+      formData.append("englishTest", data.englishTest || "");
+      formData.append("nativeLanguage", data.nativeLanguage);
+
+      if (data.englishTestScore) {
+        formData.append("englishTestScore", data.englishTestScore);
+      }
+
+      if (data.foreignLanguage) {
+        formData.append("foreignLanguage", data.foreignLanguage);
+      }
+
+      if (data.foreignLanguageLevel) {
+        formData.append("foreignLanguageLevel", data.foreignLanguageLevel);
+      }
+
+      if (data.localLanguage) {
+        formData.append("localLanguage", data.localLanguage);
+      }
+
+      if (data.localLanguageLevel) {
+        formData.append("localLanguageLevel", data.localLanguageLevel);
+      }
+
+      if (data.studiedLanguage) {
+        formData.append("studiedLanguage", data.studiedLanguage);
+      }
+
+      if (data.englishCertificate instanceof File) {
+        formData.append("englishCertificate", data.englishCertificate);
+      }
+
+      const response = await axios.post("/api/application/languageSkills", formData);
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to save language");
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Language information saved successfully");
+      router.push("/dashboard/applicants");
+    },
+
+    onError: (error) => {
+      toast.error(error?.message || "Failed to save language information");
     },
   });
 };
