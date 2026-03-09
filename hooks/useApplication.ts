@@ -490,7 +490,7 @@ export const useLanguage = () => {
     mutationFn: async (data: LanguageFormData) => {
       const formData = new FormData();
 
-      formData.append("userId", data.userId);
+      formData.append("userId", data.userId || '');
       formData.append("englishLevel", data.englishLevel);
       formData.append("englishTest", data.englishTest || "");
       formData.append("nativeLanguage", data.nativeLanguage);
