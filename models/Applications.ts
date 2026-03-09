@@ -236,24 +236,10 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
 
       foreignLanguage: {
         language: String,
-
-        level: {
-          type: String,
-          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
-        },
       },
 
       localLanguage: {
         language: String,
-
-        level: {
-          type: String,
-          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
-        },
-      },
-
-      studiedLanguage: {
-        type: String,
       },
     },
 

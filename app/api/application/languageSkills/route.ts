@@ -53,33 +53,45 @@ export async function POST(req: Request) {
     }
 
     const updateData = {
-      language: {
+      languages: {
         english: {
-          level: englishLevel,
-          test: englishTest,
+          level: ["Basic", "Intermediate", "Advanced", "Fluent"].includes(
+            englishLevel,
+          )
+            ? englishLevel
+            : "Basic",
+          test: ["None", "IELTS", "TOEFL", "Duolingo"].includes(englishTest)
+            ? englishTest
+            : "None",
           score: englishTestScore || null,
-          certificate: certificateUrl || null,
+          certificateUrl: certificateUrl || null,
         },
-
         foreignLanguage: foreignLanguage
           ? {
               language: foreignLanguage,
-              level: foreignLanguageLevel || null,
+              level: ["Basic", "Intermediate", "Advanced", "Fluent"].includes(
+                foreignLanguageLevel as string,
+              )
+                ? foreignLanguageLevel
+                : "Basic",
             }
           : null,
-
         nativeLanguage,
-
         localLanguage: localLanguage
           ? {
               language: localLanguage,
-              level: localLanguageLevel || null,
+              level: ["Basic", "Intermediate", "Advanced", "Fluent"].includes(
+                localLanguageLevel as string,
+              )
+                ? localLanguageLevel
+                : "Basic",
             }
           : null,
-
         studiedLanguage: studiedLanguage || null,
       },
     };
+
+    console.log("the result is", updateData);
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
