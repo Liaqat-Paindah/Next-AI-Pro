@@ -3,6 +3,7 @@ import { ConferencesPayload } from "@/components/dashboard/applicants/academicAc
 import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/academicActivities/laboratoryActivities";
 import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
+import { SkillsPayload } from "@/components/dashboard/applicants/skills/page";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
@@ -428,6 +429,51 @@ export const UseAcademicAwards = () => {
     },
     onError: () => {
       toast.error("Failed to save academic awards");
+    },
+  });
+};
+
+export const UseSkills = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["UseSkills"],
+    mutationFn: async (data: SkillsPayload) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+      formData.append("hasComputerSkills", data.hasComputerSkills);
+      formData.append("hasCommunicationSkills", data.hasCommunicationSkills);
+      formData.append("hasMediaContentCreation", data.hasMediaContentCreation);
+      formData.append("hasTeamworkSkills", data.hasTeamworkSkills);
+      formData.append("hasLeadershipSkills", data.hasLeadershipSkills);
+      formData.append("hasProblemSolving", data.hasProblemSolving);
+      formData.append("hasTimeManagement", data.hasTimeManagement);
+      formData.append("hasPresentationSkills", data.hasPresentationSkills);
+
+      if (data.youtubeLink) {
+        formData.append("youtubeLink", data.youtubeLink);
+      }
+
+      if (data.computerSkillsFile instanceof File) {
+        formData.append("computerSkillsFile", data.computerSkillsFile);
+      }
+
+      const response = await axios.post("/api/application/skills", formData);
+
+      if (!response.data) {
+        throw new Error("Failed to save Professional Skills");
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Skills saved successfully");
+      router.push("/dashboard/applicants");
+    },
+
+    onError: (error) => {
+      toast.error(`${error}` || "Failed to save Professional Skills");
     },
   });
 };
