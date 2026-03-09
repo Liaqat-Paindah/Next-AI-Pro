@@ -160,6 +160,65 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
+
+
+  skills: {
+      computerSkills: {
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
+      },
+      communicationSkills: {
+        type: Boolean,
+        default: false,
+      },
+      mediaContentCreation: {
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        youtubeLink: {
+          type: String,
+          trim: true,
+        },
+      },
+      teamworkSkills: {
+        type: Boolean,
+        default: false,
+      },
+      leadershipSkills: {
+        type: Boolean,
+        default: false,
+      },
+      problemSolving: {
+        type: Boolean,
+        default: false,
+      },
+      timeManagement: {
+        type: Boolean,
+        default: false,
+      },
+      presentationSkills: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
+
+
+
+
+
+
+
+
+
+
+
     // =========================
     // 3. Language Skills
     // =========================
@@ -171,18 +230,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
-    // =========================
-    // 4. Professional Skills
-    // =========================
-    skills: {
-      computerSkills: [{ skill: String, hasDocument: Boolean }],
-      communicationSkills: String,
-      mediaProductionSkills: String,
-      teamworkSkills: String,
-      problemSolvingSkills: String,
-      timeManagementSkills: String,
-      presentationSkills: String,
-    },
+
 
     // =========================
     // 5. Work Experience
