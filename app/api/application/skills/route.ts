@@ -105,16 +105,12 @@ export async function POST(req: Request) {
         presentationSkills: hasPresentationSkills === "Yes",
       },
     };
-    console.log("the final data is", updateData);
 
     // Update or create application
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
       { $set: updateData },
-      {
-        new: true,
-        runValidators: true,
-      },
+      { returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({

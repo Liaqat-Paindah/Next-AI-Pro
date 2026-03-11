@@ -243,26 +243,18 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
-    // =========================
-    // 5. Work Experience
-    // =========================
-    experience: {
-      jobs: [
-        {
-          position: String,
-          organization: String,
-          duration: String,
-          hasDocument: Boolean,
+    activities: [
+      {
+        type: {
+          type: String,
         },
-      ],
-      internships: [{ title: String, hasDocument: Boolean }],
-      volunteerActivities: [{ title: String, hasDocument: Boolean }],
-      socialActivities: [{ title: String, hasDocument: Boolean }],
-      awarenessPrograms: [{ title: String, hasDocument: Boolean }],
-      mediaActivities: [{ title: String, hasDocument: Boolean }],
-      leadershipActivities: [{ title: String, hasDocument: Boolean }],
-      certificates: [{ title: String, hasDocument: Boolean }],
-    },
+
+        fileUrl: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
 
     // =========================
     // 6. Health Status

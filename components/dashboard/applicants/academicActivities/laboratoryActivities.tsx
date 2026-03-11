@@ -232,7 +232,7 @@ const LaboratoryActivitiesForm: React.FC<Props> = ({ onChange }) => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "laboratoryActivities",
   });
@@ -282,6 +282,7 @@ const LaboratoryActivitiesForm: React.FC<Props> = ({ onChange }) => {
   const handleHasLaboratoryActivitiesChange = (value: "Yes" | "No") => {
     setValue("hasLaboratoryActivities", value);
     if (value === "No") {
+      replace([]);
       setValue("laboratoryActivities", []);
     }
     trigger("hasLaboratoryActivities");

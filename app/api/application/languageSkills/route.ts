@@ -91,7 +91,6 @@ export async function POST(req: Request) {
       },
     };
 
-    console.log("the result is", updateData);
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
