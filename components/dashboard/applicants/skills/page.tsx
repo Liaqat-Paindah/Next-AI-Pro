@@ -433,7 +433,7 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
                     <div className="mt-4 pl-4 border-l-2 border-[#00A3FF]">
                       <FileUpload
                         id="computer-skills-file"
-                        label="Upload Document (Certificate, CV, etc.)"
+                        label="Upload Document (Certificate)"
                         onFileAccepted={handleFileChange}
                         onFileRemove={handleFileRemove}
                         error={errors.computerSkillsFile?.message}

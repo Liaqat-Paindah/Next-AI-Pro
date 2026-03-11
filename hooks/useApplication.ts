@@ -10,6 +10,7 @@ import {
   EducationFormDataField,
   PersonalInfoFormData,
 } from "@/types/application";
+import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -479,8 +480,6 @@ export const UseSkills = () => {
   });
 };
 
-
-
 export const useLanguage = () => {
   const router = useRouter();
 
@@ -490,7 +489,7 @@ export const useLanguage = () => {
     mutationFn: async (data: LanguageFormData) => {
       const formData = new FormData();
 
-      formData.append("userId", data.userId || '');
+      formData.append("userId", data.userId || "");
       formData.append("englishLevel", data.englishLevel);
       formData.append("englishTest", data.englishTest || "");
       formData.append("nativeLanguage", data.nativeLanguage);
@@ -523,7 +522,10 @@ export const useLanguage = () => {
         formData.append("englishCertificate", data.englishCertificate);
       }
 
-      const response = await axios.post("/api/application/languageSkills", formData);
+      const response = await axios.post(
+        "/api/application/languageSkills",
+        formData,
+      );
 
       if (!response.data.success) {
         throw new Error(response.data.message || "Failed to save language");
@@ -534,11 +536,52 @@ export const useLanguage = () => {
 
     onSuccess: () => {
       toast.success("Language information saved successfully");
-      router.push("/dashboard/applicants");
+      router.push("/dashboard/applicants/workexperience");
     },
 
     onError: (error) => {
       toast.error(error?.message || "Failed to save language information");
+    },
+  });
+};
+
+export const useActivities = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useActivities"],
+    mutationFn: async (data: ActivitiesFormData) => {
+      const formData = new FormData();
+
+      formData.append("userId", data.userId);
+
+      data.activities.forEach((activity, index) => {
+        formData.append(`activities[${index}][type]`, activity.type);
+
+        if (activity.file) {
+          formData.append(`activities[${index}][file]`, activity.file);
+        }
+      });
+
+      const response = await axios.post(
+        "/api/application/activities",
+        formData,
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to save activities");
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Activities saved successfully");
+      router.push("/dashboard/applicants");
+    },
+
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save activities");
     },
   });
 };
