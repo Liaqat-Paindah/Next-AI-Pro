@@ -4,6 +4,7 @@ import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/a
 import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
 import { FinancialInfoPayload } from "@/components/dashboard/applicants/financialInformation/page";
+import { HobbiesFormData } from "@/components/dashboard/applicants/hobbies/page";
 import { SkillsPayload } from "@/components/dashboard/applicants/skills/page";
 import { LanguageFormData } from "@/schema/languageSchema";
 import {
@@ -538,7 +539,7 @@ export const useLanguage = () => {
 
     onSuccess: () => {
       toast.success("Language information saved successfully");
-      router.push("/dashboard/applicants/workexperience");
+      router.push("/dashboard/applicants/workExperience");
     },
 
     onError: (error) => {
@@ -672,10 +673,48 @@ export const useFinancialInfo = () => {
     },
     onSuccess: () => {
       toast.success("Financial information saved successfully");
-      router.push("/dashboard/applicants"); // change to your next step
+      router.push("/dashboard/applicants/hobbies"); // change to your next step
     },
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save financial information");
+    },
+  });
+};
+
+export const useHobbies = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useHobbies"],
+    mutationFn: async (data: HobbiesFormData & { userId: string }) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+      if (data.favoriteSports) {
+        formData.append("favoriteSports", data.favoriteSports);
+      }
+      if (data.leisureActivities) {
+        formData.append("leisureActivities", data.leisureActivities);
+      }
+      const response = await axios.post("/api/application/hobbies", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save hobbies information",
+        );
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Hobbies information saved successfully");
+      router.push("/dashboard/applicants");
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save hobbies information");
     },
   });
 };
