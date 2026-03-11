@@ -9,6 +9,7 @@ import {
   AcademicArticlesPayload,
   EducationFormDataField,
   PersonalInfoFormData,
+  SpecialConditionsFormData,
 } from "@/types/application";
 import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -577,11 +578,55 @@ export const useActivities = () => {
 
     onSuccess: () => {
       toast.success("Activities saved successfully");
-      router.push("/dashboard/applicants");
+      router.push("/dashboard/applicants/specialConditions");
     },
 
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save activities");
+    },
+  });
+};
+
+export const useSpecialConditions = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useSpecialConditions"],
+    mutationFn: async (
+      data: SpecialConditionsFormData & { userId: string },
+    ) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+      if (data.specialDisease) {
+        formData.append("specialDisease", data.specialDisease);
+      }
+      if (data.physicalDisability) {
+        formData.append("physicalDisability", data.physicalDisability);
+      }
+      const response = await axios.post(
+        "/api/application/specialConditions",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save special conditions",
+        );
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Special conditions saved successfully");
+      router.push("/dashboard/applicants");
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save special conditions");
     },
   });
 };
