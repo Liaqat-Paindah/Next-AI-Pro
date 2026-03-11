@@ -256,21 +256,18 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     ],
 
-    // =========================
-    // 6. Health Status
-    // =========================
     health: {
       specialDiseases: String,
       disabilityNeeds: String,
     },
 
-    // =========================
-    // 7. Financial Status
-    // =========================
     financial: {
-      familyIncome: Number,
-      canPayTuition: Boolean,
-      canPayTravel: Boolean,
+      familyIncome: { type: Number, required: true },
+      canPayTuition: {
+        type: String,
+        required: true,
+      },
+      canPayTravel: { type: String, required: true, default: "No" },
     },
 
     // =========================

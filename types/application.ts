@@ -183,5 +183,23 @@ export interface Article {
 export interface AcademicArticlesPayload {
   hasAcademicArticles: "Yes" | "No";
   academicArticles: Article[];
-  userId:string
+  userId: string;
 }
+
+export const specialConditionsSchema = z.object({
+  specialDisease: z
+    .string()
+    .min(
+      1,
+      "Special disease is required. If there is no disease, please write 'No'.",
+    ),
+
+  physicalDisability: z
+    .string()
+    .min(
+      1,
+      "Physical disability information is required. If there is no disability, please write 'No'.",
+    ),
+});
+
+export type SpecialConditionsFormData = z.infer<typeof specialConditionsSchema>;

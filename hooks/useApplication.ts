@@ -3,12 +3,14 @@ import { ConferencesPayload } from "@/components/dashboard/applicants/academicAc
 import { LaboratoryActivitiesPayload } from "@/components/dashboard/applicants/academicActivities/laboratoryActivities";
 import { ResearchSkillsPayload } from "@/components/dashboard/applicants/academicActivities/reseachSkills";
 import { ResearchProjectsPayload } from "@/components/dashboard/applicants/academicActivities/researchProjects";
+import { FinancialInfoPayload } from "@/components/dashboard/applicants/financialInformation/page";
 import { SkillsPayload } from "@/components/dashboard/applicants/skills/page";
 import { LanguageFormData } from "@/schema/languageSchema";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
   PersonalInfoFormData,
+  SpecialConditionsFormData,
 } from "@/types/application";
 import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -577,11 +579,103 @@ export const useActivities = () => {
 
     onSuccess: () => {
       toast.success("Activities saved successfully");
-      router.push("/dashboard/applicants");
+      router.push("/dashboard/applicants/specialConditions");
     },
 
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save activities");
+    },
+  });
+};
+
+export const useSpecialConditions = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useSpecialConditions"],
+    mutationFn: async (
+      data: SpecialConditionsFormData & { userId: string },
+    ) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+      if (data.specialDisease) {
+        formData.append("specialDisease", data.specialDisease);
+      }
+      if (data.physicalDisability) {
+        formData.append("physicalDisability", data.physicalDisability);
+      }
+      const response = await axios.post(
+        "/api/application/specialConditions",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save special conditions",
+        );
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Special conditions saved successfully");
+      router.push("/dashboard/applicants/financialInformation");
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save special conditions");
+    },
+  });
+};
+
+export const useFinancialInfo = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationKey: ["useFinancialInfo"],
+
+    mutationFn: async (data: FinancialInfoPayload & { userId: string }) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+
+      if (data.familyIncome) {
+        formData.append("familyIncome", data.familyIncome);
+      }
+
+      if (data.tuitionAbility) {
+        formData.append("tuitionAbility", data.tuitionAbility);
+      }
+
+      if (data.transportAbility) {
+        formData.append("transportAbility", data.transportAbility);
+      }
+
+      const response = await axios.post(
+        "/api/application/financialInformation",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save financial information",
+        );
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      toast.success("Financial information saved successfully");
+      router.push("/dashboard/applicants"); // change to your next step
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save financial information");
     },
   });
 };
