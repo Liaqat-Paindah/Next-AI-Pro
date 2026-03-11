@@ -87,14 +87,13 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         level: {
           type: String,
           enum: ["Master", "Bachelor", "PHD", "High School"],
-          required: true,
         },
-        fieldOfStudy: { type: String, required: true },
-        institutionName: { type: String, required: true },
-        gpa: { type: Number, required: true },
+        fieldOfStudy: { type: String },
+        institutionName: { type: String },
+        gpa: { type: Number },
         academicRank: { type: String }, // Optional rank
-        startDate: { type: Date, required: true },
-        graduationDate: { type: Date, required: true },
+        startDate: { type: Date },
+        graduationDate: { type: Date },
         educationGapExplanation: { type: String }, // optional
         thesisTopic: { type: String }, // optional
         thesisFileUrl: { type: String }, // optional
@@ -209,14 +208,12 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     languages: {
       nativeLanguage: {
         type: String,
-        required: true,
       },
 
       english: {
         level: {
           type: String,
           enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
-          required: true,
         },
 
         test: {
@@ -262,12 +259,11 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     },
 
     financial: {
-      familyIncome: { type: Number, required: true },
+      familyIncome: { type: Number },
       canPayTuition: {
         type: String,
-        required: true,
       },
-      canPayTravel: { type: String, required: true, default: "No" },
+      canPayTravel: { type: String, default: "No" },
     },
 
     hobbies: {
