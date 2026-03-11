@@ -261,11 +261,13 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       disabilityNeeds: String,
     },
 
-
     financial: {
-      familyIncome: Number,
-      canPayTuition: Boolean,
-      canPayTravel: Boolean,
+      familyIncome: { type: Number, required: true },
+      canPayTuition: {
+        type: String,
+        required: true,
+      },
+      canPayTravel: { type: String, required: true, default: "No" },
     },
 
     // =========================
