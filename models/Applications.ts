@@ -270,25 +270,23 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       canPayTravel: { type: String, required: true, default: "No" },
     },
 
-    // =========================
-    // 9. Hobbies & Interests
-    // =========================
     hobbies: {
-      sports: [String],
+      sports: String,
       freeTimeActivities: String,
     },
 
-    // =========================
-    // 10. Goals & Vision
-    // =========================
     goals: {
       purposeOfStudy: String,
       futurePlan: String,
     },
 
-    // =========================
-    // 11. Study Preferences
-    // =========================
+
+
+
+
+
+
+    
     preferences: {
       preferredFields: [String],
       preferredCountries: [String],
