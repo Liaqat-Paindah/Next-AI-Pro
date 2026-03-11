@@ -430,7 +430,7 @@ export const UseAcademicAwards = () => {
     },
     onSuccess: () => {
       toast.success("Academic awards saved successfully");
-      router.push("/dashboard/applicants"); // Update this route as needed
+      router.push("/dashboard/applicants/skills"); // Update this route as needed
     },
     onError: () => {
       toast.error("Failed to save academic awards");
