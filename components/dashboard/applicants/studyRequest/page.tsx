@@ -100,9 +100,9 @@ export default function StudyRequestPage() {
 
   const [formData, setFormData] = useState<StudyRequestData>({
     scholarshipOnly: false,
-    privateStudyAlso: false,
+    privateStudyOption: false,
     specialSkills: "",
-    specialAchievements: "",
+    achievements: "",
   });
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function StudyRequestPage() {
   }
 
   const handleRadioChange = (
-    field: "scholarshipOnly" | "privateStudyAlso",
+    field: "scholarshipOnly" | "privateStudyOption",
     value: string,
   ) => {
     setFormData((prev) => ({
@@ -126,7 +126,7 @@ export default function StudyRequestPage() {
   };
 
   const handleTextChange = (
-    field: "specialSkills" | "specialAchievements",
+    field: "specialSkills" | "achievements",
     value: string,
   ) => {
     setFormData((prev) => ({
@@ -147,7 +147,7 @@ export default function StudyRequestPage() {
   const isValidForSubmission = () => {
     return (
       formData.specialSkills.trim() !== "" &&
-      formData.specialAchievements.trim() !== ""
+      formData.achievements.trim() !== ""
     );
   };
 
@@ -252,11 +252,11 @@ export default function StudyRequestPage() {
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
-                        name="privateStudyAlso"
+                        name="privateStudyOption"
                         value="yes"
-                        checked={formData.privateStudyAlso === true}
+                        checked={formData.privateStudyOption === true}
                         onChange={(e) =>
-                          handleRadioChange("privateStudyAlso", e.target.value)
+                          handleRadioChange("privateStudyOption", e.target.value)
                         }
                         className="w-4 h-4 text-[#00A3FF] focus:ring-[#00A3FF] border-gray-300 dark:border-[#064e78] dark:bg-[#011b2b]"
                         required
@@ -268,11 +268,11 @@ export default function StudyRequestPage() {
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
-                        name="privateStudyAlso"
+                        name="privateStudyOption"
                         value="no"
-                        checked={formData.privateStudyAlso === false}
+                        checked={formData.privateStudyOption === false}
                         onChange={(e) =>
-                          handleRadioChange("privateStudyAlso", e.target.value)
+                          handleRadioChange("privateStudyOption", e.target.value)
                         }
                         className="w-4 h-4 text-[#00A3FF] focus:ring-[#00A3FF] border-gray-300 dark:border-[#064e78] dark:bg-[#011b2b]"
                         required
@@ -336,9 +336,9 @@ export default function StudyRequestPage() {
                     </label>
                   </div>
                   <textarea
-                    value={formData.specialAchievements}
+                    value={formData.achievements}
                     onChange={(e) =>
-                      handleTextChange("specialAchievements", e.target.value)
+                      handleTextChange("achievements", e.target.value)
                     }
                     placeholder="Describe your achievements and unique experiences (e.g., awards, competitions, research, community service)..."
                     rows={4}
