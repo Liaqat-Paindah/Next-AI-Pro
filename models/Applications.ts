@@ -271,11 +271,10 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       freeTimeActivities: String,
     },
 
-    goals: {
-      purposeOfStudy: String,
-      futurePlan: String,
-    },
-
+goals: {
+  purposeOfEducation: String,
+  postStudyPlan: String,
+},
 
 
 

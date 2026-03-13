@@ -12,6 +12,7 @@ import {
   EducationFormDataField,
   PersonalInfoFormData,
   SpecialConditionsFormData,
+  VisionGoalsFormData,
 } from "@/types/application";
 import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -711,10 +712,49 @@ export const useHobbies = () => {
 
     onSuccess: () => {
       toast.success("Hobbies information saved successfully");
-      router.push("/dashboard/applicants");
+      router.push("/dashboard/applicants/visionGoals");
     },
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save hobbies information");
+    },
+  });
+};
+
+export const useVisionGoals = () => {
+  const router = useRouter();
+  return useMutation({
+    mutationKey: ["useVisionGoals"],
+    mutationFn: async (data: VisionGoalsFormData & { userId: string }) => {
+      const formData = new FormData();
+      formData.append("userId", data.userId);
+      if (data.purposeOfEducation) {
+        formData.append("purposeOfEducation", data.purposeOfEducation);
+      }
+      if (data.postStudyPlan) {
+        formData.append("postStudyPlan", data.postStudyPlan);
+      }
+      const response = await axios.post(
+        "/api/application/visionGoals",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Failed to save vision goals");
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Vision goals saved successfully");
+      router.push("/dashboard/applicants");
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save vision goals");
     },
   });
 };
