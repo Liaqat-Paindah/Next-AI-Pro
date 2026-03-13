@@ -7,6 +7,7 @@ import { FinancialInfoPayload } from "@/components/dashboard/applicants/financia
 import { HobbiesFormData } from "@/components/dashboard/applicants/hobbies/page";
 import { SkillsPayload } from "@/components/dashboard/applicants/skills/page";
 import { LanguageFormData } from "@/schema/languageSchema";
+import { AcademicPreferencesData } from "@/types/academicPreferences";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
@@ -750,11 +751,47 @@ export const useVisionGoals = () => {
     },
 
     onSuccess: () => {
-      toast.success("Vision goals saved successfully");
-      router.push("/dashboard/applicants");
+      toast.success("Vision and Goals saved successfully");
+      router.push("/dashboard/applicants/academicPreferences");
     },
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save vision goals");
+    },
+  });
+};
+
+export const useAcademicPreferences = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useAcademicPreferences"],
+    mutationFn: async (data: AcademicPreferencesData & { userId: string }) => {
+      const response = await axios.post(
+        "/api/application/academicPreferences",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save academic preferences",
+        );
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Academic preferences saved successfully");
+      router.push("/dashboard/applicants"); // Adjust the route as needed
+    },
+
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save academic preferences");
     },
   });
 };
