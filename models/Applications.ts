@@ -299,30 +299,41 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       portfolio: Boolean,
     },
 
-    // =========================
-    // 13. Identity Documents
-    // =========================
-    identityDocuments: {
-      tazkira: Boolean,
-      passport: Boolean,
-    },
-
-    // =========================
-    // 14. Contact Information
-    // =========================
     contact: {
-      permanentAddress: String,
-      currentAddress: String,
+      permanentAddress: {
+        province: String,
+        district: String,
+        area: String,
+      },
+
+      currentAddress: {
+        province: String,
+        district: String,
+        area: String,
+      },
+
       detailedAddress: String,
+
       phone: String,
       whatsapp: String,
       email: String,
       relativePhone: String,
     },
+    
 
-    // =========================
-    // 15. Study Type
-    // =========================
+
+
+
+
+
+
+    
+
+    identityDocuments: {
+      tazkira: Boolean,
+      passport: Boolean,
+    },
+
     studyType: {
       scholarshipOnly: Boolean,
       privateStudyOption: Boolean,
