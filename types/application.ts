@@ -203,3 +203,20 @@ export const specialConditionsSchema = z.object({
 });
 
 export type SpecialConditionsFormData = z.infer<typeof specialConditionsSchema>;
+
+export const visionGoalsSchema = z.object({
+  purposeOfEducation: z
+    .string()
+    .min(100, "Please provide at least 100 characters describing your purpose")
+    .max(1000, "Purpose cannot exceed 1000 characters"),
+
+  postStudyPlan: z
+    .string()
+    .min(
+      100,
+      "Please provide at least 100 characters describing your post-study plans",
+    )
+    .max(1000, "Post-study plan cannot exceed 1000 characters"),
+});
+
+export type VisionGoalsFormData = z.infer<typeof visionGoalsSchema>;

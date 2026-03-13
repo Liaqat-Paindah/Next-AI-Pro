@@ -272,27 +272,25 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     },
 
     goals: {
-      purposeOfStudy: String,
-      futurePlan: String,
+      purposeOfEducation: String,
+      postStudyPlan: String,
     },
 
-
-
-
-
-
-
-    
     preferences: {
-      preferredFields: [String],
-      preferredCountries: [String],
-      preferredUniversities: [String],
-      preferredStudyLevel: String, // Bachelor, Master, PhD
+      preferredFields: {
+        type: [String],
+      },
+      preferredCountries: {
+        type: [String],
+      },
+      preferredUniversities: {
+        type: [String],
+      },
+      preferredStudyLevel: {
+        type: String,
+      },
     },
 
-    // =========================
-    // 12. Supporting Documents
-    // =========================
     supportingDocuments: {
       sop: Boolean,
       recommendationLetter: Boolean,
