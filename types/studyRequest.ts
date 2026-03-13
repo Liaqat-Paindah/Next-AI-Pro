@@ -1,6 +1,6 @@
 export interface StudyRequestData {
   scholarshipOnly: boolean;
-  privateStudyAlso: boolean;
+  privateStudyOption: boolean;
   specialSkills: string;
-  specialAchievements: string;
+  achievements: string;
 }
