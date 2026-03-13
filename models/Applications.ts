@@ -319,38 +319,31 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       email: String,
       relativePhone: String,
     },
-    
 
+    studyType: {
+      scholarshipOnly: {
+        type: Boolean,
+        default: false,
+      },
+      privateStudyOption: {
+        type: Boolean,
+        default: false,
+      },
+    },
 
-
-
-
-
-
-    
+    distinction: {
+      specialSkills: {
+        type: String,
+      },
+      achievements: {
+        type: String,
+      },
+    },
 
     identityDocuments: {
       tazkira: Boolean,
       passport: Boolean,
     },
-
-    studyType: {
-      scholarshipOnly: Boolean,
-      privateStudyOption: Boolean,
-    },
-
-    // =========================
-    // 16. Distinction / Unique Skills
-    // =========================
-    distinction: {
-      specialSkills: String,
-      achievements: String,
-    },
-
-    // =========================
-    // 17. Optional: History & Review
-    // =========================
-    history: [{ action: String, date: Date, user: String }],
 
     review: [
       {

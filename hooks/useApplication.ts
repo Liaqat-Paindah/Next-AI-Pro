@@ -16,6 +16,7 @@ import {
   VisionGoalsFormData,
 } from "@/types/application";
 import { AddressContactData } from "@/types/contactAddress";
+import { StudyRequestData } from "@/types/studyRequest";
 import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -825,13 +826,45 @@ export const useAddressContact = () => {
 
     onSuccess: () => {
       toast.success("Address & contact information saved successfully");
-      router.push("/dashboard/applicants");
+      router.push("/dashboard/applicants/studyRequest");
     },
 
     onError: (error: Error) => {
       toast.error(
         error?.message || "Failed to save address & contact information",
       );
+    },
+  });
+};
+
+export const useStudyRequest = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationKey: ["useStudyRequest"],
+    mutationFn: async (data: StudyRequestData & { userId: string }) => {
+      const response = await axios.post("/api/application/studyRequest", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Failed to save study request information",
+        );
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Study request information saved successfully");
+      router.push("/dashboard/applicants");
+    },
+
+    onError: (error: Error) => {
+      toast.error(error?.message || "Failed to save study request information");
     },
   });
 };
