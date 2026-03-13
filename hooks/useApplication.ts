@@ -860,7 +860,7 @@ export const useStudyRequest = () => {
 
     onSuccess: () => {
       toast.success("Study request information saved successfully");
-      router.push("/dashboard/applicants/documents");
+      router.push("/dashboard/applicants");
     },
 
     onError: (error: Error) => {
