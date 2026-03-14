@@ -5,9 +5,8 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { UseGetApplicants } from "@/hooks/useApplication";
-import Link from "next/link";
 import Loading from "@/app/loading";
-import PersonalInfo from "./applicant_details/personal_details";
+import ApplicationProgress from "../applicationProgress";
 
 // Digital Cursor
 const DigitalCursor = () => {
@@ -36,7 +35,7 @@ const DigitalCursor = () => {
 const Application = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const userId = session?.user?._id;
+  const id = session?.user?._id;
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -44,8 +43,11 @@ const Application = () => {
   }, [status, router]);
 
   // Fetch application data
-  const { data, isPending, error } = UseGetApplicants(userId);
-  const application = data?.data;
+  const {
+    data: applicationData,
+    isPending,
+    error,
+  } = UseGetApplicants(id as string);
 
   // Loading
   if (status === "loading" || isPending) {
@@ -68,40 +70,11 @@ const Application = () => {
     );
   }
 
-  // No personal info
-  if (!application?.personal) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <p className="text-gray-700">No personal information found.</p>
-        <Link
-          href="/dashboard/applicants/personalStep"
-          className="px-6 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white font-medium rounded-sm transition duration-300"
-        >
-          Continue
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <>
       <DigitalCursor />
       <section className="relative w-full overflow-hidden py-10">
-        <PersonalInfo personal={application?.personal} />
-
-        {/* Continue Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex justify-center"
-        >
-          <Link
-            href="/dashboard/applicants/personalStep"
-            className="px-6 py-2 mt-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white font-medium rounded-sm transition duration-300"
-          >
-            Continue
-          </Link>
-        </motion.div>
+        <ApplicationProgress application={applicationData} />
       </section>
     </>
   );

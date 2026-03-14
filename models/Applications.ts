@@ -340,19 +340,6 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       },
     },
 
-    identityDocuments: {
-      tazkira: Boolean,
-      passport: Boolean,
-    },
-
-    review: [
-      {
-        reviewerName: String,
-        score: Number,
-        comments: String,
-        decisionDate: Date,
-      },
-    ],
 
     files: {
       cvUrl: String,

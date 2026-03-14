@@ -172,10 +172,11 @@ export const UseEducationInformation = () => {
   });
 };
 
-export const UseGetApplicants = (id: string | undefined) => {
+export const UseGetApplicants = (id: string) => {
   return useQuery({
     queryKey: ["UseGetApplicants"],
     queryFn: async () => {
+      console.log("the id is in hook", id);
       const response = await axios.get(`/api/application/${id}`);
       if (!response.data) {
         throw new Error("Failed to fetch Applicantion");
@@ -183,6 +184,7 @@ export const UseGetApplicants = (id: string | undefined) => {
       return response.data;
     },
     staleTime: 0,
+    enabled: !!id,
     refetchOnWindowFocus: true,
   });
 };
