@@ -48,10 +48,13 @@ export async function POST(req: Request) {
 
       index++;
     }
+    if (activities.length === 0) {
+      activities.push({ type: "None", fileUrl: null });
+    }
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
       { $set: { activities } },
-      { returnDocument: "after", runValidators: true }
+      { returnDocument: "after", runValidators: true },
     );
 
     return NextResponse.json({
