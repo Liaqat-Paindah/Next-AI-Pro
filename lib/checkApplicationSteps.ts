@@ -38,27 +38,10 @@ export function checkApplicationSteps(
     education: !!(app?.education && app.education.length > 0),
 
     // Research: Check if any research section has data
-    research:
-      app?.research !== undefined &&
-      app?.research.articles !== undefined &&
-      app?.research.projects !== undefined &&
-      app?.research.conferences !== undefined &&
-      app?.research.laboratoryActivities !== undefined &&
-      app?.research.academicAwards !== undefined &&
-      app?.research.researchSkills !== undefined,
+    research: !!(app?.research?.steps === "true"),
 
     // Skills: At least one skill marked as true
-    skills: !!(
-      app?.skills &&
-      (app.skills.communicationSkills !== undefined ||
-        app.skills.teamworkSkills !== undefined ||
-        app.skills.leadershipSkills !== undefined ||
-        app.skills.problemSolving !== undefined ||
-        app.skills.timeManagement !== undefined ||
-        app.skills.presentationSkills !== undefined ||
-        app.skills.computerSkills?.hasSkill !== undefined ||
-        app.skills.mediaContentCreation?.hasSkill !== undefined)
-    ),
+    skills: !!(app?.skills?.steps === "true"),
 
     // Languages: Native language or English level
     languages: !!(
@@ -73,9 +56,7 @@ export function checkApplicationSteps(
 
     // Financial: Income or tuition payment capability
     financial: !!(
-      app?.financial?.familyIncome ||
-      app?.financial?.canPayTuition ||
-      app?.financial?.canPayTravel
+      app?.financial?.familyIncome || app?.financial?.canPayTuition
     ),
 
     // Goals: Purpose or post-study plan
@@ -97,11 +78,11 @@ export function checkApplicationSteps(
     ),
 
     // Contact: Essential contact info
-    contact: !!(app?.contact?.phone && app?.contact?.email),
+    contact: !!(app?.contact?.phone && app?.contact?.relativePhone),
 
     // Study Type: Both options selected
     studyType:
-      app?.studyType?.scholarshipOnly !== undefined &&
+      app?.studyType?.scholarshipOnly !== false &&
       app?.studyType?.privateStudyOption !== undefined,
 
     // Distinction: Any distinction provided

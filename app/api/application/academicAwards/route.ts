@@ -60,11 +60,14 @@ export async function POST(req: Request) {
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
       {
-        "research.hasAcademicAwards": hasAcademicAwards === "Yes",
-        "research.academicAwards": payload.academicAwards.map((award) => ({
-          title: award.title,
-          fileUrl: award.file, // store file path in fileUrl
-        })),
+        $set: {
+          "research.steps": "true", // mark research step as complete
+          "research.hasAcademicAwards": hasAcademicAwards === "Yes",
+          "research.academicAwards": payload.academicAwards.map((award) => ({
+            title: award.title,
+            fileUrl: award.file,
+          })),
+        },
       },
       { returnDocument: "after", runValidators: true },
     );

@@ -89,6 +89,7 @@ export async function POST(req: Request) {
     // Prepare update data matching your schema structure
     const updateData = {
       skills: {
+        steps: "true",
         computerSkills: {
           hasSkill: hasComputerSkills === "Yes",
           fileUrl: computerSkillsFileUrl || null,

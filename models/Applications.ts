@@ -109,6 +109,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     ],
 
     research: {
+      steps: { type: String, default: "false" },
       hasArticles: { type: Boolean, default: false },
       hasProjects: { type: Boolean, default: false },
       hasConferences: { type: Boolean, default: false },
@@ -160,6 +161,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     },
 
     skills: {
+      steps: { type: String, default: "false" },
       computerSkills: {
         hasSkill: {
           type: Boolean,
@@ -339,7 +341,6 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         type: String,
       },
     },
-
 
     files: {
       cvUrl: String,

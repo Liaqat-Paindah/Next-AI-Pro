@@ -38,6 +38,7 @@ export interface Education {
 }
 
 export interface Research {
+  steps: string;
   hasArticles?: boolean;
   hasProjects?: boolean;
   hasConferences?: boolean;
@@ -53,6 +54,7 @@ export interface Research {
 }
 
 export interface Skills {
+  steps: string;
   computerSkills?: { hasSkill?: boolean; fileUrl?: string };
   communicationSkills?: boolean;
   mediaContentCreation?: { hasSkill?: boolean; youtubeLink?: string };
