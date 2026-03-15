@@ -2,7 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
+import Link from "next/link";
+import {
   AlertCircle,
   GraduationCap,
   Beaker,
@@ -21,9 +22,13 @@ import {
   CheckCircle2,
   Circle,
   ArrowRight,
-  User
+  User,
+  ChevronRight,
 } from "lucide-react";
-import { checkApplicationSteps, ApplicationSteps } from "@/lib/checkApplicationSteps";
+import {
+  checkApplicationSteps,
+  ApplicationSteps,
+} from "@/lib/checkApplicationSteps";
 import type { ScholarshipApplication } from "@/types/checkSteps";
 import Loading from "@/app/loading";
 
@@ -36,6 +41,7 @@ interface ApplicationProgressProps {
   onStepClick?: (stepKey: keyof ApplicationSteps) => void;
   isLoading?: boolean;
   onError?: (error: Error) => void;
+  baseUrl?: string;
 }
 
 // Icons mapping for each section
@@ -87,14 +93,15 @@ const formatDate = (date?: string | null): string => {
   });
 };
 
-
-
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; onError?: (error: Error) => void },
   { hasError: boolean; error: Error | null }
 > {
-  constructor(props: { children: React.ReactNode; onError?: (error: Error) => void }) {
+  constructor(props: {
+    children: React.ReactNode;
+    onError?: (error: Error) => void;
+  }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
@@ -124,90 +131,173 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-// Progress Card Component
+// Progress Card Component with Link
 const ProgressCard = ({
   step,
   isCompleted,
   icon: Icon,
   linear,
-  onClick,
+  href,
 }: {
   step: { key: string; label: string; description: string };
   isCompleted: boolean;
   icon: React.ElementType;
   linear: string;
-  onClick: () => void;
+  href: string;
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      onClick={onClick}
-      className="relative group cursor-pointer rounded-sm overflow-hidden border border-gray-200 dark:border-[#064e78] bg-white dark:bg-[#011b2b] hover:border-[#00A3FF] dark:hover:border-[#00A3FF] transition-all duration-300"
-    >
-      <div className="relative p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-sm bg-linear-to-r ${linear} bg-opacity-10`}>
-              <Icon className="w-4 h-4 text-white" />
+    <Link href={href} passHref>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative group cursor-pointer rounded-sm overflow-hidden border border-gray-200 dark:border-[#064e78] bg-white dark:bg-[#011b2b] hover:border-[#00A3FF] dark:hover:border-[#00A3FF] transition-all duration-300"
+      >
+        <div className="relative p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className={`flex items-center justify-center w-8 h-8 rounded-sm bg-linear-to-r ${linear} bg-opacity-10`}
+              >
+                <Icon className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  {step.label}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {step.description}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-medium text-gray-900 dark:text-white">
-                {step.label}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {step.description}
-              </p>
+
+            <div className="flex items-center gap-2">
+              {isCompleted ? (
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+              ) : (
+                <Circle className="w-5 h-5 text-gray-300 dark:text-gray-600" />
+              )}
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#00A3FF] transition-colors" />
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {isCompleted ? (
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
-            ) : (
-              <Circle className="w-5 h-5 text-gray-300 dark:text-gray-600" />
-            )}
-            <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#00A3FF] transition-colors" />
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 };
 
 // Main Component
-const ApplicationProgress = ({ 
-  application, 
-  onStepClick, 
+const ApplicationProgress = ({
+  application,
   isLoading = false,
-  onError 
+  onError,
+  baseUrl = "",
 }: ApplicationProgressProps) => {
   const steps = checkApplicationSteps(application?.data);
+
+  // Manual step URLs - you can modify these paths as needed
+  const stepUrls: Record<keyof ApplicationSteps, string> = {
+    personal: "/dashboard/applicants/personalStep",
+    education: "/dashboard/applicants/educationStep",
+    research: "/dashboard/applicants/academicArticales",
+    skills: "/dashboard/applicants/skills",
+    languages: "/dashboard/applicants/languages",
+    activities: "/dashboard/applicants/workExperience",
+    health: "/dashboard/applicants/specialConditions",
+    financial: "/dashboard/applicants/financialInformation",
+    goals: "/dashboard/applicants/visionGoals",
+    preferences: "/dashboard/applicants/academicPreferences",
+    contact: "/dashboard/applicants/addressContact",
+    studyType: "/dashboard/applicants/studyRequest",
+    documents: "/dashboard/applicants/documents",
+  };
 
   const stepList: {
     key: keyof ApplicationSteps;
     label: string;
     description: string;
   }[] = [
-    { key: "personal", label: "Personal Information", description: "Basic details, identity documents, and nationality" },
-    { key: "education", label: "Education History", description: "Academic background, degrees, and transcripts" },
-    { key: "research", label: "Research Experience", description: "Publications, projects, and academic achievements" },
-    { key: "skills", label: "Skills & Competencies", description: "Technical, communication, and leadership skills" },
-    { key: "languages", label: "Language Proficiency", description: "Native language, English test scores, and other languages" },
-    { key: "activities", label: "Activities", description: "Extracurricular and volunteer activities" },
-    { key: "health", label: "Health Information", description: "Medical conditions and accessibility needs" },
-    { key: "financial", label: "Financial Information", description: "Income, tuition, and travel payment capability" },
-    { key: "goals", label: "Goals & Objectives", description: "Purpose of education and post-study plans" },
-    { key: "preferences", label: "Study Preferences", description: "Preferred fields, countries, and universities" },
-    { key: "documents", label: "Required Documents", description: "CV, SOP, passport, and other supporting documents" },
-    { key: "contact", label: "Contact Information", description: "Address, phone, email, and emergency contact" },
-    { key: "studyType", label: "Study Type", description: "Scholarship and private study preferences" },
-    { key: "distinction", label: "Distinctions", description: "Special skills and notable achievements" },
+    {
+      key: "personal",
+      label: "Personal Information",
+      description: "Basic details, identity documents, and nationality",
+    },
+    {
+      key: "education",
+      label: "Education History",
+      description: "Academic background, degrees, and transcripts",
+    },
+    {
+      key: "research",
+      label: "Research Experience",
+      description: "Publications, projects, and academic achievements",
+    },
+    {
+      key: "skills",
+      label: "Skills & Competencies",
+      description: "Technical, communication, and leadership skills",
+    },
+    {
+      key: "languages",
+      label: "Language Proficiency",
+      description: "Native language, English test scores, and other languages",
+    },
+    {
+      key: "activities",
+      label: "Activities",
+      description: "Extracurricular and volunteer activities",
+    },
+    {
+      key: "health",
+      label: "Health Information",
+      description: "Medical conditions and accessibility needs",
+    },
+    {
+      key: "financial",
+      label: "Financial Information",
+      description: "Income, tuition, and travel payment capability",
+    },
+    {
+      key: "goals",
+      label: "Goals & Objectives",
+      description: "Purpose of education and post-study plans",
+    },
+    {
+      key: "preferences",
+      label: "Study Preferences",
+      description: "Preferred fields, countries, and universities",
+    },
+    {
+      key: "contact",
+      label: "Contact Information",
+      description: "Address, phone, email, and emergency contact",
+    },
+    {
+      key: "studyType",
+      label: "Study Type",
+      description: "Scholarship and private study preferences",
+    },
+    {
+      key: "documents",
+      label: "Required Documents",
+      description: "CV, SOP, passport, and other supporting documents",
+    },
   ];
 
   const completed = Object.values(steps).filter(Boolean).length;
   const total = stepList.length;
   const percent = Math.round((completed / total) * 100);
+
+  // Find the first incomplete step
+  const firstIncompleteStep = stepList.find((step) => !steps[step.key]);
+
+  // Get the URL for the continue button
+  const getContinueUrl = () => {
+    if (!firstIncompleteStep) {
+      // If all steps are completed, go to review page or first step
+      return `${baseUrl}${stepUrls.personal}`;
+    }
+    return `${baseUrl}${stepUrls[firstIncompleteStep.key]}`;
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -218,11 +308,11 @@ const ApplicationProgress = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden "
+        className="overflow-hidden"
       >
         {/* Header */}
-        <div className="">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Application Progress
@@ -231,14 +321,14 @@ const ApplicationProgress = ({
                 Track your application completion status
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm">
                 <span className="text-sm font-medium capitalize text-gray-600 dark:text-gray-300">
                   {application?.status || "draft"}
                 </span>
               </div>
-              
+
               <div className="px-3 py-1.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm">
                 <span className="text-sm font-semibold text-white">
                   {completed}/{total}
@@ -248,11 +338,13 @@ const ApplicationProgress = ({
           </div>
 
           {/* Progress Bar */}
-          <div className="space-y-2">
+          <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-semibold text-gray-900 dark:text-white">{percent}%</span>
+              <span className="font-semibold text-gray-900 dark:text-white">
+                {percent}% Complete
+              </span>
             </div>
-            
+
             <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
@@ -278,15 +370,35 @@ const ApplicationProgress = ({
               </div>
             </div>
           </div>
+
+          {/* Continue Button - Made smaller */}
+          <div className="mt-4 flex justify-end">
+            <Link href={getContinueUrl()} passHref>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-4 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white text-sm font-medium rounded-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+              >
+                <span>Continue</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </motion.button>
+            </Link>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-right">
+            {firstIncompleteStep
+              ? `Next: ${firstIncompleteStep.label}`
+              : "All steps completed!"}
+          </p>
         </div>
 
-        {/* Steps List - Single Column */}
+        {/* Steps List - Single Column with space between */}
         <div className="p-6">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {stepList.map((step) => {
               const Icon = SECTION_ICONS[step.key];
               const linear = SECTION_linearS[step.key];
               const isCompleted = steps[step.key];
+              const href = `${baseUrl}${stepUrls[step.key]}`;
 
               return (
                 <ProgressCard
@@ -295,14 +407,12 @@ const ApplicationProgress = ({
                   isCompleted={isCompleted}
                   icon={Icon}
                   linear={linear}
-                  onClick={() => onStepClick?.(step.key)}
+                  href={href}
                 />
               );
             })}
           </div>
         </div>
-
-
       </motion.div>
     </ErrorBoundary>
   );

@@ -131,6 +131,8 @@ export interface Contact {
 export interface StudyType {
   scholarshipOnly?: boolean;
   privateStudyOption?: boolean;
+  specialSkills:string,
+  achievements:string,
 }
 
 export interface Distinction {

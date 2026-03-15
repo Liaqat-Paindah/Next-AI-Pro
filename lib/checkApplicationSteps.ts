@@ -15,7 +15,6 @@ export interface ApplicationSteps {
   documents: boolean;
   contact: boolean;
   studyType: boolean;
-  distinction: boolean;
 }
 
 export function checkApplicationSteps(
@@ -81,13 +80,11 @@ export function checkApplicationSteps(
     contact: !!(app?.contact?.phone && app?.contact?.relativePhone),
 
     // Study Type: Both options selected
-    studyType:
-      app?.studyType?.scholarshipOnly !== false &&
-      app?.studyType?.privateStudyOption !== undefined,
-
-    // Distinction: Any distinction provided
-    distinction: !!(
-      app?.distinction?.specialSkills || app?.distinction?.achievements
+    studyType: !!(
+      (app?.studyType?.scholarshipOnly !== false &&
+        app?.studyType?.privateStudyOption !== undefined) ||
+      app?.studyType?.specialSkills ||
+      app?.studyType?.achievements
     ),
   };
 }
