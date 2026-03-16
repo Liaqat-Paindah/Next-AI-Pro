@@ -1,87 +1,73 @@
 import { ConnectDB } from "@/lib/config";
-import { NextResponse } from "next/server";
 import Applications from "@/models/Applications";
+import { NextResponse } from "next/server";
 import { saveFile } from "@/lib/file_upload";
-
-interface Conference {
-  title: string;
-  file: string | null;
-}
-
-export interface ConferencesPayload {
-  hasConferences: "Yes" | "No";
-  Conferences: Conference[];
-  userId: string;
-}
 
 export async function POST(req: Request) {
   try {
+
     await ConnectDB();
 
     const formData = await req.formData();
 
     const userId = formData.get("userId") as string;
-    const hasConferences = formData.get("hasConferences") as "Yes" | "No";
+    const type = formData.get("type") as string;
+    const file = formData.get("file") as File | null;
 
-    if (!userId) {
+    if (!userId || !type || !file) {
       return NextResponse.json({
-        status: 400,
         success: false,
-        message: "User ID is required",
+        message: "Missing required fields",
       });
     }
 
-    const payload: ConferencesPayload = {
-      hasConferences,
-      userId,
-      Conferences: [],
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({
+        success: false,
+        message: "File must be less than 10MB",
+      });
+    }
+
+    const fileUrl = await saveFile(file, "documents");
+
+    const fieldMap: Record<string, string> = {
+      sop: "files.sopUrl",
+      recommendationLetters: "files.recommendationLettersUrl",
+      cv: "files.cvUrl",
+      researchProposal: "files.researchProposalUrl",
+      portfolio: "files.portfolioUrl",
+      nid: "files.nidUrl",
+      passport: "files.passportUrl",
     };
 
-    if (hasConferences === "Yes") {
-      const projectsCount = Number(formData.get("projectsCount") || 0);
+    const dbField = fieldMap[type];
 
-      for (let i = 0; i < projectsCount; i++) {
-        const title = formData.get(`projects[${i}][title]`) as string;
-        const file = formData.get(`projects[${i}][file]`) as File | null;
-
-        let filePath: string | null = null;
-
-        if (file && file instanceof File) {
-          filePath = await saveFile(file, `conferences/${userId}`);
-        }
-
-        payload.Conferences.push({
-          title,
-          file: filePath,
-        });
-      }
+    if (!dbField) {
+      return NextResponse.json({
+        success: false,
+        message: "Invalid document type",
+      });
     }
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },
-      {
-        "research.hasConferences": hasConferences === "Yes",
-        "research.conferences": payload.Conferences.map((c) => ({
-          title: c.title,
-          fileUrl: c.file,
-        })),
-      },
-      { returnDocument: "after", runValidators: true }
+      { $set: { [dbField]: fileUrl } },
+      { returnDocument: "after" }
     );
 
     return NextResponse.json({
-      status: 200,
       success: true,
+      message: "Document uploaded",
       data: updatedApplication,
-      message: "Conferences saved successfully",
     });
+
   } catch (error) {
-    console.error("Error saving conferences:", error);
+
+    console.error("Upload Document Error:", error);
 
     return NextResponse.json({
-      status: 500,
       success: false,
-      message: "Server Error",
+      message: "Server error",
     });
   }
 }

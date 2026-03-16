@@ -343,12 +343,34 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     },
 
     files: {
-      cvUrl: String,
-      sopUrl: String,
-      passportUrl: String,
-      tazkiraUrl: String,
-      portfolioUrl: String,
-      researchProposalUrl: String,
+      sopUrl: {
+        type: String,
+        default: null,
+      },
+      recommendationLettersUrl: {
+        type: String,
+        default: null,
+      },
+      cvUrl: {
+        type: String,
+        default: null,
+      },
+      researchProposalUrl: {
+        type: String,
+        default: null,
+      },
+      portfolioUrl: {
+        type: String,
+        default: null,
+      },
+      nidUrl: {
+        type: String,
+        default: null,
+      },
+      passportUrl: {
+        type: String,
+        default: null,
+      },
     },
   },
   {
