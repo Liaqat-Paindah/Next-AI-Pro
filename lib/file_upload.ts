@@ -17,10 +17,10 @@ export async function saveFile(file: File, subDir: string): Promise<string> {
   const blobPath = `${subDir}/${fileName}`;
 
   // Upload to Vercel Blob
-  const blob = await put(blobPath, file, {
+  await put(blobPath, file, {
     access: "public",
   });
 
   // Return file URL
-  return blob.url;
+  return blobPath;
 }

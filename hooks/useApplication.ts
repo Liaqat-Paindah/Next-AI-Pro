@@ -16,6 +16,10 @@ import {
   VisionGoalsFormData,
 } from "@/types/application";
 import { AddressContactData } from "@/types/contactAddress";
+import {
+  UploadDocumentPayload,
+  UploadDocumentResponse,
+} from "@/types/document";
 import { StudyRequestData } from "@/types/studyRequest";
 import { ActivitiesFormData } from "@/types/workExperience";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -867,6 +871,41 @@ export const useStudyRequest = () => {
 
     onError: (error: Error) => {
       toast.error(error?.message || "Failed to save study request information");
+    },
+  });
+};
+
+export const useUploadDocument = () => {
+  return useMutation({
+    mutationKey: ["uploadDocument"],
+
+    mutationFn: async (
+      payload: UploadDocumentPayload,
+    ): Promise<UploadDocumentResponse> => {
+      const formData = new FormData();
+
+      formData.append("userId", payload.userId);
+      formData.append("type", payload.type);
+      formData.append("file", payload.file);
+
+      const response = await axios.post<UploadDocumentResponse>(
+        "/api/application/documents",
+        formData,
+      );
+
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+
+      return response.data;
+    },
+
+    onSuccess: () => {
+      toast.success("Document uploaded successfully");
+    },
+
+    onError: (error: Error) => {
+      toast.error(error.message || "Upload failed");
     },
   });
 };
