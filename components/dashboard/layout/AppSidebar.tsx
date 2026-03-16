@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "@/components/providers/SidebarContext";
 import {
   LayoutDashboard,
-  User,
   Settings,
   ChevronDown,
   LogOut,
@@ -31,11 +30,6 @@ const mainNavItems: NavItem[] = [
     icon: <FileText className="w-4 h-4" />,
     name: "Application",
     path: "/dashboard/applicants",
-  },
-  {
-    icon: <User className="w-4 h-4" />,
-    name: "Profile",
-    path: "/profile",
   },
   {
     icon: <Settings className="w-4 h-4" />,

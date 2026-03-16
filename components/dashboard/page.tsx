@@ -1,120 +1,48 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
   ChevronUp,
   Award,
-  TrendingUp,
-  Target,
-  Send,
-  Mail,
-  UserCheck,
-  FileCheck,
-  Sparkles,
   AlertCircle,
   Download,
-  FileText,
   Circle,
   Clock,
   CheckCircle2,
+  Cpu,
 } from "lucide-react";
+import { Stage, stages } from "@/data/stage";
+import Loading from "@/app/loading";
+import { UseGetApplicants } from "@/hooks/useApplication";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-interface Stage {
-  key: string;
-  title: string;
-  description: string;
-  shortDescription: string;
-  icon: React.ElementType;
-  fileAvailable?: boolean;
-  estimatedTime?: string;
-  recommendation?: string;
-}
-
-const stages: Stage[] = [
-  {
-    key: "information_submission",
-    title: "Information Submission",
-    shortDescription: "Submit your academic details",
-    description:
-      "Submit all required information based on your education level (High School, Bachelor's, Master's, or PhD)",
-    icon: FileCheck,
-    fileAvailable: true,
-    estimatedTime: "15-20 min",
-    recommendation: "Ensure all academic transcripts and identification documents are ready before starting this stage.",
-  },
-  {
-    key: "eligibility_assessment",
-    title: "Eligibility Assessment",
-    shortDescription: "Check your qualification",
-    description:
-      "Your profile will be evaluated against international scholarship requirements and criteria",
-    icon: UserCheck,
-    fileAvailable: true,
-    estimatedTime: "2-3 days",
-    recommendation: "Review scholarship criteria carefully and highlight achievements that match their requirements.",
-  },
-  {
-    key: "eligibility_alignment",
-    title: "Eligibility Alignment",
-    shortDescription: "Match requirements",
-    description:
-      "Align your qualifications with minimum scholarship requirements through targeted improvements",
-    icon: Target,
-    fileAvailable: true,
-    estimatedTime: "3-5 days",
-    recommendation: "Focus on addressing any gaps in your qualifications and strengthen key areas.",
-  },
-  {
-    key: "competitive_enhancement",
-    title: "Competitive Enhancement",
-    shortDescription: "Boost your profile",
-    description:
-      "Strengthen your profile to increase competitiveness for international scholarships",
-    icon: TrendingUp,
-    fileAvailable: true,
-    estimatedTime: "1-2 weeks",
-    recommendation: "Consider adding new achievements or improving language test scores to stand out.",
-  },
-  {
-    key: "application_customization",
-    title: "Application Customization",
-    shortDescription: "Personalize applications",
-    description:
-      "Customize your applications to align with each scholarship's specific goals and values",
-    icon: Sparkles,
-    fileAvailable: true,
-    estimatedTime: "3-4 days",
-  },
-  {
-    key: "application_submission",
-    title: "Application Submission",
-    shortDescription: "Submit applications",
-    description:
-      "Submit your completed scholarship applications through the official portals",
-    icon: Send,
-    fileAvailable: true,
-    estimatedTime: "1-2 hours",
-  },
-  {
-    key: "post_submission_followup",
-    title: "Post-Submission Follow-Up",
-    shortDescription: "Track and follow up",
-    description:
-      "Engage in follow-up actions to increase visibility and demonstrate continued interest",
-    icon: Mail,
-    fileAvailable: true,
-    estimatedTime: "Ongoing",
-  },
-];
-
-// Progress data type
+// Types
 interface ProgressData {
   [key: string]: {
     completed: boolean;
     completedAt?: string;
   };
+}
+
+interface EducationItem {
+  level?: string;
+  fieldOfStudy?: string;
+  institutionName?: string;
+  gpa?: number;
+}
+
+interface ApplicationData {
+  _id?: string;
+  userId?: string;
+  stage?: string;
+  status?: string;
+  personal?: Record<string, unknown>;
+  education?: EducationItem[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Format date helper
@@ -130,29 +58,7 @@ const formatDate = (date?: string | null): string => {
   });
 };
 
-// Skeleton Loader
-const ScholarshipTrackerSkeleton = () => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    className="rounded-sm border border-gray-200 dark:border-[#064e78] overflow-hidden bg-white dark:bg-[#011b2b] w-full max-w-4xl mx-auto"
-  >
-    <div className="p-6 border-b border-gray-200 dark:border-[#064e78]">
-      <div className="w-48 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" />
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
-    </div>
-    <div className="p-6 space-y-4">
-      {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="h-20 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse"
-        />
-      ))}
-    </div>
-  </motion.div>
-);
-
-// Error Boundary Component
+// Error Boundary
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; onError?: (error: Error) => void },
   { hasError: boolean; error: Error | null }
@@ -176,12 +82,20 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="rounded-sm border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
-          <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
-            <AlertCircle className="w-5 h-5" />
-            <p className="text-sm font-medium">
-              Something went wrong loading scholarship tracker
-            </p>
+        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-6 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
+          <div className="relative flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-red-500/20 dark:bg-red-500/30">
+              <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-300" />
+            </div>
+            <div>
+              <p className="font-medium text-red-400 dark:text-red-300">
+                System Alert
+              </p>
+              <p className="text-sm text-red-400/80 dark:text-red-300/70">
+                Failed to load scholarship tracker
+              </p>
+            </div>
           </div>
         </div>
       );
@@ -205,58 +119,80 @@ const StageItem = ({
   isCompleted: boolean;
   isExpanded: boolean;
   onToggle: () => void;
-  onDownload: () => void;
+  onDownload: (filePath: string) => void;
   completedAt?: string;
 }) => {
   const Icon = stage.icon;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.1 }}
       className={`
-        border border-gray-200 dark:border-[#064e78] rounded-sm
-        ${isCompleted 
-          ? "bg-green-50/30 dark:bg-green-900/5 border-green-200 dark:border-green-800" 
-          : "bg-white dark:bg-[#011b2b]"
+        group relative overflow-hidden rounded-sm border transition-all duration-500
+        ${
+          isCompleted
+            ? "border-[#00A3FF]/30 bg-linear-to-br from-[#00A3FF]/5 via-transparent to-[#7000FF]/5 dark:from-[#00A3FF]/10 dark:via-transparent dark:to-[#7000FF]/10"
+            : "border-gray-200  hover:border-[#00A3FF]/30 dark:border-white/10  dark:hover:border-[#00A3FF]/30"
         }
-        hover:border-[#00A3FF] dark:hover:border-[#00A3FF] transition-all duration-300
+        backdrop-blur-sm
       `}
     >
+      {/* Animated Background linear */}
+      <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-5 dark:group-hover:opacity-10" />
+
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-5" />
+
       {/* Header */}
       <div
         onClick={onToggle}
-        className="flex items-center justify-between px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#064e78]/20 transition-colors"
+        className="relative flex cursor-pointer items-center justify-between px-6 py-4"
         role="button"
         tabIndex={0}
         aria-expanded={isExpanded}
       >
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Status Icon - Always has colors */}
-          <div
-            className={`
-            w-8 h-8 sm:w-10 sm:h-10 rounded-sm flex items-center justify-center
-            ${
-              isCompleted
-                ? "bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
-                : "bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-[#064e78]"
-            }
-          `}
-          >
-            {isCompleted ? (
-              <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            ) : (
-              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#00A3FF] dark:text-[#00A3FF]" />
-            )}
+        <div className="flex items-center space-x-4">
+          {/* Status Icon with Glow Effect */}
+          <div className="relative">
+            <div
+              className={`
+                relative flex h-12 w-12 items-center justify-center rounded-sm
+                ${
+                  isCompleted
+                    ? "bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
+                    : ""
+                }
+                transition-all duration-500 group-hover:scale-110
+              `}
+            >
+              {isCompleted ? (
+                <CheckCircle2 className="h-6 w-6 text-white" />
+              ) : (
+                <Icon className="h-6 w-6 text-[#00A3FF]" />
+              )}
+            </div>
+            {/* Glow Effect */}
+            <div
+              className={`
+                absolute inset-0 -z-10 rounded-sm blur-xl transition-opacity duration-500
+                ${
+                  isCompleted
+                    ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
+                    : "bg-[#00A3FF]/10 opacity-0 group-hover:opacity-50 dark:bg-[#00A3FF]/20 dark:group-hover:opacity-100"
+                }
+              `}
+            />
           </div>
 
-          {/* Title and Short Description */}
+          {/* Title and Description */}
           <div>
-            <h3 className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
-              Stage {index + 1}: {stage.title}
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+              <span className="text-[#00A3FF]">Stage {index + 1}</span> ·{" "}
+              {stage.title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               {stage.shortDescription}
             </p>
           </div>
@@ -264,20 +200,20 @@ const StageItem = ({
 
         <div className="flex items-center space-x-3">
           {stage.estimatedTime && (
-            <div className="hidden sm:flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-sm text-xs text-gray-600 dark:text-gray-400">
-              <Clock className="w-3 h-3" />
+            <div className="hidden items-center gap-2 rounded-sm bg-gray-100 px-3 py-1.5 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-300 sm:flex">
+              <Clock className="h-4 w-4 text-[#00A3FF]" />
               <span>{stage.estimatedTime}</span>
             </div>
           )}
           <motion.button
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-sm transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-sm bg-gray-100 text-gray-500 transition-colors  hover:text-gray-900 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
             {isExpanded ? (
-              <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+              <ChevronUp className="h-4 w-4" />
             ) : (
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
+              <ChevronDown className="h-4 w-4" />
             )}
           </motion.button>
         </div>
@@ -292,40 +228,32 @@ const StageItem = ({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="px-4 sm:px-6 pb-6 pt-2">
-              <div className="ml-12 sm:ml-14 space-y-4">
+            <div className="relative px-6 pb-6 pt-2">
+              <div className="ml-16 space-y-4">
                 {/* Full Description */}
-                <p className="text-sm text-gray-700 dark:text-gray-300">
+                <p className="text-xs text-gray-700 dark:text-gray-300">
                   {stage.description}
                 </p>
 
-
                 {/* File Download Section */}
-                {stage.fileAvailable && (
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-[#064e78]">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                      <FileText className="w-4 h-4 text-[#00A3FF]" />
-                      <span className="text-xs sm:text-sm font-medium">
-                        Stage {index + 1} Guidelines
+                {stage.fileAvailable && stage.filePath && (
+                  <motion.button
+                    onClick={() => onDownload(stage.filePath)}
+                    className="group relative overflow-hidden rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5"
+                  >
+                    <div className="relative flex items-center gap-2 rounded-sm px-6 py-2 transition-colors">
+                      <Download className="h-4 w-4 text-white" />
+                      <span className="text-xs text-white">
+                        Download Guidelines
                       </span>
                     </div>
-
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={onDownload}
-                      className="flex items-center justify-center gap-2 px-4 py-1.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm text-xs hover:opacity-90 transition-opacity"
-                    >
-                      <Download className="w-3 h-3" />
-                      <span>Download PDF</span>
-                    </motion.button>
-                  </div>
+                  </motion.button>
                 )}
 
                 {/* Completion Info */}
                 {completedAt && (
-                  <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/10 p-2 rounded-sm">
-                    <CheckCircle2 className="w-3 h-3" />
+                  <div className="flex items-center gap-2 rounded-sm bg-green-50 px-4 py-2 text-xs text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                    <CheckCircle2 className="h-4 w-4" />
                     <span>Completed on {formatDate(completedAt)}</span>
                   </div>
                 )}
@@ -338,6 +266,48 @@ const StageItem = ({
   );
 };
 
+// Helper function to determine completed stages
+const calculateProgress = (
+  applicationData: ApplicationData | undefined,
+): ProgressData => {
+  if (!applicationData) return {};
+
+  const currentStage = applicationData.stage || "information_submission";
+  const createdAt = applicationData.createdAt;
+  const updatedAt = applicationData.updatedAt;
+  const currentStageIndex = stages.findIndex(
+    (stage) => stage.key === currentStage,
+  );
+
+  const progress: ProgressData = {};
+
+  stages.forEach((stage, index) => {
+    if (index < currentStageIndex) {
+      progress[stage.key] = {
+        completed: true,
+        completedAt: updatedAt || createdAt,
+      };
+    } else if (index === currentStageIndex) {
+      progress[stage.key] = { completed: false };
+    } else {
+      progress[stage.key] = { completed: false };
+    }
+  });
+
+  // Mark info submission complete if personal data exists
+  if (
+    applicationData.personal &&
+    Object.keys(applicationData.personal).length > 0
+  ) {
+    progress.information_submission = {
+      completed: true,
+      completedAt: createdAt,
+    };
+  }
+
+  return progress;
+};
+
 // Main Component
 const ScholarshipTracker = ({
   isLoading = false,
@@ -347,185 +317,277 @@ const ScholarshipTracker = ({
   onError?: (error: Error) => void;
 }) => {
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
+  const [glowIntensity, setGlowIntensity] = useState(0.5);
 
-  // Progress data - Only Information Submission is completed
-  const [progress] = useState<ProgressData>({
-    information_submission: { completed: true, completedAt: "2024-01-15" },
-    eligibility_assessment: { completed: false },
-    eligibility_alignment: { completed: false },
-    competitive_enhancement: { completed: false },
-    application_customization: { completed: false },
-    application_submission: { completed: false },
-    post_submission_followup: { completed: false },
-  });
+  const { data: userSession, status } = useSession();
+  const userId = userSession?.user?._id;
+  const { data: response, isPending } = UseGetApplicants(userId as string);
+  const applicationData: ApplicationData | undefined = response?.data;
+
+  const router = useRouter();
+
+  const progress = useMemo(
+    () => calculateProgress(applicationData),
+    [applicationData],
+  );
+
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login");
+
+    // Animate glow intensity
+    const interval = setInterval(() => {
+      setGlowIntensity(0.3 + Math.random() * 0.4);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [status, router]);
+
+  if (status === "loading" || isPending) return <Loading />;
 
   const completedCount = Object.values(progress).filter(
-    (p) => p.completed,
+    (p) => p?.completed,
   ).length;
   const totalStages = stages.length;
   const progressPercentage = (completedCount / totalStages) * 100;
 
   const currentStageIndex = stages.findIndex(
-    (_, index) => !progress[stages[index].key]?.completed,
+    (stage) => !progress[stage.key]?.completed,
   );
 
   const handleStageToggle = (stageKey: string) => {
     setExpandedStage(expandedStage === stageKey ? null : stageKey);
   };
-
-  const handleDownload = (stageKey: string) => {
-    console.log("Downloading guidelines for:", stageKey);
-    // In production, this would download actual files
+  const baseUrl = process.env.NEXT_PUBLIC_FILE_URL;
+  if (!baseUrl) {
+    console.error("The file URL is missing");
+    return;
+  }
+  const handleDownload = (filePath: string) => {
     const link = document.createElement("a");
-    link.href = "#";
-    link.download = `${stageKey}_guidelines.pdf`;
+    link.href = `${baseUrl}/application_guidlines/${filePath}`;
+    link.target = "_blank";
     link.click();
   };
 
-  if (isLoading) {
-    return <ScholarshipTrackerSkeleton />;
-  }
+  if (isLoading) return <Loading />;
 
   return (
     <ErrorBoundary onError={onError}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-sm border border-gray-200 dark:border-[#064e78] overflow-hidden bg-white dark:bg-[#011b2b] w-full max-w-4xl mx-auto"
-      >
-        {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-[#064e78]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] flex items-center justify-center">
-                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                  Scholarship Attainment Framework
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  Track your scholarship application journey
-                </p>
-              </div>
-            </div>
+      <div className="relative md:p-2">
+        {/* Nexus Background Effects */}
+        <div className="fixed inset-0 overflow-hidden">
+          {/* linear Orbs - Light Mode */}
+          <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
+          <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
 
-            <div className="flex items-center gap-3">
-              <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  {completedCount}/{totalStages} Completed
-                </span>
-              </div>
-              <div className="px-3 py-1.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm">
-                <span className="text-xs font-semibold text-white">
-                  {Math.round(progressPercentage)}%
-                </span>
-              </div>
-            </div>
-          </div>
+          {/* linear Orbs - Dark Mode */}
+          <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
+          <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
 
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-600 dark:text-gray-400">
-                Overall Progress
-              </span>
-              <span className="font-medium text-gray-900 dark:text-white">
-                {Math.round(progressPercentage)}%
-              </span>
-            </div>
+          {/* Scanning Line */}
+          <motion.div
+            animate={{ top: ["-10%", "110%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
+          />
+        </div>
 
-            <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercentage}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="absolute h-full bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
-              />
-            </div>
-          </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative mx-auto max-w-6xl"
+        >
+          {/* Main Container */}
+          <div className="relative overflow-hidden rounded-sm border border-gray-200  backdrop-blur-sm dark:border-white/10 ">
+            {/* Animated Border */}
+            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
 
-          {/* Stage Indicators */}
-          <div className="relative flex justify-between mt-8 px-2">
-            {stages.map((stage, index) => {
-              const isCompleted = progress[stage.key]?.completed;
-              const isCurrent = index === currentStageIndex;
+            {/* Header */}
+            <div className="relative border-b border-gray-200 p-8 dark:border-white/10">
+              {/* Top Glow */}
+              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
 
-              return (
-                <div
-                  key={stage.key}
-                  className="group relative flex-1 text-center"
-                >
-                  <div className="relative inline-block">
-                    {/* Stage Dot */}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className={`
-                      w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-sm flex items-center justify-center
-                      border-2 transition-all duration-300 cursor-pointer
-                      ${
-                        isCompleted
-                          ? "border-[#00A3FF] bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
-                          : isCurrent
-                            ? "border-[#00A3FF] bg-[#00A3FF]/10"
-                            : "border-gray-300 dark:border-[#064e78] bg-white dark:bg-[#011b2b]"
-                      }
-                    `}
-                      onClick={() => handleStageToggle(stage.key)}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                      ) : (
-                        <Circle
-                          className={`w-3 h-3 sm:w-4 sm:h-4 ${isCurrent ? "text-[#00A3FF]" : "text-gray-400 dark:text-gray-600"}`}
-                        />
-                      )}
-                    </motion.div>
-
-                    {/* Connection Line */}
-                    {index < stages.length - 1 && (
-                      <div className="absolute top-4 sm:top-5 left-[60%] w-full h-0.5 bg-gray-200 dark:bg-gray-700 hidden sm:block">
-                        <motion.div
-                          initial={{ width: "0%" }}
-                          animate={{
-                            width: progress[stages[index + 1].key]?.completed
-                              ? "100%"
-                              : "0%",
-                          }}
-                          className="h-full bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
-                        />
-                      </div>
-                    )}
+              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
+                      <Award className="h-8 w-8 text-white" />
+                    </div>
+                    <div className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50" />
                   </div>
-
-                  {/* Stage Title - Tooltip on hover */}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs px-2 py-1 rounded-sm pointer-events-none z-10">
-                    {stage.title}
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                      Scholarship
+                      <span className="text-[#00A3FF]"> Attainment </span>
+                    </h1>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Track your scholarship application journey
+                    </p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Stages List */}
-        <div className="p-6">
-          <div className="flex flex-col gap-3">
-            {stages.map((stage, index) => (
-              <StageItem
-                key={stage.key}
-                stage={stage}
-                index={index}
-                isCompleted={progress[stage.key]?.completed || false}
-                isExpanded={expandedStage === stage.key}
-                onToggle={() => handleStageToggle(stage.key)}
-                onDownload={() => handleDownload(stage.key)}
-                completedAt={progress[stage.key]?.completedAt}
-              />
-            ))}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5">
+                      <div className="rounded-sm bg-white px-6 py-2 dark:bg-black/90">
+                        <span className="text-sm text-gray-900 dark:text-white">
+                          {Math.round(progressPercentage)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className="absolute inset-0 -z-10 rounded-sm blur-lg"
+                      style={{
+                        background: `linear-linear(to right, #00A3FF, #7000FF)`,
+                        opacity:
+                          glowIntensity *
+                          (typeof window !== "undefined" &&
+                          window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches
+                            ? 0.5
+                            : 0.3),
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Current Stage Indicator */}
+              {applicationData?.stage && (
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="mt-6 rounded-sm bg-linear-to-r from-[#00A3FF]/5 to-[#7000FF]/5 p-4 dark:from-[#00A3FF]/10 dark:to-[#7000FF]/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20">
+                      <Cpu className="h-4 w-4 text-[#00A3FF]" />
+                    </div>
+                    <p className="text-xs text-[#00A3FF] dark:text-[#00A3FF]">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        Active Stage:
+                      </span>{" "}
+                      {stages.find((s) => s.key === applicationData.stage)
+                        ?.title || applicationData.stage}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Progress Bar */}
+              <div className="mt-6 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    System Progress
+                  </span>
+                  <span className="font-mono text-[#00A3FF] dark:text-[#00A3FF]">
+                    {Math.round(progressPercentage)}%
+                  </span>
+                </div>
+
+                <div className="relative h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-white/5">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercentage}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="relative h-full rounded-full bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
+                  >
+                    {/* Scanning Effect */}
+                    <motion.div
+                      animate={{ x: ["-100%", "100%"] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute inset-0 w-20 bg-linear-to-r from-transparent via-white/50 to-transparent dark:via-white/30"
+                    />
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Stage Indicators */}
+              <div className="relative mt-10 flex justify-between px-4">
+                {stages.map((stage, index) => {
+                  const isCompleted = progress[stage.key]?.completed;
+                  const isCurrent = index === currentStageIndex;
+
+                  return (
+                    <div
+                      key={stage.key}
+                      className="group relative flex-1 text-center"
+                    >
+                      <div className="relative inline-block">
+                        {/* Stage Dot */}
+                        <motion.button
+                          whileHover={{ scale: 1.2 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleStageToggle(stage.key)}
+                          className={`
+                            relative flex h-12 w-12 items-center justify-center border border-[#7000FF] rounded-sm  transition-all duration-500
+                            ${
+                              isCompleted
+                                ? "border-[#00A3FF] bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
+                                : isCurrent
+                                  ? "border-[#00A3FF]  bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20"
+                                  : " border border-[#7000FF] hover:border-[#00A3FF]/50 dark:border-[#7000FF] dark:hover:border-[#00A3FF]/50"
+                            }
+                          `}
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="h-5 w-5 text-white" />
+                          ) : (
+                            <Circle
+                              className={`h-4 w-4 ${
+                                isCurrent
+                                  ? "text-[#00A3FF]"
+                                  : "text-[#7000FF] dark:text-[#7000FF]"
+                              }`}
+                            />
+                          )}
+
+                          {/* Pulse Effect for Current Stage */}
+                          {isCurrent && !isCompleted && (
+                            <span className="absolute inset-0 animate-ping rounded-sm bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30" />
+                          )}
+                        </motion.button>
+
+                        {/* Glow Effect */}
+                        <div
+                          className={`
+                            absolute inset-0 -z-10 rounded-sm blur-xl transition-opacity duration-500
+                            ${
+                              isCompleted
+                                ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
+                                : isCurrent
+                                  ? "bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30"
+                                  : "bg-transparent group-hover:bg-[#00A3FF]/10 dark:group-hover:bg-[#00A3FF]/20"
+                            }
+                          `}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Stages List */}
+            <div className="relative p-8">
+              <div className="relative space-y-3">
+                {stages.map((stage, index) => (
+                  <StageItem
+                    key={stage.key}
+                    stage={stage}
+                    index={index}
+                    isCompleted={progress[stage.key]?.completed || false}
+                    isExpanded={expandedStage === stage.key}
+                    onToggle={() => handleStageToggle(stage.key)}
+                    onDownload={handleDownload}
+                    completedAt={progress[stage.key]?.completedAt}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </ErrorBoundary>
   );
 };
