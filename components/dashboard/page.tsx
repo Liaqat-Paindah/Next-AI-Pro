@@ -119,7 +119,7 @@ const StageItem = ({
   isCompleted: boolean;
   isExpanded: boolean;
   onToggle: () => void;
-  onDownload: () => void;
+  onDownload: (filePath: string) => void;
   completedAt?: string;
 }) => {
   const Icon = stage.icon;
@@ -236,22 +236,18 @@ const StageItem = ({
                 </p>
 
                 {/* File Download Section */}
-                {stage.fileAvailable && (
-                  <div>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={onDownload}
-                      className="group relative overflow-hidden rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5"
-                    >
-                      <div className="relative flex items-center gap-2 rounded-sm  px-6 py-2 transition-colors   ">
-                        <Download className="h-4 w-4 text-white dark:text-white " />
-                        <span className="text-xs   text-white dark:text-white">
-                          Download Guidelines
-                        </span>
-                      </div>
-                    </motion.button>
-                  </div>
+                {stage.fileAvailable && stage.filePath && (
+                  <motion.button
+                    onClick={() => onDownload(stage.filePath)}
+                    className="group relative overflow-hidden rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5"
+                  >
+                    <div className="relative flex items-center gap-2 rounded-sm px-6 py-2 transition-colors">
+                      <Download className="h-4 w-4 text-white" />
+                      <span className="text-xs text-white">
+                        Download Guidelines
+                      </span>
+                    </div>
+                  </motion.button>
                 )}
 
                 {/* Completion Info */}
@@ -361,11 +357,15 @@ const ScholarshipTracker = ({
   const handleStageToggle = (stageKey: string) => {
     setExpandedStage(expandedStage === stageKey ? null : stageKey);
   };
-
-  const handleDownload = () => {
+  const baseUrl = process.env.NEXT_PUBLIC_FILE_URL;
+  if (!baseUrl) {
+    console.error("The file URL is missing");
+    return;
+  }
+  const handleDownload = (filePath: string) => {
     const link = document.createElement("a");
-    link.href =
-      "https://drive.google.com/file/d/1ttBqLEBGp2SjPS7ks2iFKLu66U2KMnVS/view?usp=sharing";
+    link.href = `${baseUrl}/application_guidlines/${filePath}`;
+    link.target = "_blank";
     link.click();
   };
 
@@ -561,8 +561,6 @@ const ScholarshipTracker = ({
                             }
                           `}
                         />
-
-             
                       </div>
                     </div>
                   );

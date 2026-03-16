@@ -14,6 +14,7 @@ export interface Stage {
   description: string;
   shortDescription: string;
   icon: React.ElementType;
+  filePath: string;
   fileAvailable?: boolean;
   estimatedTime?: string;
   recommendation?: string;
@@ -27,6 +28,7 @@ export const stages: Stage[] = [
     description:
       "Submit all required information based on your education level (High School, Bachelor's, Master's, or PhD)",
     icon: FileCheck,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "30 Min-2 Hours",
     recommendation:
@@ -39,6 +41,7 @@ export const stages: Stage[] = [
     description:
       "Your profile will be evaluated against international scholarship requirements and criteria",
     icon: UserCheck,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "2-3 days",
     recommendation:
@@ -51,6 +54,7 @@ export const stages: Stage[] = [
     description:
       "Align your qualifications with minimum scholarship requirements through targeted improvements",
     icon: Target,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "3-5 days",
     recommendation:
@@ -63,6 +67,7 @@ export const stages: Stage[] = [
     description:
       "Strengthen your profile to increase competitiveness for international scholarships",
     icon: TrendingUp,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "1-2 weeks",
     recommendation:
@@ -75,16 +80,18 @@ export const stages: Stage[] = [
     description:
       "Customize your applications to align with each scholarship's specific goals and values",
     icon: Sparkles,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "3-4 days",
   },
   {
-    key: "application_submission",
+    key: "application_guidlines",
     title: "Application Submission",
     shortDescription: "Submit applications",
     description:
       "Submit your completed scholarship applications through the official portals",
     icon: Send,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "1-2 hours",
   },
@@ -95,6 +102,7 @@ export const stages: Stage[] = [
     description:
       "Engage in follow-up actions to increase visibility and demonstrate continued interest",
     icon: Mail,
+    filePath: "application_guidlines.pdf",
     fileAvailable: true,
     estimatedTime: "Ongoing",
   },
