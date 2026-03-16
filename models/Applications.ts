@@ -9,6 +9,20 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       default: "draft",
     },
 
+    stage: {
+      type: String,
+      enum: [
+        "information_submission",
+        "eligibility_assessment",
+        "eligibility_alignment",
+        "competitive_enhancement",
+        "application_customization",
+        "application_submission",
+        "post_submission_followup",
+      ],
+      default: "information_submission",
+    },
+
     personal: {
       age: {
         type: Number,
