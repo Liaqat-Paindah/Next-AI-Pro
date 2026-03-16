@@ -503,7 +503,7 @@ const ScholarshipTracker = ({
               </div>
 
               {/* Stage Indicators */}
-              <div className="relative mt-10 flex justify-between px-4">
+              <div className="relative mt-6 sm:mt-8 md:mt-10 flex justify-between px-2 sm:px-4">
                 {stages.map((stage, index) => {
                   const isCompleted = progress[stage.key]?.completed;
                   const isCurrent = index === currentStageIndex;
@@ -520,21 +520,23 @@ const ScholarshipTracker = ({
                           whileTap={{ scale: 0.95 }}
                           onClick={() => handleStageToggle(stage.key)}
                           className={`
-                            relative flex h-12 w-12 items-center justify-center border border-[#7000FF] rounded-sm  transition-all duration-500
-                            ${
-                              isCompleted
-                                ? "border-[#00A3FF] bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
-                                : isCurrent
-                                  ? "border-[#00A3FF]  bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20"
-                                  : " border border-[#7000FF] hover:border-[#00A3FF]/50 dark:border-[#7000FF] dark:hover:border-[#00A3FF]/50"
-                            }
-                          `}
+              relative flex h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 
+              items-center justify-center border border-[#7000FF] 
+              rounded-sm transition-all duration-500
+              ${
+                isCompleted
+                  ? "border-[#00A3FF] bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
+                  : isCurrent
+                    ? "border-[#00A3FF] bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20"
+                    : "border border-[#7000FF] hover:border-[#00A3FF]/50 dark:border-[#7000FF] dark:hover:border-[#00A3FF]/50"
+              }
+            `}
                         >
                           {isCompleted ? (
-                            <CheckCircle2 className="h-5 w-5 text-white" />
+                            <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-white" />
                           ) : (
                             <Circle
-                              className={`h-4 w-4 ${
+                              className={`h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 ${
                                 isCurrent
                                   ? "text-[#00A3FF]"
                                   : "text-[#7000FF] dark:text-[#7000FF]"
@@ -551,20 +553,33 @@ const ScholarshipTracker = ({
                         {/* Glow Effect */}
                         <div
                           className={`
-                            absolute inset-0 -z-10 rounded-sm blur-xl transition-opacity duration-500
-                            ${
-                              isCompleted
-                                ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
-                                : isCurrent
-                                  ? "bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30"
-                                  : "bg-transparent group-hover:bg-[#00A3FF]/10 dark:group-hover:bg-[#00A3FF]/20"
-                            }
-                          `}
+              absolute inset-0 -z-10 rounded-sm blur-md sm:blur-lg md:blur-xl 
+              transition-opacity duration-500
+              ${
+                isCompleted
+                  ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
+                  : isCurrent
+                    ? "bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30"
+                    : "bg-transparent group-hover:bg-[#00A3FF]/10 dark:group-hover:bg-[#00A3FF]/20"
+              }
+            `}
                         />
+
+                        {/* Optional: Stage Label - Visible on larger screens */}
+                        <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400 sm:block md:text-sm"></span>
                       </div>
                     </div>
                   );
                 })}
+              </div>
+
+              {/* Mobile Stage Label - Separate row for stage names on mobile */}
+              <div className="mt-8 flex justify-between px-2 sm:hidden">
+                {stages.map((stage) => (
+                  <div key={stage.key} className="flex-1 text-center">
+                    <span className="text-xs text-gray-600 dark:text-gray-400"></span>
+                  </div>
+                ))}
               </div>
             </div>
 
