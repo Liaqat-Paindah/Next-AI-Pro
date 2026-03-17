@@ -57,7 +57,7 @@ const ScholarshipFrameworkLanding = () => {
   const { data: session } = useSession();
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className=" min-h-screen overflow-hidden ">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* linear Orbs */}
