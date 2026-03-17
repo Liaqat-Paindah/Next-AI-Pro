@@ -24,9 +24,9 @@ export const stages: Stage[] = [
   {
     key: "information_submission",
     title: "Information Submission",
-    shortDescription: "Submit your academic details",
+    shortDescription: "Providing required information",
     description:
-      "Submit all required information based on your education level (High School, Bachelor's, Master's, or PhD)",
+      "At this stage, applicants submit the personal and academic information required for scholarship evaluation and registration.",
     icon: FileCheck,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -37,9 +37,9 @@ export const stages: Stage[] = [
   {
     key: "eligibility_assessment",
     title: "Eligibility Assessment",
-    shortDescription: "Check your qualification",
+    shortDescription: "Checking qualifications",
     description:
-      "Your profile will be evaluated against international scholarship requirements and criteria",
+      "At this stage, we assess applicants’ profiles against the minimum criteria of international scholarships.",
     icon: UserCheck,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -50,9 +50,9 @@ export const stages: Stage[] = [
   {
     key: "eligibility_alignment",
     title: "Eligibility Alignment",
-    shortDescription: "Match requirements",
+    shortDescription: "Completing Qualification",
     description:
-      "Align your qualifications with minimum scholarship requirements through targeted improvements",
+      "At this stage, we guide applicants in aligning their qualifications with scholarship requirements.",
     icon: Target,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -63,9 +63,9 @@ export const stages: Stage[] = [
   {
     key: "competitive_enhancement",
     title: "Competitive Enhancement",
-    shortDescription: "Boost your profile",
+    shortDescription: "Building a strong profile",
     description:
-      "Strengthen your profile to increase competitiveness for international scholarships",
+      "At this stage, we help applicants strengthen their profiles to improve their scholarship competitiveness.",
     icon: TrendingUp,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -76,9 +76,9 @@ export const stages: Stage[] = [
   {
     key: "application_customization",
     title: "Application Customization",
-    shortDescription: "Personalize applications",
+    shortDescription: "Matching Goals and Values",
     description:
-      "Customize your applications to align with each scholarship's specific goals and values",
+      "At this stage, we tailor each application to the goals and values of the target scholarship.",
     icon: Sparkles,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -87,9 +87,9 @@ export const stages: Stage[] = [
   {
     key: "application_guidlines",
     title: "Application Submission",
-    shortDescription: "Submit applications",
+    shortDescription: "Submitting Professionally",
     description:
-      "Submit your completed scholarship applications through the official portals",
+      "At this stage, we professionally prepare and submit applicants’ scholarship applications.",
     icon: Send,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
@@ -98,9 +98,9 @@ export const stages: Stage[] = [
   {
     key: "post_submission_followup",
     title: "Post-Submission Follow-Up",
-    shortDescription: "Track and follow up",
+    shortDescription: "Following up effectively",
     description:
-      "Engage in follow-up actions to increase visibility and demonstrate continued interest",
+      "At this stage, we conduct strategic follow-ups to further support applicants’ chances of success.",
     icon: Mail,
     filePath: "application_guidlines.pdf",
     fileAvailable: true,
