@@ -1,0 +1,172 @@
+export interface Education {
+  level: string;
+  fieldOfStudy?: string;
+  institutionName?: string;
+  gpa?: number;
+  academicRank?: string;
+  startDate?: Date;
+  graduationDate?: Date;
+  educationGapExplanation?: string;
+  thesisTopic?: string;
+  thesisFileUrl?: string;
+  diplomaFileUrl?: string;
+  transcriptFileUrl?: string;
+  finalExamYear?: number;
+  finalExamScore?: number;
+  majorSubjects?: string[];
+}
+
+export interface Article {
+  title: string;
+  citation: string;
+  link: string;
+}
+
+export interface Project {
+  title: string;
+  fileUrl: string;
+}
+
+export interface Conference {
+  title: string;
+  fileUrl: string;
+}
+
+export interface LabActivity {
+  title: string;
+  fileUrl: string;
+}
+
+export interface AcademicAward {
+  title: string;
+  fileUrl: string;
+}
+
+export interface ResearchSkill {
+  title: string;
+  fileUrl: string;
+}
+
+export interface Address {
+  province?: string;
+  district?: string;
+  area?: string;
+}
+
+export interface Application {
+  _id: string;
+  userId: string;
+  status: "draft" | "submitted" | "under_review" | "approved" | "rejected";
+  stage: string;
+  personal: {
+    age: number;
+    gender: string;
+    maritalStatus: string;
+    firstName: string;
+    lastName: string;
+    fatherName: string;
+    birthDate: Date;
+    nationality: string;
+    nationalId: string;
+    passportId: string;
+    dateofIssue: Date;
+    dataofExpire: Date;
+  };
+  education: Education[];
+  research: {
+    steps: string;
+    hasArticles: boolean;
+    hasProjects: boolean;
+    hasConferences: boolean;
+    hasLabs: boolean;
+    hasResearchSkills: boolean;
+    hasAcademicAwards: boolean;
+    articles: Article[];
+    projects: Project[];
+    conferences: Conference[];
+    laboratoryActivities: LabActivity[];
+    academicAwards: AcademicAward[];
+    researchSkills: ResearchSkill[];
+  };
+  skills: {
+    steps: string;
+    computerSkills: { hasSkill: boolean; fileUrl?: string };
+    communicationSkills: boolean;
+    mediaContentCreation: { hasSkill: boolean; youtubeLink?: string };
+    teamworkSkills: boolean;
+    leadershipSkills: boolean;
+    problemSolving: boolean;
+    timeManagement: boolean;
+    presentationSkills: boolean;
+  };
+  languages: {
+    nativeLanguage?: string;
+    english: {
+      level?: string;
+      test?: string;
+      score?: string;
+      certificateUrl?: string;
+    };
+    foreignLanguage?: { language: string };
+    localLanguage?: { language: string };
+  };
+  activities: Array<{ type: string; fileUrl?: string }>;
+  health: {
+    specialDiseases?: string;
+    disabilityNeeds?: string;
+  };
+  financial: {
+    familyIncome?: number;
+    canPayTuition?: string;
+    canPayTravel?: string;
+  };
+  hobbies: {
+    sports?: string;
+    freeTimeActivities?: string;
+  };
+  goals: {
+    purposeOfEducation?: string;
+    postStudyPlan?: string;
+  };
+  preferences: {
+    preferredFields?: string[];
+    preferredCountries?: string[];
+    preferredUniversities?: string[];
+    preferredStudyLevel?: string;
+  };
+  supportingDocuments: {
+    sop: boolean;
+    recommendationLetter: boolean;
+    cv: boolean;
+    researchProposal: boolean;
+    portfolio: boolean;
+  };
+  contact: {
+    permanentAddress: Address;
+    currentAddress: Address;
+    detailedAddress?: string;
+    phone?: string;
+    whatsapp?: string;
+    email?: string;
+    relativePhone?: string;
+  };
+  studyType: {
+    scholarshipOnly: boolean;
+    privateStudyOption: boolean;
+  };
+  distinction: {
+    specialSkills?: string;
+    achievements?: string;
+  };
+  files: {
+    sopUrl?: string;
+    recommendationLettersUrl?: string;
+    cvUrl?: string;
+    researchProposalUrl?: string;
+    portfolioUrl?: string;
+    nidUrl?: string;
+    passportUrl?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
