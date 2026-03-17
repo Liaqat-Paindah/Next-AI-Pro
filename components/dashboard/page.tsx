@@ -465,7 +465,7 @@ const ScholarshipTracker = ({
                     </div>
                     <p className="text-xs text-[#00A3FF] dark:text-[#00A3FF]">
                       <span className="font-medium text-gray-700 dark:text-gray-300">
-                        Active Stage:
+                        Completed Stage:
                       </span>{" "}
                       {stages.find((s) => s.key === applicationData.stage)
                         ?.title || applicationData.stage}
