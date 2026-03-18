@@ -1,198 +1,91 @@
 "use client";
-import Loading from "@/app/loading";
-import { UseGetApplicants } from "@/hooks/useApplication";
+
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
 import {
-  User,
-  GraduationCap,
-  FlaskConical,
-  Wrench,
-  Languages,
-  Heart,
   DollarSign,
-  Target,
   FileText,
+  FlaskConical,
+  GraduationCap,
+  Heart,
+  Languages,
   Phone,
-  CheckCircle,
-  XCircle,
+  Target,
+  User,
+  Wrench,
+  Calendar,
+  Award,
+  AlertCircle,
+  Download,
+  ChevronDown,
   Clock,
-  FileCheck,
+  FileDown,
+  Printer,
+  Mail,
+  Share2,
+  Sparkles,
 } from "lucide-react";
+import Loading from "@/app/loading";
+import { UseGetApplicants } from "@/hooks/useApplication";
+import { Application } from "@/types/application_details";
+import TabNavigation from "@/components/dashboard/applicants/application_details/TabNavigation";
+import PersonalInfoTab from "@/components/dashboard/applicants/application_details/tabs/PersonalInfoTab";
+import EducationTab from "@/components/dashboard/applicants/application_details/tabs/EducationTab";
+import ResearchTab from "@/components/dashboard/applicants/application_details/tabs/ResearchTab";
+import SkillsTab from "@/components/dashboard/applicants/application_details/tabs/SkillsTab";
+import LanguagesTab from "@/components/dashboard/applicants/application_details/tabs/LanguagesTab";
+import HealthTab from "@/components/dashboard/applicants/application_details/tabs/HealthTab";
+import FinancialTab from "@/components/dashboard/applicants/application_details/tabs/FinancialTab";
+import GoalsTab from "@/components/dashboard/applicants/application_details/tabs/GoalsTab";
+import DocumentsTab from "@/components/dashboard/applicants/application_details/tabs/DocumentsTab";
+import ContactTab from "@/components/dashboard/applicants/application_details/tabs/ContactTab";
 
-// Define types based on the schema
-interface Education {
-  level: string;
-  fieldOfStudy?: string;
-  institutionName?: string;
-  gpa?: number;
-  academicRank?: string;
-  startDate?: Date;
-  graduationDate?: Date;
-  educationGapExplanation?: string;
-  thesisTopic?: string;
-  thesisFileUrl?: string;
-  diplomaFileUrl?: string;
-  transcriptFileUrl?: string;
-  finalExamYear?: number;
-  finalExamScore?: number;
-  majorSubjects?: string[];
-}
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError?: (error: Error) => void },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: {
+    children: React.ReactNode;
+    onError?: (error: Error) => void;
+  }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
-interface Article {
-  title: string;
-  citation: string;
-  link: string;
-}
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
 
-interface Project {
-  title: string;
-  fileUrl: string;
-}
+  componentDidCatch(error: Error) {
+    this.props.onError?.(error);
+  }
 
-interface Conference {
-  title: string;
-  fileUrl: string;
-}
-
-interface LabActivity {
-  title: string;
-  fileUrl: string;
-}
-
-interface AcademicAward {
-  title: string;
-  fileUrl: string;
-}
-
-interface ResearchSkill {
-  title: string;
-  fileUrl: string;
-}
-
-interface Address {
-  province?: string;
-  district?: string;
-  area?: string;
-}
-
-interface Application {
-  _id: string;
-  userId: string;
-  status: "draft" | "submitted" | "under_review" | "approved" | "rejected";
-  stage: string;
-  personal: {
-    age: number;
-    gender: string;
-    maritalStatus: string;
-    firstName: string;
-    lastName: string;
-    fatherName: string;
-    birthDate: Date;
-    nationality: string;
-    nationalId: string;
-    passportId: string;
-    dateofIssue: Date;
-    dataofExpire: Date;
-  };
-  education: Education[];
-  research: {
-    steps: string;
-    hasArticles: boolean;
-    hasProjects: boolean;
-    hasConferences: boolean;
-    hasLabs: boolean;
-    hasResearchSkills: boolean;
-    hasAcademicAwards: boolean;
-    articles: Article[];
-    projects: Project[];
-    conferences: Conference[];
-    laboratoryActivities: LabActivity[];
-    academicAwards: AcademicAward[];
-    researchSkills: ResearchSkill[];
-  };
-  skills: {
-    steps: string;
-    computerSkills: { hasSkill: boolean; fileUrl?: string };
-    communicationSkills: boolean;
-    mediaContentCreation: { hasSkill: boolean; youtubeLink?: string };
-    teamworkSkills: boolean;
-    leadershipSkills: boolean;
-    problemSolving: boolean;
-    timeManagement: boolean;
-    presentationSkills: boolean;
-  };
-  languages: {
-    nativeLanguage?: string;
-    english: {
-      level?: string;
-      test?: string;
-      score?: string;
-      certificateUrl?: string;
-    };
-    foreignLanguage?: { language: string };
-    localLanguage?: { language: string };
-  };
-  activities: Array<{ type: string; fileUrl?: string }>;
-  health: {
-    specialDiseases?: string;
-    disabilityNeeds?: string;
-  };
-  financial: {
-    familyIncome?: number;
-    canPayTuition?: string;
-    canPayTravel?: string;
-  };
-  hobbies: {
-    sports?: string;
-    freeTimeActivities?: string;
-  };
-  goals: {
-    purposeOfEducation?: string;
-    postStudyPlan?: string;
-  };
-  preferences: {
-    preferredFields?: string[];
-    preferredCountries?: string[];
-    preferredUniversities?: string[];
-    preferredStudyLevel?: string;
-  };
-  supportingDocuments: {
-    sop: boolean;
-    recommendationLetter: boolean;
-    cv: boolean;
-    researchProposal: boolean;
-    portfolio: boolean;
-  };
-  contact: {
-    permanentAddress: Address;
-    currentAddress: Address;
-    detailedAddress?: string;
-    phone?: string;
-    whatsapp?: string;
-    email?: string;
-    relativePhone?: string;
-  };
-  studyType: {
-    scholarshipOnly: boolean;
-    privateStudyOption: boolean;
-  };
-  distinction: {
-    specialSkills?: string;
-    achievements?: string;
-  };
-  files: {
-    sopUrl?: string;
-    recommendationLettersUrl?: string;
-    cvUrl?: string;
-    researchProposalUrl?: string;
-    portfolioUrl?: string;
-    nidUrl?: string;
-    passportUrl?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-6 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
+          <div className="relative flex items-center space-x-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-red-500/20 dark:bg-red-500/30">
+              <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-300" />
+            </div>
+            <div>
+              <p className="font-medium text-red-400 dark:text-red-300">
+                System Alert
+              </p>
+              <p className="text-sm text-red-400/80 dark:text-red-300/70">
+                Failed to load application details
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 const GetApplicationDetails = () => {
@@ -202,62 +95,23 @@ const GetApplicationDetails = () => {
   const application = NewData?.data;
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("personal");
+  const [glowIntensity, setGlowIntensity] = useState(0.5);
+  const [isDownloadMenuOpen, setIsDownloadMenuOpen] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/login");
     }
+
+    // Animate glow intensity
+    const interval = setInterval(() => {
+      setGlowIntensity(0.3 + Math.random() * 0.4);
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, [status, router]);
-
-  if (status === "loading" || isLoading) {
-    return <Loading />;
-  }
-
-  if (!application) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-700">
-            No Application Found
-          </h2>
-          <p className="text-gray-500 mt-2">
-            You have not submitted any scholarship application yet.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const app = application as Application;
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "approved":
-        return "text-green-600 bg-green-100";
-      case "rejected":
-        return "text-red-600 bg-red-100";
-      case "under_review":
-        return "text-blue-600 bg-blue-100";
-      case "submitted":
-        return "text-yellow-600 bg-yellow-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "approved":
-        return <CheckCircle className="w-5 h-5" />;
-      case "rejected":
-        return <XCircle className="w-5 h-5" />;
-      case "under_review":
-        return <Clock className="w-5 h-5" />;
-      default:
-        return <FileCheck className="w-5 h-5" />;
-    }
-  };
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -265,6 +119,36 @@ const GetApplicationDetails = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleDownload = async (format: "pdf" | "json" | "txt") => {
+    setIsDownloading(true);
+    setDownloadProgress(0);
+
+    // Simulate download progress
+    const interval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
+    // Simulate download completion
+    setTimeout(() => {
+      clearInterval(interval);
+      setDownloadProgress(100);
+      setIsDownloading(false);
+      setIsDownloadMenuOpen(false);
+
+      // Show success message (you can replace with toast notification)
+      alert(`Application downloaded as ${format.toUpperCase()}`);
+
+      // Reset progress after showing success
+      setTimeout(() => setDownloadProgress(0), 1000);
+    }, 2000);
   };
 
   const tabs = [
@@ -280,902 +164,328 @@ const GetApplicationDetails = () => {
     { id: "contact", label: "Contact", icon: Phone },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with Status */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Scholarship Application
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Submitted on {formatDate(app.createdAt)}
+  if (status === "loading" || isLoading) {
+    return <Loading />;
+  }
+
+  if (!application) {
+    return (
+      <div className=" flex items-center justify-center">
+        <div className="relative max-w-sm w-full">
+          {/* Nexus Background Effects */}
+          <div className="fixed inset-0 overflow-hidden">
+            <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
+            <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
+            <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
+            <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
+            <motion.div
+              animate={{ top: ["-10%", "110%"] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
+            />
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative overflow-hidden rounded-sm border border-gray-200 backdrop-blur-sm dark:border-white/10"
+          >
+            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
+
+            <div className="relative p-8 text-center">
+              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
+
+              <div className="relative flex justify-center mb-6">
+                <div className="relative">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
+                    <FileText className="h-10 w-10 text-white" />
+                  </div>
+                  <div
+                    className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50"
+                    style={{ opacity: glowIntensity }}
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                No Application Found
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+                You have not submitted any scholarship application yet.
               </p>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => router.push("/dashboard/apply")}
+                className="mt-6 inline-flex items-center px-6 py-2.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm text-sm font-medium hover:shadow-lg hover:shadow-[#00A3FF]/20 transition-all duration-300"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Start Application
+              </motion.button>
             </div>
-            <div
-              className={`px-4 py-2 rounded-full flex items-center gap-2 ${getStatusColor(app.status)}`}
-            >
-              {getStatusIcon(app.status)}
-              <span className="font-medium capitalize">
-                {app.status.replace("_", " ")}
-              </span>
-            </div>
-          </div>
-          <div className="mt-4">
-            <div className="bg-gray-100 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                style={{
-                  width: `${(tabs.findIndex((t) => t.id === app.stage) + 1) * 10}%`,
-                }}
-              />
-            </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Current Stage:{" "}
-              <span className="font-medium capitalize">
-                {app.stage.replace(/_/g, " ")}
-              </span>
-            </p>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="bg-white rounded-lg shadow-sm mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex overflow-x-auto py-2 px-4 gap-1">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          {activeTab === "personal" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Personal Information
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Full Name
-                    </label>
-                    <p className="text-gray-900">
-                      {app.personal.firstName} {app.personal.lastName}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Father Name
-                    </label>
-                    <p className="text-gray-900">{app.personal.fatherName}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Date of Birth
-                    </label>
-                    <p className="text-gray-900">
-                      {formatDate(app.personal.birthDate)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Age
-                    </label>
-                    <p className="text-gray-900">{app.personal.age} years</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Gender
-                    </label>
-                    <p className="text-gray-900">{app.personal.gender}</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Marital Status
-                    </label>
-                    <p className="text-gray-900">
-                      {app.personal.maritalStatus}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Nationality
-                    </label>
-                    <p className="text-gray-900">{app.personal.nationality}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      National ID
-                    </label>
-                    <p className="text-gray-900">{app.personal.nationalId}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Passport ID
-                    </label>
-                    <p className="text-gray-900">{app.personal.passportId}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Passport Expiry
-                    </label>
-                    <p className="text-gray-900">
-                      {formatDate(app.personal.dataofExpire)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "education" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Education History
-              </h2>
-              {app.education.map((edu, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-3">
-                  <h3 className="font-medium text-lg text-blue-600">
-                    {edu.level}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {edu.fieldOfStudy && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Field of Study
-                        </label>
-                        <p className="text-gray-900">{edu.fieldOfStudy}</p>
-                      </div>
-                    )}
-                    {edu.institutionName && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Institution
-                        </label>
-                        <p className="text-gray-900">{edu.institutionName}</p>
-                      </div>
-                    )}
-                    {edu.gpa && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          GPA
-                        </label>
-                        <p className="text-gray-900">{edu.gpa}</p>
-                      </div>
-                    )}
-                    {edu.academicRank && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Academic Rank
-                        </label>
-                        <p className="text-gray-900">{edu.academicRank}</p>
-                      </div>
-                    )}
-                    {edu.startDate && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Start Date
-                        </label>
-                        <p className="text-gray-900">
-                          {formatDate(edu.startDate)}
-                        </p>
-                      </div>
-                    )}
-                    {edu.graduationDate && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Graduation Date
-                        </label>
-                        <p className="text-gray-900">
-                          {formatDate(edu.graduationDate)}
-                        </p>
-                      </div>
-                    )}
-                    {edu.finalExamScore && (
-                      <div>
-                        <label className="text-sm font-medium text-gray-500">
-                          Final Exam Score
-                        </label>
-                        <p className="text-gray-900">{edu.finalExamScore}</p>
-                      </div>
-                    )}
-                  </div>
-                  {edu.majorSubjects && edu.majorSubjects.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Major Subjects
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {edu.majorSubjects.map((subject, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 bg-gray-100 rounded-md text-sm"
-                          >
-                            {subject}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === "research" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Research & Publications
-              </h2>
-
-              {app.research.hasArticles && app.research.articles.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-medium text-lg">Articles</h3>
-                  {app.research.articles.map((article, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <p className="font-medium">{article.title}</p>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {article.citation}
-                      </p>
-                      {article.link && (
-                        <a
-                          href={article.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 text-sm hover:underline mt-2 inline-block"
-                        >
-                          View Article
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {app.research.hasProjects && app.research.projects.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-medium text-lg">Projects</h3>
-                  {app.research.projects.map((project, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <p className="font-medium">{project.title}</p>
-                      {project.fileUrl && (
-                        <a
-                          href={project.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 text-sm hover:underline mt-2 inline-block"
-                        >
-                          View Project File
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {app.research.hasConferences &&
-                app.research.conferences.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="font-medium text-lg">Conferences</h3>
-                    {app.research.conferences.map((conference, index) => (
-                      <div key={index} className="border rounded-lg p-4">
-                        <p className="font-medium">{conference.title}</p>
-                        {conference.fileUrl && (
-                          <a
-                            href={conference.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 text-sm hover:underline mt-2 inline-block"
-                          >
-                            View Conference File
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-            </div>
-          )}
-
-          {activeTab === "skills" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Skills
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Computer Skills
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.computerSkills.hasSkill ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Communication Skills
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.communicationSkills ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Media Content Creation
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.mediaContentCreation.hasSkill ? "Yes" : "No"}
-                    </p>
-                    {app.skills.mediaContentCreation.youtubeLink && (
-                      <a
-                        href={app.skills.mediaContentCreation.youtubeLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 text-sm hover:underline block mt-1"
-                      >
-                        YouTube Channel
-                      </a>
-                    )}
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Teamwork Skills
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.teamworkSkills ? "Yes" : "No"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Leadership Skills
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.leadershipSkills ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Problem Solving
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.problemSolving ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Time Management
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.timeManagement ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Presentation Skills
-                    </label>
-                    <p className="text-gray-900">
-                      {app.skills.presentationSkills ? "Yes" : "No"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "languages" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Language Proficiency
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {app.languages.nativeLanguage && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Native Language
-                    </label>
-                    <p className="text-gray-900">
-                      {app.languages.nativeLanguage}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    English Level
-                  </label>
-                  <p className="text-gray-900">
-                    {app.languages.english.level || "Not specified"}
-                  </p>
-                  {app.languages.english.test !== "None" && (
-                    <>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {app.languages.english.test}:{" "}
-                        {app.languages.english.score}
-                      </p>
-                      {app.languages.english.certificateUrl && (
-                        <a
-                          href={app.languages.english.certificateUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 text-sm hover:underline block mt-1"
-                        >
-                          View Certificate
-                        </a>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {app.languages.foreignLanguage && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Foreign Language
-                    </label>
-                    <p className="text-gray-900">
-                      {app.languages.foreignLanguage.language}
-                    </p>
-                  </div>
-                )}
-
-                {app.languages.localLanguage && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Local Language
-                    </label>
-                    <p className="text-gray-900">
-                      {app.languages.localLanguage.language}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "health" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Health Information
-              </h2>
-
-              <div className="grid grid-cols-1 gap-4">
-                {app?.health?.specialDiseases && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Special Diseases
-                    </label>
-                    <p className="text-gray-900">
-                      {app.health.specialDiseases}
-                    </p>
-                  </div>
-                )}
-
-                {app?.health?.disabilityNeeds && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Disability Needs
-                    </label>
-                    <p className="text-gray-900">
-                      {app.health.disabilityNeeds}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "financial" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Financial Information
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {app.financial.familyIncome && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Family Income
-                    </label>
-                    <p className="text-gray-900">
-                      ${app.financial.familyIncome.toLocaleString()}
-                    </p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Can Pay Tuition
-                  </label>
-                  <p className="text-gray-900 capitalize">
-                    {app.financial.canPayTuition}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Can Pay Travel
-                  </label>
-                  <p className="text-gray-900 capitalize">
-                    {app.financial.canPayTravel}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <label className="text-sm font-medium text-gray-500">
-                  Study Type
-                </label>
-                <div className="flex gap-4 mt-1">
-                  {app.studyType.scholarshipOnly && (
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                      Scholarship Only
-                    </span>
-                  )}
-                  {app.studyType.privateStudyOption && (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                      Private Study Option
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "goals" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Goals & Preferences
-              </h2>
-
-              <div className="space-y-4">
-                {app?.goals?.purposeOfEducation && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Purpose of Education
-                    </label>
-                    <p className="text-gray-900">
-                      {app.goals.purposeOfEducation}
-                    </p>
-                  </div>
-                )}
-
-                {app.goals?.postStudyPlan && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Post-Study Plan
-                    </label>
-                    <p className="text-gray-900">{app.goals.postStudyPlan}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="font-medium text-lg">Preferences</h3>
-
-                {app.preferences.preferredFields &&
-                  app.preferences.preferredFields.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Preferred Fields
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {app.preferences.preferredFields.map((field, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-gray-100 rounded-md text-sm"
-                          >
-                            {field}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                {app.preferences.preferredCountries &&
-                  app.preferences.preferredCountries.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Preferred Countries
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {app.preferences.preferredCountries.map(
-                          (country, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-gray-100 rounded-md text-sm"
-                            >
-                              {country}
-                            </span>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                {app.preferences.preferredUniversities &&
-                  app.preferences.preferredUniversities.length > 0 && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Preferred Universities
-                      </label>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {app.preferences.preferredUniversities.map(
-                          (university, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-gray-100 rounded-md text-sm"
-                            >
-                              {university}
-                            </span>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                {app.preferences.preferredStudyLevel && (
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">
-                      Preferred Study Level
-                    </label>
-                    <p className="text-gray-900">
-                      {app.preferences.preferredStudyLevel}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {app.distinction.specialSkills && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Special Skills
-                  </label>
-                  <p className="text-gray-900">
-                    {app.distinction.specialSkills}
-                  </p>
-                </div>
-              )}
-
-              {app.distinction.achievements && (
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Achievements
-                  </label>
-                  <p className="text-gray-900">
-                    {app.distinction.achievements}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "documents" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Supporting Documents
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {app?.supportingDocuments?.sop && app.files.sopUrl && (
-                  <a
-                    href={app.files.sopUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    <span>Statement of Purpose</span>
-                  </a>
-                )}
-
-                {app.supportingDocuments?.recommendationLetter &&
-                  app.files.recommendationLettersUrl && (
-                    <a
-                      href={app.files.recommendationLettersUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>Recommendation Letters</span>
-                    </a>
-                  )}
-
-                {app.supportingDocuments?.cv && app.files.cvUrl && (
-                  <a
-                    href={app.files.cvUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    <span>CV / Resume</span>
-                  </a>
-                )}
-
-                {app.supportingDocuments?.researchProposal &&
-                  app.files.researchProposalUrl && (
-                    <a
-                      href={app.files.researchProposalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>Research Proposal</span>
-                    </a>
-                  )}
-
-                {app.supportingDocuments?.portfolio &&
-                  app.files.portfolioUrl && (
-                    <a
-                      href={app.files.portfolioUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>Portfolio</span>
-                    </a>
-                  )}
-              </div>
-
-              <div className="mt-6">
-                <h3 className="font-medium text-lg mb-3">
-                  Identification Documents
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {app.files.nidUrl && (
-                    <a
-                      href={app.files.nidUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>National ID</span>
-                    </a>
-                  )}
-
-                  {app.files.passportUrl && (
-                    <a
-                      href={app.files.passportUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <span>Passport</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "contact" && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Contact Information
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-medium text-lg">Contact Details</h3>
-                  {app.contact.phone && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Phone
-                      </label>
-                      <p className="text-gray-900">{app.contact.phone}</p>
-                    </div>
-                  )}
-
-                  {app.contact.whatsapp && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        WhatsApp
-                      </label>
-                      <p className="text-gray-900">{app.contact.whatsapp}</p>
-                    </div>
-                  )}
-
-                  {app.contact.email && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Email
-                      </label>
-                      <p className="text-gray-900">{app.contact.email}</p>
-                    </div>
-                  )}
-
-                  {app.contact.relativePhone && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Relative Phone
-                      </label>
-                      <p className="text-gray-900">
-                        {app.contact.relativePhone}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium text-lg mb-2">
-                      Permanent Address
-                    </h3>
-                    <p className="text-gray-900">
-                      {app.contact.permanentAddress?.area && (
-                        <span>{app.contact.permanentAddress.area}, </span>
-                      )}
-                      {app.contact.permanentAddress?.district && (
-                        <span>{app.contact.permanentAddress.district}, </span>
-                      )}
-                      {app.contact.permanentAddress?.province}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium text-lg mb-2">
-                      Current Address
-                    </h3>
-                    <p className="text-gray-900">
-                      {app.contact.currentAddress?.area && (
-                        <span>{app.contact.currentAddress?.area}, </span>
-                      )}
-                      {app.contact.currentAddress?.district && (
-                        <span>{app.contact.currentAddress?.district}, </span>
-                      )}
-                      {app.contact.currentAddress?.province}
-                    </p>
-                  </div>
-
-                  {app.contact?.detailedAddress && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">
-                        Detailed Address
-                      </label>
-                      <p className="text-gray-900">
-                        {app.contact.detailedAddress}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          </motion.div>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  const app = application as Application;
+
+  // Render the appropriate tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "personal":
+        return <PersonalInfoTab data={app.personal} />;
+      case "education":
+        return <EducationTab data={app.education} />;
+      case "research":
+        return <ResearchTab data={app.research} />;
+      case "skills":
+        return <SkillsTab data={app.skills} />;
+      case "languages":
+        return <LanguagesTab data={app.languages} />;
+      case "health":
+        return <HealthTab health={app.health} />;
+      case "financial":
+        return (
+          <FinancialTab financial={app.financial} studyType={app.studyType} />
+        );
+      case "goals":
+        return (
+          <GoalsTab
+            goals={app.goals}
+            preferences={app.preferences}
+            distinction={app.distinction}
+          />
+        );
+      case "documents":
+        return (
+          <DocumentsTab
+            supportingDocuments={app.supportingDocuments}
+            files={app.files}
+          />
+        );
+      case "contact":
+        return <ContactTab contact={app.contact} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <ErrorBoundary>
+      <div className="relative md:p-2 min-h-screen">
+        {/* Nexus Background Effects */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          {/* linear Orbs - Light Mode */}
+          <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
+          <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
+
+          {/* linear Orbs - Dark Mode */}
+          <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
+          <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
+
+          {/* Scanning Line */}
+          <motion.div
+            animate={{ top: ["-10%", "110%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
+          />
+
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-5" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative mx-auto max-w-7xl"
+        >
+          {/* Main Container */}
+          <div className="relative overflow-hidden rounded-sm border border-gray-200 backdrop-blur-sm dark:border-white/10">
+            {/* Animated Border */}
+            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
+
+            {/* Header with Status */}
+            <div className="relative border-b border-gray-200 p-4 sm:p-6 dark:border-white/10">
+              {/* Top Glow */}
+              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
+
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
+                      <Award className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+                    </div>
+                    <div
+                      className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50"
+                      style={{ opacity: glowIntensity }}
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                      Application
+                      <span className="text-[#00A3FF]"> Details</span>
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Submitted on {formatDate(app.createdAt)}
+                      </p>
+                      <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-600" />
+                      <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Updated {formatDate(app.updatedAt)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                    onClick={() => window.print()}
+                  >
+                    <Printer className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Tab Navigation with Nexus styling */}
+              <div className="mt-6">
+                <TabNavigation
+                  tabs={tabs}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                />
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="relative p-4 sm:p-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative"
+                >
+                  {/* Grid Pattern Overlay */}
+                  <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-5 pointer-events-none" />
+
+                  {/* Content */}
+                  <div className="relative">{renderTabContent()}</div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Footer with Download Button */}
+            <div className="relative border-t border-gray-200 dark:border-white/10 p-4 sm:p-6">
+              {/* Bottom Glow */}
+              <div className="absolute left-1/2 bottom-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Download Section */}
+                <div className="relative flex items-center gap-3">
+                  {/* Download Progress Bar */}
+                  {isDownloading && (
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${downloadProgress}%` }}
+                      className="absolute -top-2 left-0 h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-full"
+                      style={{ width: `${downloadProgress}%` }}
+                    />
+                  )}
+
+                  {/* Download Button with Dropdown */}
+                  <div className="relative">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setIsDownloadMenuOpen(!isDownloadMenuOpen)}
+                      disabled={isDownloading}
+                      className="inline-flex items-center px-4 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm text-sm font-medium hover:shadow-lg hover:shadow-[#00A3FF]/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      {isDownloading
+                        ? `Downloading... ${downloadProgress}%`
+                        : "Download Application"}
+                      <ChevronDown
+                        className={`w-4 h-4 ml-2 transition-transform duration-300 ${isDownloadMenuOpen ? "rotate-180" : ""}`}
+                      />
+                    </motion.button>
+
+                    {/* Download Dropdown Menu */}
+                    <AnimatePresence>
+                      {isDownloadMenuOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute bottom-full mb-2 right-0 w-48 rounded-sm border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 shadow-xl overflow-hidden"
+                        >
+                          <div className="p-1">
+                            <button
+                              onClick={() => handleDownload("pdf")}
+                              className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-sm transition-colors"
+                            >
+                              <FileDown className="w-4 h-4 mr-2 text-[#00A3FF]" />
+                              Download as PDF
+                            </button>
+                            <button
+                              onClick={() => handleDownload("json")}
+                              className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-sm transition-colors"
+                            >
+                              <FileDown className="w-4 h-4 mr-2 text-[#7000FF]" />
+                              Download as JSON
+                            </button>
+                            <button
+                              onClick={() => handleDownload("txt")}
+                              className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-sm transition-colors"
+                            >
+                              <FileDown className="w-4 h-4 mr-2 text-gray-500" />
+                              Download as TXT
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Email Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Footer Stats */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500 dark:text-gray-500">
+                <span>Application ID: {app._id?.slice(-8).toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </ErrorBoundary>
   );
 };
 
