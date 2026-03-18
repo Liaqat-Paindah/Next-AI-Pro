@@ -108,7 +108,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         academicRank: { type: String }, // Optional rank
         startDate: { type: Date },
         graduationDate: { type: Date },
-        educationGapExplanation: { type: String }, // optional
+        educationGapExplanation: { type: String }, 
         thesisTopic: { type: String }, // optional
         thesisFileUrl: { type: String }, // optional
         diplomaFileUrl: { type: String }, // optional
