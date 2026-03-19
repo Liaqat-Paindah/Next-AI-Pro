@@ -8,10 +8,8 @@ import {
   Award,
   AlertCircle,
   Download,
-  Circle,
   Clock,
   CheckCircle2,
-  Cpu,
 } from "lucide-react";
 import { Stage, stages } from "@/data/stage";
 import Loading from "@/app/loading";
@@ -45,19 +43,6 @@ interface ApplicationData {
   updatedAt?: string;
 }
 
-// Format date helper
-const formatDate = (date?: string | null): string => {
-  if (!date) return "N/A";
-  const cleanedDate = date.replace(/\+00:00$/, "Z");
-  const dateObj = new Date(cleanedDate);
-  if (isNaN(dateObj.getTime()) || dateObj.getFullYear() <= 1) return "N/A";
-  return dateObj.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
-
 // Error Boundary
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; onError?: (error: Error) => void },
@@ -82,17 +67,17 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-6 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
+        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-4 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
           <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
           <div className="relative flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-red-500/20 dark:bg-red-500/30">
               <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-300" />
             </div>
-            <div>
-              <p className="font-medium text-red-400 dark:text-red-300">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-400 dark:text-red-300">
                 System Alert
               </p>
-              <p className="text-sm text-red-400/80 dark:text-red-300/70">
+              <p className="text-xs text-red-400/80 dark:text-red-300/70">
                 Failed to load scholarship tracker
               </p>
             </div>
@@ -112,7 +97,7 @@ const StageItem = ({
   isExpanded,
   onToggle,
   onDownload,
-  completedAt,
+  isCurrentStage,
 }: {
   stage: Stage;
   index: number;
@@ -121,93 +106,157 @@ const StageItem = ({
   onToggle: () => void;
   onDownload: (filePath: string) => void;
   completedAt?: string;
+  isCurrentStage: boolean;
 }) => {
   const Icon = stage.icon;
 
+  // Determine status text and colors
+  const getStatusInfo = () => {
+    if (isCompleted) {
+      return {
+        text: "Completed",
+        bg: "bg-green-100 dark:bg-green-500/20",
+        textColor: "text-green-700 dark:text-green-400",
+        borderColor: "border-green-500/30",
+        glowColor: "shadow-green-500/20",
+        iconColor: "text-green-600 dark:text-green-400",
+        iconComponent: CheckCircle2,
+      };
+    }
+    if (isCurrentStage) {
+      return {
+        text: "In Progress",
+        bg: "bg-blue-100 dark:bg-[#00A3FF]/20",
+        textColor: "text-[#00A3FF] dark:text-[#00A3FF]",
+        borderColor: "border-[#00A3FF]/50",
+        glowColor: "shadow-[#00A3FF]/20",
+        iconColor: "text-[#00A3FF]",
+        iconComponent: Clock,
+      };
+    }
+    return {
+      text: "Pending",
+      bg: "bg-gray-100 dark:bg-white/5",
+      textColor: "text-gray-700 dark:text-gray-300",
+      borderColor: "border-gray-200 dark:border-white/10",
+      glowColor: "shadow-transparent",
+      iconColor: "text-gray-400 dark:text-gray-500",
+      iconComponent: Clock,
+    };
+  };
+
+  const statusInfo = getStatusInfo();
+  const StatusIcon = statusInfo.iconComponent;
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       className={`
-        group relative overflow-hidden rounded-sm border transition-all duration-500
+        group relative overflow-hidden rounded-sm border transition-all duration-300
+        ${statusInfo.borderColor}
         ${
           isCompleted
-            ? "border-[#00A3FF]/30 bg-linear-to-br from-[#00A3FF]/5 via-transparent to-[#7000FF]/5 dark:from-[#00A3FF]/10 dark:via-transparent dark:to-[#7000FF]/10"
-            : "border-gray-200  hover:border-[#00A3FF]/30 dark:border-white/10  dark:hover:border-[#00A3FF]/30"
+            ? `bg-linear-to-r from-green-50/80 to-emerald-50/80 dark:from-green-500/10 dark:to-emerald-500/10 shadow-sm ${statusInfo.glowColor}`
+            : isCurrentStage
+              ? "bg-linear-to-r from-[#00A3FF]/5 to-[#7000FF]/5 dark:from-[#00A3FF]/10 dark:to-[#7000FF]/10"
+              : ""
         }
         backdrop-blur-sm
+        hover:shadow-md transition-shadow
       `}
     >
-      {/* Animated Background linear */}
-      <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-5 dark:group-hover:opacity-10" />
+      {/* Completed Stage Overlay Effect */}
+      {isCompleted && (
+        <div className="absolute inset-0 bg-linear-to-r from-green-500/5 to-emerald-500/5 pointer-events-none" />
+      )}
 
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-5" />
-
-      {/* Header */}
+      {/* Header - Optimized for mobile touch */}
       <div
         onClick={onToggle}
-        className="relative flex cursor-pointer items-center justify-between px-6 py-4"
+        className="relative flex cursor-pointer items-center justify-between p-3 min-h-18 active:bg-black/5 dark:active:bg-white/5"
         role="button"
         tabIndex={0}
         aria-expanded={isExpanded}
       >
-        <div className="flex items-center space-x-4">
-          {/* Status Icon with Glow Effect */}
-          <div className="relative">
+        <div className="flex items-center space-x-3 flex-1 min-w-0">
+          {/* Status Icon - Updated to match EducationTab design */}
+          <div className="relative shrink-0">
             <div
               className={`
-                relative flex h-12 w-12 items-center justify-center rounded-sm
+                relative flex h-10 w-10 items-center justify-center rounded-sm
+                transition-all duration-300 group-active:scale-95
                 ${
                   isCompleted
-                    ? "bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
-                    : ""
+                    ? "bg-linear-to-br from-green-500 to-emerald-600 shadow-sm shadow-green-500/30"
+                    : isCurrentStage
+                      ? "bg-linear-to-br from-[#00A3FF] to-[#7000FF] shadow-sm shadow-[#00A3FF]/30"
+                      : "bg-gray-100 dark:bg-white/10"
                 }
-                transition-all duration-500 group-hover:scale-110
               `}
             >
               {isCompleted ? (
-                <CheckCircle2 className="h-6 w-6 text-white" />
+                <CheckCircle2 className="h-5 w-5 text-white" />
               ) : (
-                <Icon className="h-6 w-6 text-[#00A3FF]" />
+                <Icon
+                  className={`h-5 w-5 ${
+                    isCurrentStage ? "text-white" : "text-gray-500 dark:text-gray-400"
+                  }`}
+                />
               )}
             </div>
-            {/* Glow Effect */}
-            <div
-              className={`
-                absolute inset-0 -z-10 rounded-sm blur-xl transition-opacity duration-500
-                ${
-                  isCompleted
-                    ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
-                    : "bg-[#00A3FF]/10 opacity-0 group-hover:opacity-50 dark:bg-[#00A3FF]/20 dark:group-hover:opacity-100"
-                }
-              `}
-            />
+
+            {/* Completed Badge */}
+            {isCompleted && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1"
+              >
+                <div className="h-3 w-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-900" />
+              </motion.div>
+            )}
           </div>
 
-          {/* Title and Description */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              <span className="text-[#00A3FF]">Stage {index + 1}</span> ·{" "}
-              {stage.title}
-            </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">
+          {/* Title and Description - Optimized for text wrapping */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center flex-wrap gap-1">
+              <h3
+                className={`text-sm font-semibold ${
+                  isCompleted
+                    ? "text-green-700 dark:text-green-400"
+                    : isCurrentStage
+                      ? "text-[#00A3FF] dark:text-[#00A3FF]"
+                      : "text-gray-900 dark:text-white"
+                }`}
+              >
+                {stage.title}
+              </h3>
+
+
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
               {stage.shortDescription}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
-          {stage.estimatedTime && (
-            <div className="hidden items-center gap-2 rounded-sm bg-gray-100 px-3 py-1.5 text-xs text-gray-700 dark:bg-white/5 dark:text-gray-300 sm:flex">
-              <Clock className="h-4 w-4 text-[#00A3FF]" />
-              <span>{stage.estimatedTime}</span>
-            </div>
-          )}
+        <div className="flex items-center space-x-2 shrink-0 ml-2">
+          {/* Status Badge - Compact for mobile */}
+          <div
+            className={`
+              flex items-center gap-1 rounded-sm px-2 py-1
+              ${statusInfo.bg} ${statusInfo.textColor}
+            `}
+          >
+            <StatusIcon className={`h-3 w-3 ${statusInfo.iconColor}`} />
+            <span className="text-xs font-medium">{statusInfo.text}</span>
+          </div>
+
           <motion.button
-            className="flex h-8 w-8 items-center justify-center rounded-sm bg-gray-100 text-gray-500 transition-colors  hover:text-gray-900 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
-            whileHover={{ scale: 1.1 }}
+            className="flex h-8 w-8 items-center justify-center rounded-sm text-gray-500 transition-colors hover:text-gray-900 dark:bg-white/10 dark:text-gray-400 dark:hover:bg-white/20 dark:hover:text-white shrink-0"
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {isExpanded ? (
@@ -219,43 +268,34 @@ const StageItem = ({
         </div>
       </div>
 
-      {/* Expanded Content */}
+      {/* Expanded Content - Mobile optimized */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
           >
-            <div className="relative px-6 pb-6 pt-2">
-              <div className="ml-16 space-y-4">
-                {/* Full Description */}
-                <p className="text-xs text-gray-700 dark:text-gray-300">
+            <div className="px-3 pb-4 pt-0">
+              <div className="ml-2 space-y-3">
+                {/* Full Description - Better text wrapping */}
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   {stage.description}
                 </p>
 
-                {/* File Download Section */}
+                {/* File Download Section - Full width on mobile */}
                 {stage.fileAvailable && stage.filePath && (
                   <motion.button
                     onClick={() => onDownload(stage.filePath)}
-                    className="group relative overflow-hidden rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5"
+                    className="w-full"
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <div className="relative flex items-center gap-2 rounded-sm px-6 py-2 transition-colors">
-                      <Download className="h-4 w-4 text-white" />
-                      <span className="text-xs text-white">
-                        Download Guidelines
-                      </span>
+                    <div className="flex items-center justify-center gap-2 cursor-pointer rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] px-4 py-2 text-white active:opacity-90">
+                      <Download className="h-4 w-4" />
+                      <span className="text-xs">Download Guidelines</span>
                     </div>
                   </motion.button>
-                )}
-
-                {/* Completion Info */}
-                {completedAt && (
-                  <div className="flex items-center gap-2 rounded-sm bg-green-50 px-4 py-2 text-xs text-green-700 dark:bg-green-500/10 dark:text-green-400">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Completed on {formatDate(completedAt)}</span>
-                  </div>
                 )}
               </div>
             </div>
@@ -266,11 +306,11 @@ const StageItem = ({
   );
 };
 
-// Helper function to determine completed stages
+// Helper function to determine completed stages and current active stage
 const calculateProgress = (
   applicationData: ApplicationData | undefined,
-): ProgressData => {
-  if (!applicationData) return {};
+): { progress: ProgressData; nextStage: Stage | null } => {
+  if (!applicationData) return { progress: {}, nextStage: null };
 
   const currentStage = applicationData.stage || "information_submission";
   const createdAt = applicationData.createdAt;
@@ -305,7 +345,11 @@ const calculateProgress = (
     };
   }
 
-  return progress;
+  // Find the next stage (first incomplete stage)
+  const nextStage =
+    stages.find((stage) => !progress[stage.key]?.completed) || null;
+
+  return { progress, nextStage };
 };
 
 // Main Component
@@ -317,7 +361,7 @@ const ScholarshipTracker = ({
   onError?: (error: Error) => void;
 }) => {
   const [expandedStage, setExpandedStage] = useState<string | null>(null);
-  const [glowIntensity, setGlowIntensity] = useState(0.5);
+  const [, setGlowIntensity] = useState(0.5);
 
   const { data: userSession, status } = useSession();
   const userId = userSession?.user?._id;
@@ -326,7 +370,7 @@ const ScholarshipTracker = ({
 
   const router = useRouter();
 
-  const progress = useMemo(
+  const { progress } = useMemo(
     () => calculateProgress(applicationData),
     [applicationData],
   );
@@ -357,11 +401,13 @@ const ScholarshipTracker = ({
   const handleStageToggle = (stageKey: string) => {
     setExpandedStage(expandedStage === stageKey ? null : stageKey);
   };
+
   const baseUrl = process.env.NEXT_PUBLIC_FILE_URL;
   if (!baseUrl) {
     console.error("The file URL is missing");
-    return;
+    return null;
   }
+
   const handleDownload = (filePath: string) => {
     const link = document.createElement("a");
     link.href = `${baseUrl}/application_guidlines/${filePath}`;
@@ -373,219 +419,89 @@ const ScholarshipTracker = ({
 
   return (
     <ErrorBoundary onError={onError}>
-      <div className="relative md:p-2">
-        {/* Nexus Background Effects */}
-        <div className="fixed inset-0 overflow-hidden">
-          {/* linear Orbs - Light Mode */}
-          <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
-          <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
-
-          {/* linear Orbs - Dark Mode */}
-          <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
-          <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
-
-          {/* Scanning Line */}
-          <motion.div
-            animate={{ top: ["-10%", "110%"] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
-          />
+      <div className="relative">
+        {/* Background Effects - Optimized for mobile */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -left-1/4 top-0 h-64 w-64 rounded-full bg-linear-to-r from-[#00A3FF]/5 to-[#7000FF]/5 blur-sm" />
+          <div className="absolute -right-1/4 bottom-0 h-64 w-64 rounded-full bg-linear-to-r from-[#7000FF]/5 to-[#00A3FF]/5 blur-3xl" />
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="relative mx-auto max-w-6xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative mx-auto max-w-sm md:max-w-2xl lg:max-w-4xl"
         >
           {/* Main Container */}
-          <div className="relative overflow-hidden rounded-sm border border-gray-200  backdrop-blur-sm dark:border-white/10 ">
-            {/* Animated Border */}
-            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
-
-            {/* Header */}
-            <div className="relative border-b border-gray-200 p-8 dark:border-white/10">
-              {/* Top Glow */}
-              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
-
-              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
-                      <Award className="h-8 w-8 text-white" />
+          <div className="relative overflow-hidden rounded-sm border backdrop-blur-sm dark:border-white/10 bg-white/80 dark:bg-gray-900/80">
+            {/* Header with Progress Bar - Mobile optimized */}
+            <div className="relative border-b border-gray-200 p-4 dark:border-white/10">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <div className="relative shrink-0">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF] shadow-sm shadow-[#00A3FF]/20">
+                      <Award className="h-6 w-6 text-white" />
                     </div>
-                    <div className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50" />
+                    <div className="absolute inset-0 -z-10 rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50" />
                   </div>
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                      Scholarship Attainment
-                      <span className="text-[#00A3FF]"> Framework </span>
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-base font-bold text-gray-900 dark:text-white">
+                      Scholarship Framework
                     </h1>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      A Ladder to Success
+                      Track your progress
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <div className="rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-0.5">
-                      <div className="rounded-sm bg-white px-6 py-2 dark:bg-black/90">
-                        <span className="text-sm text-gray-900 dark:text-white">
-                          {Math.round(progressPercentage)}%
-                        </span>
-                      </div>
+                {/* Progress Badge */}
+                <div className="shrink-0">
+                  <div className="rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] p-px">
+                    <div className="rounded-sm px-3 py-1.5 bg-white dark:bg-gray-900">
+                      <span className="text-xs font-medium bg-clip-text text-transparent bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
+                        {completedCount}/{totalStages}
+                      </span>
                     </div>
-                    <div
-                      className="absolute inset-0 -z-10 rounded-sm blur-lg"
-                      style={{
-                        background: `linear-linear(to right, #00A3FF, #7000FF)`,
-                        opacity:
-                          glowIntensity *
-                          (typeof window !== "undefined" &&
-                          window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches
-                            ? 0.5
-                            : 0.3),
-                      }}
-                    />
                   </div>
                 </div>
               </div>
 
-              {/* Current Stage Indicator */}
-              {applicationData?.stage && (
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="mt-6 rounded-sm bg-linear-to-r from-[#00A3FF]/5 to-[#7000FF]/5 p-4 dark:from-[#00A3FF]/10 dark:to-[#7000FF]/10"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20">
-                      <Cpu className="h-4 w-4 text-[#00A3FF]" />
-                    </div>
-                    <p className="text-xs text-[#00A3FF] dark:text-[#00A3FF]">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">
-                        Completed Stage:
-                      </span>{" "}
-                      {stages.find((s) => s.key === applicationData.stage)
-                        ?.title || applicationData.stage}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-
               {/* Progress Bar */}
-              <div className="mt-6 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Framework Progress
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    Overall Progress
                   </span>
-                  <span className="font-mono text-[#00A3FF] dark:text-[#00A3FF]">
+                  <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
                     {Math.round(progressPercentage)}%
                   </span>
                 </div>
-
-                <div className="relative h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-white/5">
+                <div className="h-2 w-full bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercentage}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="relative h-full rounded-full bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="h-full rounded-full bg-linear-to-r from-[#00A3FF] to-[#7000FF] relative"
                   >
-                    {/* Scanning Effect */}
+                    {/* Animated shine effect */}
                     <motion.div
-                      animate={{ x: ["-100%", "100%"] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute inset-0 w-20 bg-linear-to-r from-transparent via-white/50 to-transparent dark:via-white/30"
+                      className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent"
+                      animate={{
+                        x: ["-100%", "100%"],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                     />
                   </motion.div>
                 </div>
               </div>
-
-              {/* Stage Indicators */}
-              <div className="relative mt-6 sm:mt-8 md:mt-10 flex justify-between px-2 sm:px-4">
-                {stages.map((stage, index) => {
-                  const isCompleted = progress[stage.key]?.completed;
-                  const isCurrent = index === currentStageIndex;
-
-                  return (
-                    <div
-                      key={stage.key}
-                      className="group relative flex-1 text-center"
-                    >
-                      <div className="relative inline-block">
-                        {/* Stage Dot */}
-                        <motion.button
-                          whileHover={{ scale: 1.2 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleStageToggle(stage.key)}
-                          className={`
-              relative flex h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 
-              items-center justify-center border border-[#7000FF] 
-              rounded-sm transition-all duration-500
-              ${
-                isCompleted
-                  ? "border-[#00A3FF] bg-linear-to-br from-[#00A3FF] to-[#7000FF]"
-                  : isCurrent
-                    ? "border-[#00A3FF] bg-[#00A3FF]/10 dark:bg-[#00A3FF]/20"
-                    : "border border-[#7000FF] hover:border-[#00A3FF]/50 dark:border-[#7000FF] dark:hover:border-[#00A3FF]/50"
-              }
-            `}
-                        >
-                          {isCompleted ? (
-                            <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-white" />
-                          ) : (
-                            <Circle
-                              className={`h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-4 md:w-4 ${
-                                isCurrent
-                                  ? "text-[#00A3FF]"
-                                  : "text-[#7000FF] dark:text-[#7000FF]"
-                              }`}
-                            />
-                          )}
-
-                          {/* Pulse Effect for Current Stage */}
-                          {isCurrent && !isCompleted && (
-                            <span className="absolute inset-0 animate-ping rounded-sm bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30" />
-                          )}
-                        </motion.button>
-
-                        {/* Glow Effect */}
-                        <div
-                          className={`
-              absolute inset-0 -z-10 rounded-sm blur-md sm:blur-lg md:blur-xl 
-              transition-opacity duration-500
-              ${
-                isCompleted
-                  ? "bg-[#00A3FF]/30 dark:bg-[#00A3FF]/50"
-                  : isCurrent
-                    ? "bg-[#00A3FF]/20 dark:bg-[#00A3FF]/30"
-                    : "bg-transparent group-hover:bg-[#00A3FF]/10 dark:group-hover:bg-[#00A3FF]/20"
-              }
-            `}
-                        />
-
-                        {/* Optional: Stage Label - Visible on larger screens */}
-                        <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400 sm:block md:text-sm"></span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Mobile Stage Label - Separate row for stage names on mobile */}
-              <div className="mt-8 flex justify-between px-2 sm:hidden">
-                {stages.map((stage) => (
-                  <div key={stage.key} className="flex-1 text-center">
-                    <span className="text-xs text-gray-600 dark:text-gray-400"></span>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* Stages List */}
-            <div className="relative p-8">
-              <div className="relative space-y-3">
+            {/* Stages List - Optimized spacing for mobile */}
+            <div className="p-3 sm:p-4">
+              <div className="space-y-2">
                 {stages.map((stage, index) => (
                   <StageItem
                     key={stage.key}
@@ -596,10 +512,16 @@ const ScholarshipTracker = ({
                     onToggle={() => handleStageToggle(stage.key)}
                     onDownload={handleDownload}
                     completedAt={progress[stage.key]?.completedAt}
+                    isCurrentStage={
+                      index === currentStageIndex &&
+                      !progress[stage.key]?.completed
+                    }
                   />
                 ))}
               </div>
             </div>
+
+
           </div>
         </motion.div>
       </div>
