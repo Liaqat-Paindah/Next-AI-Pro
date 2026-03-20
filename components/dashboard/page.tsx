@@ -538,10 +538,10 @@ const ScholarshipTracker = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <h1 className="text-base font-bold text-gray-900 dark:text-white">
-                      Scholarship Framework
+                      Scholarship Attainment Framework
                     </h1>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Track your progress
+                      A Ladder to Success
                     </p>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ const ScholarshipTracker = ({
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="font-medium text-gray-700 dark:text-gray-300">
-                    Overall Progress
+                    Framework Progress
                   </span>
                   <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
                     {Math.round(progressPercentage)}%

@@ -352,7 +352,7 @@ const Header = () => {
                     {/* Mobile Auth Button - Compact */}
                     <li className="pt-3">
                       <Link
-                        href="/auth/login"
+                        href="/journey"
                         onClick={() => setNavbarOpen(false)}
                         className="flex w-full items-center justify-center px-4 py-2.5 rounded-sm
                 text-sm font-medium text-blue-900 dark:text-blue-400
@@ -361,7 +361,7 @@ const Header = () => {
                 bg-linear-to-r from-transparent to-transparent
                 hover:from-blue-50 hover:to-transparent dark:hover:from-gray-800"
                       >
-                        Sign In
+                        Start Your Scholarship Journey
                       </Link>
                     </li>
                   </ul>

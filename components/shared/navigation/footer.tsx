@@ -140,15 +140,15 @@ const Footer = () => {
     {
       icon: <Icons.Email className="w-4 h-4" />,
       label: "Email Us",
-      value: "info@ayandaha.com",
-      href: "mailto:info@ayandaha.com",
+      value: "ayandaha2026@gmail.com",
+      href: "mailto:ayandaha2026@gmail.com",
       type: "link",
     },
     {
       icon: <Icons.Phone className="w-4 h-4" />,
       label: "Call Us",
-      value: "+93 700 000 000",
-      href: "tel:+93700000000",
+      value: "+93 796 493 189",
+      href: "tel:+93796493189",
       type: "link",
     },
   ];
