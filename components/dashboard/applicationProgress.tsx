@@ -323,6 +323,14 @@ const ApplicationProgress = ({
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm  transition-colors duration-200">
+                <Link
+                  href="/dashboard/applicants/application_details"
+                  className="text-sm font-medium capitalize text-gray-600 dark:text-gray-300 hover:text-[#00A3FF] dark:hover:text-[#00A3FF] transition-colors duration-200"
+                >
+                  My Application
+                </Link>
+              </div>
               <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm">
                 <span className="text-sm font-medium capitalize text-gray-600 dark:text-gray-300">
                   {application?.status || "draft"}
