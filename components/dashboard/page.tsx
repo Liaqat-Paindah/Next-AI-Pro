@@ -43,6 +43,40 @@ interface ApplicationData {
   updatedAt?: string;
 }
 
+const stageMessages: Record<string, { title: string; message: string }> = {
+  information_submission: {
+    title: "Information Submission",
+    message: "Please complete and submit all required information to proceed.",
+  },
+  eligibility_assessment: {
+    title: "Eligibility Assessment",
+    message:
+      "Your profile is under review. Please wait while we assess your eligibility.",
+  },
+  eligibility_alignment: {
+    title: "Eligibility Alignment",
+    message: "Follow our guidance to meet the required eligibility criteria.",
+  },
+  competitive_enhancement: {
+    title: "Competitive Enhancement",
+    message: "Work on the recommended improvements to strengthen your profile.",
+  },
+  application_customization: {
+    title: "Application Customization",
+    message:
+      "We are tailoring your application. Stay available for any required input.",
+  },
+  application_submission: {
+    title: "Application Submission",
+    message: "Your application is being prepared and submitted professionally.",
+  },
+  post_submission_followup: {
+    title: "Post-Submission Follow-Up",
+    message:
+      "We are following up on your application. We will update you on any progress",
+  },
+};
+
 // Error Boundary
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode; onError?: (error: Error) => void },
@@ -115,7 +149,7 @@ const StageItem = ({
     if (isCompleted) {
       return {
         text: "Completed",
-        bg: "bg-green-100 dark:bg-green-500/20",
+        bg: "border border-green-400 dark:bg-green-500/20",
         textColor: "text-green-700 dark:text-green-400",
         borderColor: "border-green-500/30",
         glowColor: "shadow-green-500/20",
@@ -126,16 +160,16 @@ const StageItem = ({
     if (isCurrentStage) {
       return {
         text: "In Progress",
-        bg: "bg-blue-100 dark:bg-[#00A3FF]/20",
-        textColor: "text-[#00A3FF] dark:text-[#00A3FF]",
-        borderColor: "border-[#00A3FF]/50",
-        glowColor: "shadow-[#00A3FF]/20",
-        iconColor: "text-[#00A3FF]",
+        bg: "border border-green-400 dark:bg-green-500/20",
+        textColor: "text-green-700 dark:text-green-700",
+        borderColor: "border-green-500/30",
+        glowColor: "shadow-green-700/20",
+        iconColor: "text-green-600 dark:text-green-400",
         iconComponent: Clock,
       };
     }
     return {
-      text: "Pending",
+      text: "Not Started",
       bg: "bg-gray-100 dark:bg-white/5",
       textColor: "text-gray-700 dark:text-gray-300",
       borderColor: "border-gray-200 dark:border-white/10",
@@ -160,7 +194,7 @@ const StageItem = ({
           isCompleted
             ? `bg-linear-to-r from-green-50/80 to-emerald-50/80 dark:from-green-500/10 dark:to-emerald-500/10 shadow-sm ${statusInfo.glowColor}`
             : isCurrentStage
-              ? "bg-linear-to-r from-[#00A3FF]/5 to-[#7000FF]/5 dark:from-[#00A3FF]/10 dark:to-[#7000FF]/10"
+              ? "bg-linear-to-r from-green-20/80 to-blue-50/20 dark:from-blue-100/10 dark:to-blue-300/10"
               : ""
         }
         backdrop-blur-sm
@@ -191,7 +225,7 @@ const StageItem = ({
                   isCompleted
                     ? "bg-linear-to-br from-green-500 to-emerald-600 shadow-sm shadow-green-500/30"
                     : isCurrentStage
-                      ? "bg-linear-to-br from-[#00A3FF] to-[#7000FF] shadow-sm shadow-[#00A3FF]/30"
+                      ? "bg-linear-to-br from-green-300 to-emerald-400"
                       : "bg-gray-100 dark:bg-white/10"
                 }
               `}
@@ -201,7 +235,9 @@ const StageItem = ({
               ) : (
                 <Icon
                   className={`h-5 w-5 ${
-                    isCurrentStage ? "text-white" : "text-gray-500 dark:text-gray-400"
+                    isCurrentStage
+                      ? "text-white"
+                      : "text-gray-500 dark:text-gray-400"
                   }`}
                 />
               )}
@@ -227,18 +263,13 @@ const StageItem = ({
                   isCompleted
                     ? "text-green-700 dark:text-green-400"
                     : isCurrentStage
-                      ? "text-[#00A3FF] dark:text-[#00A3FF]"
+                      ? "text-green-700 dark:text-green-100"
                       : "text-gray-900 dark:text-white"
                 }`}
               >
                 {stage.title}
               </h3>
-
-
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-              {stage.shortDescription}
-            </p>
           </div>
         </div>
 
@@ -309,47 +340,107 @@ const StageItem = ({
 // Helper function to determine completed stages and current active stage
 const calculateProgress = (
   applicationData: ApplicationData | undefined,
-): { progress: ProgressData; nextStage: Stage | null } => {
-  if (!applicationData) return { progress: {}, nextStage: null };
+): {
+  progress: ProgressData;
+  nextStage: Stage | null;
+  activeStageKey: string | null;
+  hasValidStage: boolean;
+} => {
+  // If no application data, return empty progress with no active stage
+  if (!applicationData) {
+    return { progress: {}, nextStage: null, activeStageKey: null, hasValidStage: false };
+  }
 
-  const currentStage = applicationData.stage || "information_submission";
+  const backendStage = applicationData.stage;
   const createdAt = applicationData.createdAt;
   const updatedAt = applicationData.updatedAt;
-  const currentStageIndex = stages.findIndex(
-    (stage) => stage.key === currentStage,
-  );
+  
+  // Check if the stage from backend exists and is valid
+  const isValidStage = backendStage 
+    ? stages.some((stage) => stage.key === backendStage)
+    : false;
 
   const progress: ProgressData = {};
 
-  stages.forEach((stage, index) => {
-    if (index < currentStageIndex) {
-      progress[stage.key] = {
-        completed: true,
-        completedAt: updatedAt || createdAt,
-      };
-    } else if (index === currentStageIndex) {
-      progress[stage.key] = { completed: false };
-    } else {
-      progress[stage.key] = { completed: false };
-    }
+  // Initialize all stages as not completed
+  stages.forEach((stage) => {
+    progress[stage.key] = { completed: false };
   });
 
-  // Mark info submission complete if personal data exists
-  if (
-    applicationData.personal &&
-    Object.keys(applicationData.personal).length > 0
-  ) {
-    progress.information_submission = {
-      completed: true,
-      completedAt: createdAt,
-    };
+  // Only mark stages as completed if we have a valid stage from backend
+  if (isValidStage && backendStage) {
+    const currentStageIndex = stages.findIndex((stage) => stage.key === backendStage);
+    
+    // Mark all stages before current as completed
+    stages.forEach((stage, index) => {
+      if (index < currentStageIndex) {
+        progress[stage.key] = {
+          completed: true,
+          completedAt: updatedAt || createdAt,
+        };
+      }
+    });
+
+    // Only mark information submission as completed if:
+    // 1. The current stage is actually information_submission AND personal data exists, OR
+    // 2. The current stage is past information_submission (already handled above)
+    if (
+      backendStage === "information_submission" &&
+      applicationData.personal &&
+      Object.keys(applicationData.personal).length > 0
+    ) {
+      progress.information_submission = {
+        completed: true,
+        completedAt: createdAt,
+      };
+    }
+  } else {
+    // If no valid stage, don't mark any stage as completed automatically
+    // Only mark information submission if we have personal data AND no stage is set
+    // This handles new users who haven't started the process
+    if (
+      !backendStage &&
+      applicationData.personal &&
+      Object.keys(applicationData.personal).length > 0
+    ) {
+      progress.information_submission = {
+        completed: true,
+        completedAt: createdAt,
+      };
+    }
   }
 
-  // Find the next stage (first incomplete stage)
-  const nextStage =
-    stages.find((stage) => !progress[stage.key]?.completed) || null;
+  // Find the first incomplete stage (this will be the next stage to work on)
+  const firstIncompleteStage = stages.find((stage) => !progress[stage.key]?.completed);
+  
+  // Convert undefined to null for nextStage
+  const nextStage = firstIncompleteStage || null;
+  
+  // Determine active stage:
+  // - If we have a valid backend stage and it's not completed, show that as active
+  // - If the backend stage is completed, show the next incomplete stage as active
+  let activeStageKey = null;
+  
+  if (isValidStage && backendStage) {
+    const isStageCompleted = progress[backendStage]?.completed || false;
+    if (!isStageCompleted) {
+      // Current stage is not completed, show it as active
+      activeStageKey = backendStage;
+    } else {
+      // Current stage is completed, show the next incomplete stage as active
+      activeStageKey = nextStage?.key || null;
+    }
+  } else if (!isValidStage && nextStage) {
+    // If no valid stage from backend but we have an incomplete stage (like info submission with personal data)
+    activeStageKey = nextStage.key;
+  }
 
-  return { progress, nextStage };
+  return { 
+    progress, 
+    nextStage, 
+    activeStageKey,
+    hasValidStage: isValidStage 
+  };
 };
 
 // Main Component
@@ -370,7 +461,7 @@ const ScholarshipTracker = ({
 
   const router = useRouter();
 
-  const { progress } = useMemo(
+  const { progress, activeStageKey } = useMemo(
     () => calculateProgress(applicationData),
     [applicationData],
   );
@@ -394,10 +485,6 @@ const ScholarshipTracker = ({
   const totalStages = stages.length;
   const progressPercentage = (completedCount / totalStages) * 100;
 
-  const currentStageIndex = stages.findIndex(
-    (stage) => !progress[stage.key]?.completed,
-  );
-
   const handleStageToggle = (stageKey: string) => {
     setExpandedStage(expandedStage === stageKey ? null : stageKey);
   };
@@ -414,6 +501,12 @@ const ScholarshipTracker = ({
     link.target = "_blank";
     link.click();
   };
+
+  // Get current stage message - only if we have a valid active stage
+  const currentStageMessage =
+    activeStageKey && stageMessages[activeStageKey]
+      ? stageMessages[activeStageKey]
+      : null;
 
   if (isLoading) return <Loading />;
 
@@ -497,6 +590,30 @@ const ScholarshipTracker = ({
                   </motion.div>
                 </div>
               </div>
+
+              {/* Current Stage Message - Only shows when there's a valid active stage from backend */}
+              {currentStageMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-4 p-3 rounded-sm bg-linear-to-r from-[#00A3FF]/10 to-[#7000FF]/10 border border-[#00A3FF]/20 dark:border-[#7000FF]/30"
+                >
+                  <div className="flex items-start space-x-2">
+                    <div className="shrink-0 mt-0.5">
+                      <div className="h-2 w-2 rounded-full bg-[#00A3FF] animate-pulse" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-0.5">
+                        {currentStageMessage.title}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                        {currentStageMessage.message}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Stages List - Optimized spacing for mobile */}
@@ -513,15 +630,12 @@ const ScholarshipTracker = ({
                     onDownload={handleDownload}
                     completedAt={progress[stage.key]?.completedAt}
                     isCurrentStage={
-                      index === currentStageIndex &&
-                      !progress[stage.key]?.completed
+                      stage.key === activeStageKey
                     }
                   />
                 ))}
               </div>
             </div>
-
-
           </div>
         </motion.div>
       </div>
