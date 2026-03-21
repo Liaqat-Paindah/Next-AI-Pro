@@ -223,7 +223,7 @@ const ApplicationProgress = ({
     },
     {
       key: "education",
-      label: "Education History",
+      label: "Education Information",
       description: "Academic background, degrees, and transcripts",
     },
     {
@@ -233,22 +233,22 @@ const ApplicationProgress = ({
     },
     {
       key: "skills",
-      label: "Skills & Competencies",
+      label: "Professional Skills",
       description: "Technical, communication, and leadership skills",
     },
     {
       key: "languages",
-      label: "Language Proficiency",
+      label: "Language Information",
       description: "Native language, English test scores, and other languages",
     },
     {
       key: "activities",
-      label: "Activities",
+      label: "Activities & Work Experience",
       description: "Extracurricular and volunteer activities",
     },
     {
       key: "health",
-      label: "Health Information",
+      label: "Health Condition",
       description: "Medical conditions and accessibility needs",
     },
     {

@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { specialConditionsSchema, SpecialConditionsFormData } from "@/types/application";
+import {
+  specialConditionsSchema,
+  SpecialConditionsFormData,
+} from "@/types/application";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { UseFormRegister, FieldError } from "react-hook-form";
 import Loading from "@/app/loading";
@@ -135,9 +138,7 @@ const FormTextArea = ({
 
       <div className="relative">
         {icon && (
-          <div className="absolute left-3 top-3 text-gray-400">
-            {icon}
-          </div>
+          <div className="absolute left-3 top-3 text-gray-400">{icon}</div>
         )}
 
         <textarea
@@ -257,9 +258,8 @@ export default function SpecialConditions() {
                   {/* Header Section */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
-                      Special Health Conditions
+                      Health Condition
                     </h3>
-
                   </div>
 
                   {/* Special Diseases Input */}
@@ -289,7 +289,9 @@ export default function SpecialConditions() {
                   {/* Additional Notes Section (Optional) */}
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      This information helps us make necessary arrangements for your comfort and safety during the pilgrimage.
+                      This Information helps ensure that the necessary
+                      conditions and facilities are provided for you to pursue
+                      your studies.
                     </p>
                   </div>
                 </div>
