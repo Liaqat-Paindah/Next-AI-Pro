@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
       first_name,
       last_name,
       fatherName,
-      age,
+      mother_name,
+      siblings,
+      dependents,
+      children,
       gender,
       maritalStatus,
       birthDate,
@@ -74,7 +77,10 @@ export async function POST(req: NextRequest) {
         firstName: first_name,
         lastName: last_name,
         fatherName,
-        age,
+        mother_name,
+        siblings,
+        dependents,
+        children,
         gender,
         maritalStatus,
         birthDate,
@@ -100,7 +106,10 @@ export async function POST(req: NextRequest) {
               firstName: first_name,
               lastName: last_name,
               fatherName,
-              age,
+              mother_name,
+              siblings,
+              dependents,
+              children,
               gender,
               maritalStatus,
               birthDate,
@@ -139,4 +148,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

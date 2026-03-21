@@ -24,11 +24,21 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     },
 
     personal: {
-      age: {
+      mother_name: {
+        type: String,
+        required: true,
+      },
+
+      siblings: {
         type: Number,
         required: true,
-        min: 1,
-        max: 100,
+      },
+      dependents: {
+        type: Number,
+        required: true,
+      },
+      children: {
+        type: Number,
       },
 
       gender: {
@@ -40,7 +50,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       maritalStatus: {
         type: String,
         required: true,
-        enum: ["Single", "Married"],
+        enum: ["Single", "Married", "Engaged"],
       },
 
       firstName: {
@@ -108,7 +118,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         academicRank: { type: String }, // Optional rank
         startDate: { type: Date },
         graduationDate: { type: Date },
-        educationGapExplanation: { type: String }, 
+        educationGapExplanation: { type: String },
         thesisTopic: { type: String }, // optional
         thesisFileUrl: { type: String }, // optional
         diplomaFileUrl: { type: String }, // optional
