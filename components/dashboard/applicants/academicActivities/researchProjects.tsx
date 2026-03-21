@@ -439,7 +439,7 @@ const ResearchProjectsForm: React.FC<Props> = ({ onChange }) => {
 
                         <FileUpload
                           id={`project-file-${index}`}
-                          label="Project File"
+                          label="Project File Or Documents"
                           onFileAccepted={(file) =>
                             handleFileChange(index, file)
                           }

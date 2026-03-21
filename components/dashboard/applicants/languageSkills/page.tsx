@@ -108,36 +108,81 @@ const FormSelect = ({
   );
 };
 
+// Document Type Select Component (Only for Foreign Language)
+interface DocumentTypeSelectProps {
+  label: string;
+  register: ReturnType<UseFormRegister<LanguageFormData>>;
+  error?: string;
+  required?: boolean;
+}
+
+const DocumentTypeSelect = ({
+  label,
+  register,
+  error,
+  required = false,
+}: DocumentTypeSelectProps) => {
+  return (
+    <div className="relative">
+      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+        {label}
+        {required && <span className="text-[#00A3FF] ml-1">*</span>}
+      </label>
+
+      <div className="relative">
+        <select
+          className={`w-full px-3 py-2.5 text-sm bg-white dark:bg-[#011b2b] border ${
+            error ? "border-red-500" : "border-gray-200 dark:border-[#064e78]"
+          } rounded-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light appearance-none`}
+          {...register}
+        >
+          <option value="">Select Document Type</option>
+          <option value="Certificate">Certificate</option>
+          <option value="Diploma">Diploma</option>
+          <option value="Transcript">Transcript</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    </div>
+  );
+};
+
 export default function LanguageSkillsForm() {
   const router = useRouter();
   const { data: userSession, status } = useSession();
   const mutation = useLanguage();
 
-const {
-  register,
-  handleSubmit,
-  formState: { errors },
-  watch,
-  setValue,
-  getValues,
-} = useForm<LanguageFormData>({
-  resolver: zodResolver(languageSchema),
-  mode: "onSubmit", 
-  defaultValues: {
-    englishLevel: "",
-    englishTest: "None",
-    englishTestScore: "",
-    foreignLanguage: "",
-    foreignLanguageLevel: undefined,
-    nativeLanguage: "",
-    localLanguage: "",
-    localLanguageLevel: undefined,
-    studiedLanguage: "",
-    englishCertificate: undefined, // <-- add this
-  },
-});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setValue,
+    getValues,
+  } = useForm<LanguageFormData>({
+    resolver: zodResolver(languageSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      englishLevel: "",
+      englishTest: "None",
+      englishTestScore: "",
+      englishCertificate: undefined,
+      foreignLanguage: "",
+      foreignLanguageLevel: undefined,
+      foreignDocumentType: undefined,
+      foreignCertificate: undefined,
+      nativeLanguage: "",
+      nativeLanguageLevel: undefined,
+      localLanguage: "",
+      localLanguageLevel: undefined,
+      studiedLanguage: "",
+      studiedLanguageDocument: undefined,
+    },
+  });
 
   const englishTest = watch("englishTest");
+  const foreignLanguage = watch("foreignLanguage");
 
   // Handle file changes
   const handleEnglishCertificateChange = (file: File) => {
@@ -146,6 +191,14 @@ const {
 
   const handleEnglishCertificateRemove = () => {
     setValue("englishCertificate", undefined);
+  };
+
+  const handleForeignCertificateChange = (file: File) => {
+    setValue("foreignCertificate", file);
+  };
+
+  const handleForeignCertificateRemove = () => {
+    setValue("foreignCertificate", undefined);
   };
 
   useEffect(() => {
@@ -253,22 +306,14 @@ const {
                 </div>
               </div>
 
-              {/* Other Foreign Language */}
-              <div className="space-y-2">
+              {/* Native Language Section */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-[#064e78] pb-2">
+                  <LanguageIcons.Native className="w-5 h-5 text-[#00A3FF]" />
+                  <span className="text-sm font-medium">Native Language</span>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Foreign Language */}
-                  <div className="space-y-4">
-                    <FormInput
-                      label="Foreign Language"
-                      type="text"
-                      register={register("foreignLanguage")}
-                      placeholder="Example: German, French, Spanish"
-                      icon={<LanguageIcons.Foreign className="w-4 h-4" />}
-                    />
-
-                  </div>
-
-                  {/* Native Language */}
                   <FormInput
                     label="Native Language"
                     type="text"
@@ -278,14 +323,82 @@ const {
                     required
                     error={errors.nativeLanguage?.message}
                   />
+
+                  <FormSelect
+                    label="Proficiency Level"
+                    register={register("nativeLanguageLevel")}
+                    error={errors.nativeLanguageLevel?.message}
+                    icon={<LanguageIcons.Native className="w-4 h-4" />}
+                    required
+                  >
+                    <option value="">Select Level</option>
+                    <option value="Native">Native</option>
+                    <option value="Fluent">Fluent</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Basic">Basic</option>
+                  </FormSelect>
                 </div>
               </div>
 
-              {/* Local Languages */}
+              {/* Foreign Language Section */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-[#064e78] pb-2">
+                  <LanguageIcons.Foreign className="w-5 h-5 text-[#00A3FF]" />
+                  <span className="text-sm font-medium">Foreign Language</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormInput
+                    label="Foreign Language"
+                    type="text"
+                    register={register("foreignLanguage")}
+                    placeholder="Example: German, French, Spanish"
+                    icon={<LanguageIcons.Foreign className="w-4 h-4" />}
+                  />
+
+                  <FormSelect
+                    label="Proficiency Level"
+                    register={register("foreignLanguageLevel")}
+                    error={errors.foreignLanguageLevel?.message}
+                    icon={<LanguageIcons.Foreign className="w-4 h-4" />}
+                  >
+                    <option value="">Select Level</option>
+                    <option value="Basic">Basic</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Fluent">Fluent</option>
+                  </FormSelect>
+
+                  {foreignLanguage && (
+                    <>
+                      <DocumentTypeSelect
+                        label="Document Type"
+                        register={register("foreignDocumentType")}
+                        error={errors.foreignDocumentType?.message}
+                        required
+                      />
+
+                      <div className="md:col-span-1">
+                        <FileUpload
+                          id="foreign-certificate"
+                          label="Upload Supporting Document"
+                          onFileAccepted={handleForeignCertificateChange}
+                          onFileRemove={handleForeignCertificateRemove}
+                          error={errors.foreignCertificate?.message}
+                          currentFile={getValues("foreignCertificate")}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Local Language Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-[#064e78] pb-2">
                   <LanguageIcons.Local className="w-5 h-5 text-[#00A3FF]" />
-                  <span className="text-sm font-medium">Local Languages</span>
+                  <span className="text-sm font-medium">Local Language</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -297,7 +410,18 @@ const {
                     icon={<LanguageIcons.Local className="w-4 h-4" />}
                   />
 
-
+                  <FormSelect
+                    label="Proficiency Level"
+                    register={register("localLanguageLevel")}
+                    error={errors.localLanguageLevel?.message}
+                    icon={<LanguageIcons.Local className="w-4 h-4" />}
+                  >
+                    <option value="">Select Level</option>
+                    <option value="Basic">Basic</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Fluent">Fluent</option>
+                  </FormSelect>
                 </div>
               </div>
 

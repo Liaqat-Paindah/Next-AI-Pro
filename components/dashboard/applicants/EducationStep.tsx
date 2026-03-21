@@ -22,7 +22,6 @@ import { MasterEducation as MasterSection } from "./education/MasterSection";
 import { BachelorEducation as BachelorSection } from "./education/BachelorSection";
 import { HighSchoolEducation as HighSchoolSection } from "./education/HighSchoolSection";
 
-
 // Icons
 const Icons = {
   Education: ({ className = "w-4 h-4" }) => (
@@ -581,16 +580,7 @@ export default function EducationInfo() {
                     {/* Level-specific help text */}
                     <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-sm">
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        <strong>Note:</strong> You are providing details for{" "}
-                        {getSelectedLevelLabel()}.
-                        {selectedLevel === "PHD" &&
-                          " Please include your PhD, Master's, Bachelor's, and High School education details."}
-                        {selectedLevel === "Master" &&
-                          " Please include your Bachelor's and High School education details."}
-                        {selectedLevel === "Bachelor" &&
-                          " Please include your Bachelor's and High School education details."}
-                        {selectedLevel === "HighSchool" &&
-                          " Please provide your High School education details."}
+                        <strong>Note:</strong> Please make sure that your information is accurate and your documents are complete.
                       </p>
                     </div>
                   </motion.div>

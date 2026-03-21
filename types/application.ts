@@ -11,10 +11,13 @@ export const personalInfoSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   fatherName: z.string().min(1, "Father name is required"),
-  age: z
-    .number({ message: "Age is required" })
-    .min(1, "Age must be at least 1"),
+  mother_name: z.string().min(1, "Mother name is required"),
   gender: z.string().min(1, "gender is required"),
+  children: z
+    .string()
+    .optional().nullable(),
+  siblings: z.string().min(1, "Number of Sibilings is required"),
+  dependents: z.string().min(1, "Number of Dependents is required"),
   maritalStatus: z.string().min(1, "Marital Status is required"),
   birthDate: z.string().min(1, "Birth date is required"),
   nationality: z.string().min(1, "Nationality is required"),

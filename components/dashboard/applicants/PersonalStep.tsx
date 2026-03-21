@@ -148,6 +148,7 @@ interface FormInputProps {
   id: keyof PersonalInfoFormData;
   placeholder: string;
   required?: boolean;
+  min?: string;
   register: UseFormRegister<PersonalInfoFormData>;
   error?: FieldError;
   disabled?: boolean;
@@ -207,12 +208,14 @@ const FormInput = ({
               <>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </>
             )}
             {id === "maritalStatus" && (
               <>
                 <option value="Single">Single</option>
                 <option value="Married">Married</option>
+                <option value="Other">Engaged</option>
               </>
             )}
           </select>
@@ -250,7 +253,13 @@ const FormInput = ({
 };
 
 // Static Email Display Component
-const StaticEmailDisplay = ({ email, icon }: { email: string; icon: React.ReactNode }) => {
+const StaticEmailDisplay = ({
+  email,
+  icon,
+}: {
+  email: string;
+  icon: React.ReactNode;
+}) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -282,9 +291,11 @@ export default function Personal() {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
   });
+  const watchedMaritalStatus = watch("maritalStatus");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -367,7 +378,7 @@ export default function Personal() {
                       Personal Details
                     </h3>
                   </div>
-                  
+
                   <FormInput
                     label="First Name"
                     type="text"
@@ -402,13 +413,35 @@ export default function Personal() {
                   />
 
                   <FormInput
-                    label="Age"
-                    type="number"
-                    id="age"
-                    placeholder="Enter your age"
+                    label="Mother Name"
+                    type="string"
+                    id="mother_name"
+                    placeholder="Enter your Mother Name"
                     required
                     register={register}
-                    error={errors.age}
+                    error={errors.mother_name}
+                    icon={<Icons.Calendar className="w-4 h-4" />}
+                  />
+
+                  <FormInput
+                    label="Number of siblings"
+                    type="text"
+                    id="siblings"
+                    placeholder="Enter your siblings number"
+                    required
+                    register={register}
+                    error={errors.siblings}
+                    icon={<Icons.Calendar className="w-4 h-4" />}
+                  />
+
+                  <FormInput
+                    label="Number of dependents"
+                    type="text"
+                    id="dependents"
+                    placeholder="Enter your dependents number"
+                    required
+                    register={register}
+                    error={errors.dependents}
                     icon={<Icons.Calendar className="w-4 h-4" />}
                   />
 
@@ -431,6 +464,18 @@ export default function Personal() {
                     register={register}
                     error={errors.maritalStatus}
                   />
+                  {watchedMaritalStatus === "Married" && (
+                    <FormInput
+                      label="Number of Children (if any)"
+                      type="text"
+                      min="0"
+                      id="children"
+                      placeholder="Enter number of children"
+                      register={register}
+                      error={errors.children}
+                      icon={<Icons.Calendar className="w-4 h-4" />}
+                    />
+                  )}
 
                   <FormInput
                     label="Birth Date"
@@ -457,12 +502,12 @@ export default function Personal() {
                   {/* Passport Details Section */}
                   <div className="space-y-4 md:col-span-2 mt-4">
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
-                      Passport Details
+                      ID & Passport Details
                     </h3>
                   </div>
 
                   <FormInput
-                    label="National ID"
+                    label="National ID (Tazkira)"
                     type="text"
                     id="nationalId"
                     placeholder="Enter your national ID"
@@ -524,13 +569,17 @@ export default function Personal() {
                   />
 
                   {/* Static Email Display - Non-editable */}
-                  <StaticEmailDisplay 
-                    email={UserSession?.user?.email || ""} 
+                  <StaticEmailDisplay
+                    email={UserSession?.user?.email || ""}
                     icon={<Icons.Mail className="w-4 h-4" />}
                   />
-                  
+
                   {/* Hidden input to submit email with form */}
-                  <input type="hidden" {...register("email")} value={UserSession?.user?.email || ""} />
+                  <input
+                    type="hidden"
+                    {...register("email")}
+                    value={UserSession?.user?.email || ""}
+                  />
                 </div>
 
                 {/* Form Actions */}

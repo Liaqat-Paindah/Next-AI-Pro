@@ -501,38 +501,56 @@ export const useLanguage = () => {
 
     mutationFn: async (data: LanguageFormData) => {
       const formData = new FormData();
-
       formData.append("userId", data.userId || "");
       formData.append("englishLevel", data.englishLevel);
       formData.append("englishTest", data.englishTest || "");
-      formData.append("nativeLanguage", data.nativeLanguage);
-
+      
       if (data.englishTestScore) {
         formData.append("englishTestScore", data.englishTestScore);
       }
+      
+      if (data.englishCertificate instanceof File) {
+        formData.append("englishCertificate", data.englishCertificate);
+      }
 
+      // Native Language
+      if (data.nativeLanguage) {
+        formData.append("nativeLanguage", data.nativeLanguage);
+      }
+      
+      if (data.nativeLanguageLevel) {
+        formData.append("nativeLanguageLevel", data.nativeLanguageLevel);
+      }
+
+      // Foreign Language
       if (data.foreignLanguage) {
         formData.append("foreignLanguage", data.foreignLanguage);
       }
-
+      
       if (data.foreignLanguageLevel) {
         formData.append("foreignLanguageLevel", data.foreignLanguageLevel);
       }
+      
+      if (data.foreignDocumentType) {
+        formData.append("foreignDocumentType", data.foreignDocumentType);
+      }
+      
+      if (data.foreignCertificate instanceof File) {
+        formData.append("foreignCertificate", data.foreignCertificate);
+      }
 
+      // Local Language
       if (data.localLanguage) {
         formData.append("localLanguage", data.localLanguage);
       }
-
+      
       if (data.localLanguageLevel) {
         formData.append("localLanguageLevel", data.localLanguageLevel);
       }
 
+      // Studied Language (if still needed)
       if (data.studiedLanguage) {
         formData.append("studiedLanguage", data.studiedLanguage);
-      }
-
-      if (data.englishCertificate instanceof File) {
-        formData.append("englishCertificate", data.englishCertificate);
       }
 
       const response = await axios.post(
@@ -557,6 +575,10 @@ export const useLanguage = () => {
     },
   });
 };
+
+
+
+
 
 export const useActivities = () => {
   const router = useRouter();
