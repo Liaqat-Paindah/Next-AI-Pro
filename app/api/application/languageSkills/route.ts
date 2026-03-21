@@ -18,37 +18,57 @@ export async function POST(req: Request) {
       });
     }
 
+    // English Language
     const englishLevel = formData.get("englishLevel") as string;
     const englishTest = formData.get("englishTest") as string;
     const englishTestScore = formData.get("englishTestScore") as string;
+    const englishCertificate = formData.get("englishCertificate") as File | null;
 
+    // Native Language
+    const nativeLanguage = formData.get("nativeLanguage") as string;
+    const nativeLanguageLevel = formData.get("nativeLanguageLevel") as string;
+
+    // Foreign Language
     const foreignLanguage = formData.get("foreignLanguage") as string;
     const foreignLanguageLevel = formData.get("foreignLanguageLevel") as string;
+    const foreignDocumentType = formData.get("foreignDocumentType") as string;
+    const foreignCertificate = formData.get("foreignCertificate") as File | null;
 
-    const nativeLanguage = formData.get("nativeLanguage") as string;
-
+    // Local Language
     const localLanguage = formData.get("localLanguage") as string;
     const localLanguageLevel = formData.get("localLanguageLevel") as string;
 
     const studiedLanguage = formData.get("studiedLanguage") as string;
 
-    const englishCertificate = formData.get(
-      "englishCertificate",
-    ) as File | null;
+    // Upload files
+    let englishCertificateUrl: string | undefined;
+    let foreignCertificateUrl: string | undefined;
 
-    let certificateUrl: string | undefined;
-
+    // English Certificate
     if (englishCertificate && englishCertificate instanceof File) {
       if (englishCertificate.size > 10 * 1024 * 1024) {
         return NextResponse.json({
           success: false,
-          message: "File size must be less than 10MB",
+          message: "English certificate file size must be less than 10MB",
         });
       }
-
-      certificateUrl = await saveFile(
+      englishCertificateUrl = await saveFile(
         englishCertificate,
-        "languageCertificates",
+        "languageCertificates/english",
+      );
+    }
+
+    // Foreign Language Certificate
+    if (foreignCertificate && foreignCertificate instanceof File) {
+      if (foreignCertificate.size > 10 * 1024 * 1024) {
+        return NextResponse.json({
+          success: false,
+          message: "Foreign language certificate file size must be less than 10MB",
+        });
+      }
+      foreignCertificateUrl = await saveFile(
+        foreignCertificate,
+        "languageCertificates/foreign",
       );
     }
 
@@ -64,8 +84,18 @@ export async function POST(req: Request) {
             ? englishTest
             : "None",
           score: englishTestScore || null,
-          certificateUrl: certificateUrl || null,
+          certificateUrl: englishCertificateUrl || null,
         },
+        nativeLanguage: nativeLanguage
+          ? {
+              language: nativeLanguage,
+              level: ["Basic", "Intermediate", "Advanced", "Fluent", "Native"].includes(
+                nativeLanguageLevel as string,
+              )
+                ? nativeLanguageLevel
+                : "Basic",
+            }
+          : null,
         foreignLanguage: foreignLanguage
           ? {
               language: foreignLanguage,
@@ -74,9 +104,10 @@ export async function POST(req: Request) {
               )
                 ? foreignLanguageLevel
                 : "Basic",
+              documentType: foreignDocumentType || null,
+              certificateUrl: foreignCertificateUrl || null,
             }
           : null,
-        nativeLanguage,
         localLanguage: localLanguage
           ? {
               language: localLanguage,
@@ -90,7 +121,6 @@ export async function POST(req: Request) {
         studiedLanguage: studiedLanguage || null,
       },
     };
-
 
     const updatedApplication = await Applications.findOneAndUpdate(
       { userId },

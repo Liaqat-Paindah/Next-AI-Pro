@@ -233,7 +233,12 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
 
     languages: {
       nativeLanguage: {
-        type: String,
+        language: {
+          type: String,
+        },
+        level: {
+          type: String,
+        },
       },
 
       english: {
@@ -241,28 +246,46 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
           type: String,
           enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
         },
-
         test: {
           type: String,
           enum: ["None", "IELTS", "TOEFL", "Duolingo"],
           default: "None",
         },
-
         score: {
           type: String,
         },
-
         certificateUrl: {
           type: String,
         },
       },
 
       foreignLanguage: {
-        language: String,
+        language: {
+          type: String,
+          trim: true,
+        },
+        level: {
+          type: String,
+          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
+        },
+        documentType: {
+          type: String,
+          enum: ["Certificate", "Diploma", "Transcript", "Other"],
+        },
+        certificateUrl: {
+          type: String,
+        },
       },
 
       localLanguage: {
-        language: String,
+        language: {
+          type: String,
+          trim: true,
+        },
+        level: {
+          type: String,
+          enum: ["Basic", "Intermediate", "Advanced", "Fluent"],
+        },
       },
     },
 

@@ -2,9 +2,11 @@ import { z } from "zod";
 
 export const languageSchema = z
   .object({
-    // English
+    // User ID
     userId: z.string().optional(),
-    englishLevel: z.string().min(1, 'English Level is Required'),
+
+    // English Language
+    englishLevel: z.string().min(1, "English Level is Required"),
     englishTest: z.enum(["IELTS", "TOEFL", "Duolingo", "None"]).optional(),
     englishTestScore: z.string().optional(),
     englishCertificate: z
@@ -14,38 +16,80 @@ export const languageSchema = z
       })
       .optional(),
 
-    // Other Foreign Language
-    foreignLanguage: z.string().optional(),
-    foreignLanguageLevel: z
-      .enum(["Basic", "Intermediate", "Advanced", "Fluent"])
-      .optional(),
-
     // Native Language
     nativeLanguage: z.string().min(1, "Native language is required"),
-
-    // Local Languages
-    localLanguage: z.string().optional(),
-    localLanguageLevel: z
-      .enum(["Basic", "Intermediate", "Advanced", "Fluent"])
+    nativeLanguageLevel: z
+      .string()
+      .min(1, "Select the Level of Native Language")
       .optional(),
 
-    // Study Language
-    studiedLanguage: z.string().optional(),
-    studiedLanguageDocument: z
+    // Foreign Language
+    foreignLanguage: z.string().optional(),
+    foreignLanguageLevel: z.string().optional(),
+    foreignDocumentType: z.string().optional(),
+    foreignCertificate: z
       .instanceof(File)
+      .refine((file) => file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      })
       .optional(),
+    localLanguage: z.string().optional(),
+    localLanguageLevel: z.string().optional(),
+    studiedLanguage: z.string().optional(),
+    studiedLanguageDocument: z.instanceof(File).optional(),
   })
   .superRefine((data, ctx) => {
-    // If English test is selected (not "None"), score is required
-    if (data.englishTest && data.englishTest !== "None" && !data.englishTestScore) {
+    if (data.englishTest && data.englishTest !== "None") {
+      if (!data.englishTestScore) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Test score is required",
+          path: ["englishTestScore"],
+        });
+      }
+
+      if (!data.englishCertificate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Certificate is required for English test",
+          path: ["englishCertificate"],
+        });
+      }
+    }
+    if (data.nativeLanguage && !data.nativeLanguageLevel) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Test score is required",
-        path: ["englishTestScore"],
+        message: "Native language level is required",
+        path: ["nativeLanguageLevel"],
+      });
+    }
+    if (data.foreignLanguage) {
+      if (!data.foreignLanguageLevel) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Foreign language level is required",
+          path: ["foreignLanguageLevel"],
+        });
+      }
+
+      if (!data.foreignDocumentType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please select the foreign language document type",
+          path: ["foreignDocumentType"],
+        });
+      }
+    }
+
+    // If local language is provided, level is required
+    if (data.localLanguage && !data.localLanguageLevel) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Local language level is required",
+        path: ["localLanguageLevel"],
       });
     }
 
-    // If studied language is provided, document is required
     if (data.studiedLanguage && !data.studiedLanguageDocument) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
