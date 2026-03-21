@@ -109,18 +109,28 @@ const educationLevelOptions = [
     description: "Doctoral degree program with research focus",
   },
   {
-    value: "Master",
-    label: "Master",
+    value: "Master's",
+    label: "Master's",
     description: "Postgraduate degree (MA, MSc, MBA, etc.)",
   },
   {
-    value: "Bachelor",
-    label: "Bachelor",
+    value: "Bachelor's",
+    label: "Bachelor's",
     description: "Undergraduate degree (BA, BSc, BEng, etc.)",
+  },
+  {
+    value: "Associate",
+    label: "Associate",
+    description: "",
   },
   {
     value: "HighSchool",
     label: "High School ",
+    description: "Secondary education completion",
+  },
+  {
+    value: "MiddleSchool",
+    label: "Middle School ",
     description: "Secondary education completion",
   },
 ];
@@ -416,7 +426,7 @@ export default function EducationInfo() {
                 {/* Header */}
                 <div className="">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2">
-                    Education Information
+                    Educational Information
                   </h3>
                 </div>
 
@@ -580,7 +590,8 @@ export default function EducationInfo() {
                     {/* Level-specific help text */}
                     <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-sm">
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        <strong>Note:</strong> Please make sure that your information is accurate and your documents are complete.
+                        <strong>Note:</strong> Please make sure that your
+                        information is accurate and your documents are complete.
                       </p>
                     </div>
                   </motion.div>

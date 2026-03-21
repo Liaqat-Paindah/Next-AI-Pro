@@ -21,8 +21,11 @@ const activityOptions = [
   },
   {
     value: "public_welfare",
-    label:
-      "Participation in Public Welfare Activities",
+    label: "Participation in Public Welfare Activities",
+  },
+  {
+    value: "media_activities",
+    label: "Media Activities such as publishing articles, interviews, etc.",
   },
   {
     value: "community_awareness",
@@ -30,12 +33,15 @@ const activityOptions = [
   },
   {
     value: "social_organizations",
-    label:
-      "Membership, Establishment, or Leadership of Social Organizations",
+    label: "Membership, Establishment, or Leadership of Social Organizations",
   },
   {
     value: "awards",
     label: "Awards and Certificates Received",
+  },
+  {
+    value: "other",
+    label: "Others Activities",
   },
   { value: "no_activity", label: "No Activity" },
 ];
@@ -108,7 +114,7 @@ export default function ActivitiesUpload() {
   const router = useRouter();
   const { data: userSession, status } = useSession();
   const [activities, setActivities] = useState<Activity[]>([
-    { type: "", file: null},
+    { type: "", file: null },
   ]);
 
   const { mutate, isPending } = useActivities();
@@ -124,7 +130,7 @@ export default function ActivitiesUpload() {
   }
 
   const addActivity = () => {
-    setActivities([...activities, { type: "", file: null}]);
+    setActivities([...activities, { type: "", file: null }]);
   };
 
   const removeActivity = (index: number) => {
@@ -225,7 +231,7 @@ export default function ActivitiesUpload() {
               {/* Header */}
               <div className="border-b border-gray-200 dark:border-[#064e78] pb-4">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-wider">
-                  Activities & Experiences
+                  Activities & Work Experiences
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   Share your professional and social activities
@@ -272,7 +278,6 @@ export default function ActivitiesUpload() {
                           value={activity.type}
                           onChange={(e) => {
                             handleChange(index, "type", e.target.value);
-                          
                           }}
                           className="w-full px-3 py-2.5 text-sm bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light"
                         >

@@ -182,16 +182,6 @@ export const HighSchoolEducation = ({
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
-        <FormInput
-          label="Academic Gap Since Last Graduation"
-          type="text"
-          id={`${prefix}.academic_gap`}
-          placeholder="1 year and 6 months"
-          required
-          register={register}
-          error={errors?.academic_gap}
-          icon={<Icons.Clock className="w-4 h-4" />}
-        />
         {showFinalExam && (
           <>
             <FormInput

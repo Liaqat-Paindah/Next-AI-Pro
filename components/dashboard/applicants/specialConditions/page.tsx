@@ -1,15 +1,58 @@
 "use client";
 
-import { useSpecialConditions } from "@/hooks/useApplication";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { specialConditionsSchema, SpecialConditionsFormData } from "@/types/application";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { UseFormRegister, FieldError } from "react-hook-form";
+import { UseFormRegister } from "react-hook-form";
 import Loading from "@/app/loading";
+import { Loader2 } from "lucide-react";
+import { z } from "zod";
+import { useSpecialConditions } from "@/hooks/useApplication";
+
+// Define the form data type
+export interface SpecialConditionsFormData {
+  hasSpecialDisease: "Yes" | "No";
+  specialDiseaseDescription?: string;
+  hasPhysicalDisability: "Yes" | "No";
+  physicalDisabilityDescription?: string;
+}
+
+// Zod Validation Schema
+const specialConditionsSchema = z
+  .object({
+    hasSpecialDisease: z.enum(["Yes", "No"]),
+    specialDiseaseDescription: z.string().optional(),
+    hasPhysicalDisability: z.enum(["Yes", "No"]),
+    physicalDisabilityDescription: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // If hasSpecialDisease is "Yes", validate that description is provided
+    if (
+      data.hasSpecialDisease === "Yes" &&
+      !data.specialDiseaseDescription?.trim()
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please describe your condition",
+        path: ["specialDiseaseDescription"],
+      });
+    }
+
+    // If hasPhysicalDisability is "Yes", validate that description is provided
+    if (
+      data.hasPhysicalDisability === "Yes" &&
+      !data.physicalDisabilityDescription?.trim()
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please describe your disability and accommodation needs",
+        path: ["physicalDisabilityDescription"],
+      });
+    }
+  });
 
 // Icons for the form
 const Icons = {
@@ -91,32 +134,30 @@ const DigitalCursor = () => {
   );
 };
 
-// Form Input Props Interface
-interface FormInputProps {
+// Form TextArea Component
+interface FormTextAreaProps {
   label: string;
-  type: string;
-  id: keyof SpecialConditionsFormData;
-  placeholder: string;
-  required?: boolean;
   register: UseFormRegister<SpecialConditionsFormData>;
-  error?: FieldError;
-  disabled?: boolean;
+  error?: string;
+  placeholder: string;
   icon?: React.ReactNode;
+  required?: boolean;
+  disabled?: boolean;
   rows?: number;
+  fieldName: keyof SpecialConditionsFormData;
 }
 
-// Form Input Component (Textarea variant for this use case)
 const FormTextArea = ({
   label,
-  id,
-  placeholder,
-  required,
   register,
   error,
-  disabled,
+  placeholder,
   icon,
-  rows = 3,
-}: FormInputProps) => {
+  required = false,
+  disabled,
+  rows = 4,
+  fieldName,
+}: FormTextAreaProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -125,27 +166,19 @@ const FormTextArea = ({
       animate={{ opacity: 1, y: 0 }}
       className="relative"
     >
-      <label
-        htmlFor={id}
-        className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1"
-      >
+      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
         {label}
         {required && <span className="text-[#00A3FF] ml-1">*</span>}
       </label>
 
       <div className="relative">
         {icon && (
-          <div className="absolute left-3 top-3 text-gray-400">
-            {icon}
-          </div>
+          <div className="absolute left-3 top-3 text-gray-400">{icon}</div>
         )}
 
         <textarea
-          id={id}
-          {...register(id)}
           placeholder={placeholder}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           disabled={disabled}
           rows={rows}
           className={`w-full ${icon ? "pl-10" : "px-3"} py-2.5 text-sm bg-white dark:bg-[#011b2b] border ${
@@ -153,6 +186,7 @@ const FormTextArea = ({
           } rounded-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light resize-none ${
             disabled ? "opacity-50 cursor-not-allowed" : ""
           }`}
+          {...register(fieldName)}
         />
 
         {/* Digital Underline Effect */}
@@ -166,7 +200,7 @@ const FormTextArea = ({
         )}
       </div>
 
-      {error && <p className="text-red-500 text-xs mt-1">{error.message}</p>}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </motion.div>
   );
 };
@@ -174,15 +208,27 @@ const FormTextArea = ({
 export default function SpecialConditions() {
   const router = useRouter();
   const { data: UserSession, status } = useSession();
-  const mutation = useSpecialConditions(); // You might want to create a separate hook for this
+  const mutation = useSpecialConditions();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
+    trigger,
   } = useForm<SpecialConditionsFormData>({
     resolver: zodResolver(specialConditionsSchema),
+    defaultValues: {
+      hasSpecialDisease: "No",
+      specialDiseaseDescription: "",
+      hasPhysicalDisability: "No",
+      physicalDisabilityDescription: "",
+    },
   });
+
+  const hasSpecialDisease = watch("hasSpecialDisease");
+  const hasPhysicalDisability = watch("hasPhysicalDisability");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -197,12 +243,89 @@ export default function SpecialConditions() {
     return null;
   }
 
-  const submit = (data: SpecialConditionsFormData) => {
-    // Add userId to the data before submitting
+  // Radio button component
+  const RadioOption = ({
+    name,
+    label,
+    icon,
+  }: {
+    name: keyof SpecialConditionsFormData;
+    label: string;
+    icon: React.ReactNode;
+  }) => {
+    const value = watch(name) as "Yes" | "No";
+
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          {icon}
+          <span className="text-sm font-medium">{label}</span>
+        </div>
+        <div className="flex gap-6">
+          {["Yes", "No"].map((option) => (
+            <label
+              key={option}
+              className="flex items-center gap-2 cursor-pointer group"
+            >
+              <div className="relative">
+                <input
+                  type="radio"
+                  value={option}
+                  checked={value === option}
+                  onChange={() => setValue(name, option as "Yes" | "No")}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-4 h-4 rounded-sm transition-all duration-300 ${
+                    value === option
+                      ? "border-[#00A3FF] bg-[#00A3FF]"
+                      : "border border-gray-300 dark:border-[#064e78] group-hover:border-[#00A3FF]"
+                  }`}
+                >
+                  {value === option && (
+                    <svg
+                      className="w-full h-full text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {option}
+              </span>
+            </label>
+          ))}
+        </div>
+        {errors[name] && (
+          <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>
+        )}
+      </div>
+    );
+  };
+
+  const submit = async (data: SpecialConditionsFormData) => {
+    // Trigger validation first
+    const isValid = await trigger();
+    if (!isValid) return;
+
+    // Transform data to match the expected payload
     const payload = {
-      ...data,
+      specialDisease:
+        data.hasSpecialDisease === "Yes"
+          ? data.specialDiseaseDescription || ""
+          : "",
+      physicalDisability:
+        data.hasPhysicalDisability === "Yes"
+          ? data.physicalDisabilityDescription || ""
+          : "",
       userId: UserSession?.user?._id as string,
     };
+
     mutation.mutate(payload);
   };
 
@@ -252,45 +375,75 @@ export default function SpecialConditions() {
             className="max-w-4xl mx-auto"
           >
             <div className="bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-6 md:p-8 relative">
-              <form onSubmit={handleSubmit(submit)} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6">
-                  {/* Header Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2 mb-4">
-                      Special Health Conditions
-                    </h3>
+              <form onSubmit={handleSubmit(submit)} className="space-y-8">
+                {/* Header Section */}
+                <div className="border-b border-gray-200 dark:border-[#064e78] pb-4">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-wider">
+                    Health Condition
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Please indicate if you have any conditions that may require
+                    accommodations
+                  </p>
+                </div>
 
+                <div className="grid grid-cols-1 gap-8">
+                  {/* Special Diseases Section */}
+                  <div className="space-y-4">
+                    <RadioOption
+                      name="hasSpecialDisease"
+                      label="Special Diseases / Chronic Illnesses"
+                      icon=""
+                    />
+
+                    {hasSpecialDisease === "Yes" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 pl-4 border-l-2 border-[#00A3FF]"
+                      >
+                        <FormTextArea
+                          label="Describe your condition"
+                          register={register}
+                          fieldName="specialDiseaseDescription"
+                          placeholder="Please describe your chronic illness, treatment requirements, and any accommodations needed..."
+                          icon=""
+                          error={errors.specialDiseaseDescription?.message}
+                          required
+                        />
+                      </motion.div>
+                    )}
                   </div>
 
-                  {/* Special Diseases Input */}
-                  <FormTextArea
-                    label="Special Diseases / Chronic Illnesses"
-                    type="text"
-                    id="specialDisease"
-                    placeholder="Enter any chronic illnesses or special diseases (e.g., diabetes, hypertension, asthma)..."
-                    register={register}
-                    error={errors.specialDisease}
-                    icon={<Icons.Activity className="w-4 h-4" />}
-                    rows={4}
-                  />
+                  {/* Physical Disability Section */}
+                  <div className="space-y-4">
+                    <RadioOption
+                      name="hasPhysicalDisability"
+                      label="Physical Disability Requiring Accommodations"
+                      icon=""
+                    />
 
-                  {/* Physical Disability Input */}
-                  <FormTextArea
-                    label="Physical Disability Requiring Accommodations"
-                    type="text"
-                    id="physicalDisability"
-                    placeholder="Enter any physical disabilities or accommodation needs (e.g., wheelchair access, mobility assistance)..."
-                    register={register}
-                    error={errors.physicalDisability}
-                    icon={<Icons.Wheelchair className="w-4 h-4" />}
-                    rows={4}
-                  />
-
-                  {/* Additional Notes Section (Optional) */}
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      This information helps us make necessary arrangements for your comfort and safety during the pilgrimage.
-                    </p>
+                    {hasPhysicalDisability === "Yes" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 pl-4 border-l-2 border-[#00A3FF]"
+                      >
+                        <FormTextArea
+                          label="Describe your needs"
+                          register={register}
+                          fieldName="physicalDisabilityDescription"
+                          placeholder="Please describe your disability, mobility needs, and required accommodations..."
+                          icon=""
+                          error={errors.physicalDisabilityDescription?.message}
+                          required
+                        />
+                      </motion.div>
+                    )}
                   </div>
                 </div>
 
@@ -304,7 +457,7 @@ export default function SpecialConditions() {
                     className="flex-1 relative group"
                   >
                     <div className="absolute -inset-0.5 rounded-sm opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
-                    <div className="relative px-4 py-2 dark:bg-[#076094] text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2 dark:border-[#5fb7e9]">
+                    <div className="relative px-4 py-2 bg-transparent border border-gray-300 dark:border-[#064e78] text-gray-700 dark:text-gray-300 rounded-sm font-medium text-sm flex items-center justify-center gap-2 hover:border-[#00A3FF] transition-colors">
                       <span>Back</span>
                     </div>
                   </motion.button>
@@ -320,15 +473,7 @@ export default function SpecialConditions() {
                     <div className="relative px-4 py-2 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm font-medium text-sm flex items-center justify-center gap-2">
                       {mutation.isPending ? (
                         <>
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{
-                              duration: 1,
-                              repeat: Infinity,
-                              ease: "linear",
-                            }}
-                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                          />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                           <span>Saving...</span>
                         </>
                       ) : (

@@ -110,7 +110,7 @@ export const BachelorEducation = ({
       )}
 
       <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
-        Bachelor Education
+        Bachelor`s Degree Details
       </h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -179,10 +179,10 @@ export const BachelorEducation = ({
         />
 
         <FormInput
-          label="Academic Gap Since Last Graduation"
+          label="Official Duration of the Bachelor's Program (In Yeas)"
           type="text"
           id={`${prefix}.academic_gap`}
-          placeholder="1 year and 6 months"
+          placeholder="Type in Year"
           required
           register={register}
           error={errors?.academic_gap}

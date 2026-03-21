@@ -11,7 +11,6 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import { UseFormRegister, FieldError } from "react-hook-form";
 import Loading from "@/app/loading";
 
-
 const hobbiesSchema = z.object({
   favoriteSports: z
     .string()
@@ -285,8 +284,8 @@ export default function Hobbies() {
                   {/* Additional Notes Section (Optional) */}
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      Share your interests to help us connect you with
-                      like-minded fellow pilgrims.
+                      Share your Interests to help us connect you with
+                      like-minded applicants.
                     </p>
                   </div>
                 </div>
