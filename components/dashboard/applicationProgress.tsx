@@ -258,7 +258,7 @@ const ApplicationProgress = ({
     },
     {
       key: "goals",
-      label: "Goals & Objectives",
+      label: "Goals & Vision",
       description: "Purpose of education and post-study plans",
     },
     {
@@ -268,7 +268,7 @@ const ApplicationProgress = ({
     },
     {
       key: "contact",
-      label: "Contact Information",
+      label: "Address & Contact Information",
       description: "Address, phone, email, and emergency contact",
     },
     {

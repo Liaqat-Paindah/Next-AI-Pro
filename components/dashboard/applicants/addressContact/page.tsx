@@ -138,7 +138,8 @@ export default function AddressContactPage() {
       formData.currentDistrict.trim() !== "" &&
       formData.currentArea.trim() !== "" &&
       formData.currentFullAddress.trim() !== "" &&
-      formData.relativePhone.trim() !== ""
+      formData.relativePhone.trim() !== "" &&
+      formData.whatsapp.trim() !== ""
     );
   };
 
@@ -316,7 +317,7 @@ export default function AddressContactPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="block text-sm text-gray-600 dark:text-gray-400">
-                      WhatsApp Number (Optional)
+                      WhatsApp Number
                     </label>
                     <input
                       value={formData.whatsapp}
@@ -326,6 +327,10 @@ export default function AddressContactPage() {
                       placeholder="e.g., +1234567890"
                       className="w-full px-3 py-2.5 text-sm bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm text-gray-900 dark:text-white focus:outline-none focus:border-[#00A3FF] dark:focus:border-[#00A3FF] transition-colors font-light"
                     />
+                    <span className="text-xs  text-gray-500 dark:text-gray-400">
+                      Add your WhatsApp number, as most of our commination with
+                      you will be through the WhatsApp.
+                    </span>
                   </div>
                   <div className="space-y-1">
                     <label className="block text-sm text-gray-600 dark:text-gray-400">
