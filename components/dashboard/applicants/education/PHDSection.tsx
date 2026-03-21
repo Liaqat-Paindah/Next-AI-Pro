@@ -98,7 +98,7 @@ export const PHDEducation = ({
       )}
 
       <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
-        PHD Degree
+        PHD Degree Details
       </h4>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -9,14 +9,14 @@ import Loading from "@/app/loading";
 import { MultiSelect } from "@/components/shared/multi-select";
 import { AcademicPreferencesData } from "@/types/academicPreferences";
 import { useAcademicPreferences } from "@/hooks/useApplication";
-import { countries,universities } from "@/data/countries";
-
+import { countries, universities } from "@/data/countries";
 
 const studyLevels = [
+  { value: "high_school", label: "High School" },
   { value: "bachelor", label: "Bachelor Degree" },
   { value: "master", label: "Master Degree" },
-  { value: "phd", label: "PhD" },
-  { value: "diploma", label: "Diploma" },
+  { value: "phd", label: "PHD" },
+  { value: "postdoctoral", label: "Postdoctoral" },
 ];
 
 // Icons

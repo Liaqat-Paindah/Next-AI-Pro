@@ -12,7 +12,6 @@ import {
   AcademicArticlesPayload,
   EducationFormDataField,
   PersonalInfoFormData,
-  SpecialConditionsFormData,
   VisionGoalsFormData,
 } from "@/types/application";
 import { AddressContactData } from "@/types/contactAddress";
@@ -578,8 +577,6 @@ export const useLanguage = () => {
 
 
 
-
-
 export const useActivities = () => {
   const router = useRouter();
 
@@ -626,17 +623,16 @@ export const useSpecialConditions = () => {
 
   return useMutation({
     mutationKey: ["useSpecialConditions"],
-    mutationFn: async (
-      data: SpecialConditionsFormData & { userId: string },
-    ) => {
+    mutationFn: async (data: {
+      specialDisease: string;
+      physicalDisability: string;
+      userId: string;
+    }) => {
       const formData = new FormData();
       formData.append("userId", data.userId);
-      if (data.specialDisease) {
-        formData.append("specialDisease", data.specialDisease);
-      }
-      if (data.physicalDisability) {
-        formData.append("physicalDisability", data.physicalDisability);
-      }
+      formData.append("specialDisease", data.specialDisease);
+      formData.append("physicalDisability", data.physicalDisability);
+      
       const response = await axios.post(
         "/api/application/specialConditions",
         formData,
@@ -646,6 +642,7 @@ export const useSpecialConditions = () => {
           },
         },
       );
+      
       if (!response.data.success) {
         throw new Error(
           response.data.message || "Failed to save special conditions",
