@@ -6,6 +6,7 @@ import type { Path } from "react-hook-form";
 import { FormInput } from "./FormInput";
 import { FileUpload } from "@/components/shared/drop_zone";
 import { MasterEducationProps, EducationFormData } from "@/types/application";
+import { PeriodEndDateRow } from "./PeriodEndDateRow";
 
 // Icons
 const Icons = {
@@ -68,8 +69,10 @@ const Icons = {
 export const PHDEducation = ({
   prefix,
   register,
+  errors,
   onRemove,
   showThesis = true,
+  watch,
 }: MasterEducationProps) => {
   return (
     <motion.div
@@ -109,6 +112,7 @@ export const PHDEducation = ({
           placeholder="Enter your field of study"
           required
           register={register}
+          error={errors?.fieldOfStudy}
           icon={<Icons.Book className="w-4 h-4" />}
         />
 
@@ -119,6 +123,7 @@ export const PHDEducation = ({
           placeholder="Enter institution name"
           required
           register={register}
+          error={errors?.institutionName}
           icon={<Icons.University className="w-4 h-4" />}
         />
 
@@ -129,6 +134,7 @@ export const PHDEducation = ({
           placeholder="Enter Average Marks"
           required
           register={register}
+          error={errors?.gpa}
           icon={<Icons.Education className="w-4 h-4" />}
         />
 
@@ -138,6 +144,7 @@ export const PHDEducation = ({
           id={`${prefix}.academicRank`}
           placeholder="Enter academic rank (optional)"
           register={register}
+          error={errors?.academicRank}
         />
 
         <FormInput
@@ -147,18 +154,31 @@ export const PHDEducation = ({
           placeholder=""
           required
           register={register}
+          error={errors?.startDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
-        <FormInput
-          label="Graduation Date"
-          type="date"
-          id={`${prefix}.graduationDate`}
-          placeholder=""
-          required
-          register={register}
-          icon={<Icons.Calendar className="w-4 h-4" />}
-        />
+        {watch ? (
+          <PeriodEndDateRow
+            prefix={prefix}
+            endFieldName="graduationDate"
+            endLabel="Graduation date"
+            register={register}
+            watch={watch}
+            endDateError={errors?.graduationDate}
+          />
+        ) : (
+          <FormInput
+            label="Graduation Date"
+            type="date"
+            id={`${prefix}.graduationDate`}
+            placeholder=""
+            required={false}
+            register={register}
+            error={errors?.graduationDate}
+            icon={<Icons.Calendar className="w-4 h-4" />}
+          />
+        )}
 
         {showThesis && (
           <>

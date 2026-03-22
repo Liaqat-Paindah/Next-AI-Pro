@@ -9,6 +9,7 @@ import {
   HighSchoolEducationProps,
   EducationFormData,
 } from "@/types/application";
+import { PeriodEndDateRow } from "./PeriodEndDateRow";
 
 // Icons
 const Icons = {
@@ -80,13 +81,22 @@ const Icons = {
   ),
 };
 
+const defaultK12Subheading =
+  "General information for this school period is sufficient.";
+
 export const HighSchoolEducation = ({
   prefix,
   register,
   errors,
   onRemove,
-  showFinalExam = true,
+  showFinalExam = false,
+  watch,
+  heading = "High School Degree Details",
+  subheading = defaultK12Subheading,
+  allFieldsOptional = false,
 }: HighSchoolEducationProps) => {
+  const req = !allFieldsOptional;
+
   return (
     <motion.div
       initial={{ opacity: 0, height: 0 }}
@@ -113,9 +123,12 @@ export const HighSchoolEducation = ({
         </button>
       )}
 
-      <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">
-        High School Education
+      <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
+        {heading}
       </h4>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+        {subheading}
+      </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
@@ -123,7 +136,7 @@ export const HighSchoolEducation = ({
           type="text"
           id={`${prefix}.fieldOfStudy`}
           placeholder="Example:General"
-          required
+          required={req}
           register={register}
           error={errors?.fieldOfStudy}
           icon={<Icons.Book className="w-4 h-4" />}
@@ -134,7 +147,7 @@ export const HighSchoolEducation = ({
           type="text"
           id={`${prefix}.institutionName`}
           placeholder="Enter institution name"
-          required
+          required={req}
           register={register}
           error={errors?.institutionName}
           icon={<Icons.University className="w-4 h-4" />}
@@ -145,7 +158,7 @@ export const HighSchoolEducation = ({
           type="number"
           id={`${prefix}.gpa`}
           placeholder="Enter Average Marks"
-          required
+          required={req}
           register={register}
           error={errors?.gpa}
           icon={<Icons.Education className="w-4 h-4" />}
@@ -165,22 +178,33 @@ export const HighSchoolEducation = ({
           type="date"
           id={`${prefix}.startDate`}
           placeholder=""
-          required
+          required={req}
           register={register}
           error={errors?.startDate}
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
-        <FormInput
-          label="Graduation Date"
-          type="date"
-          id={`${prefix}.graduationDate`}
-          placeholder=""
-          required
-          register={register}
-          error={errors?.graduationDate}
-          icon={<Icons.Calendar className="w-4 h-4" />}
-        />
+        {watch ? (
+          <PeriodEndDateRow
+            prefix={prefix}
+            endFieldName="graduationDate"
+            endLabel="Graduation date"
+            register={register}
+            watch={watch}
+            endDateError={errors?.graduationDate}
+          />
+        ) : (
+          <FormInput
+            label="Graduation Date"
+            type="date"
+            id={`${prefix}.graduationDate`}
+            placeholder=""
+            required={false}
+            register={register}
+            error={errors?.graduationDate}
+            icon={<Icons.Calendar className="w-4 h-4" />}
+          />
+        )}
 
         {showFinalExam && (
           <>
@@ -189,7 +213,7 @@ export const HighSchoolEducation = ({
               type="number"
               id={`${prefix}.finalExamYear`}
               placeholder="Enter Kankor exam year"
-              required
+              required={req}
               register={register}
               error={errors?.finalExamYear}
             />
@@ -199,7 +223,7 @@ export const HighSchoolEducation = ({
               type="number"
               id={`${prefix}.finalExamScore`}
               placeholder="Enter Kankor exam score"
-              required
+              required={req}
               register={register}
               error={errors?.finalExamScore}
             />

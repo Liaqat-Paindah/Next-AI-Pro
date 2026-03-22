@@ -3,6 +3,58 @@ import { NextRequest, NextResponse } from "next/server";
 import Applications from "@/models/Applications";
 import { saveFile } from "@/lib/file_upload"; // Path to your Vercel Blob utility
 
+async function appendK12FormPrefix(
+  formData: FormData,
+  educationArray: Array<Record<string, unknown>>,
+  prefix: string,
+  level: string,
+  uploadFolder: string,
+) {
+  if (!formData.get(`${prefix}[fieldOfStudy]`)) {
+    return;
+  }
+
+  const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
+  const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
+
+  let diplomaFileUrl = "";
+  let transcriptFileUrl = "";
+
+  if (diplomaFile && diplomaFile.size > 0) {
+    diplomaFileUrl = await saveFile(diplomaFile, uploadFolder);
+  }
+
+  if (transcriptFile && transcriptFile.size > 0) {
+    transcriptFileUrl = await saveFile(transcriptFile, uploadFolder);
+  }
+
+  const currentlyStudyingRaw = formData.get(`${prefix}[currentlyStudying]`);
+
+  educationArray.push({
+    level,
+    fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
+    institutionName: formData.get(`${prefix}[institutionName]`) as string,
+    gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
+    academicRank: formData.get(`${prefix}[academicRank]`) as string,
+    academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
+    startDate: formData.get(`${prefix}[startDate]`)
+      ? new Date(formData.get(`${prefix}[startDate]`) as string)
+      : null,
+    graduationDate: formData.get(`${prefix}[graduationDate]`)
+      ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
+      : null,
+    finalExamYear: formData.get(`${prefix}[finalExamYear]`)
+      ? parseInt(formData.get(`${prefix}[finalExamYear]`) as string)
+      : undefined,
+    finalExamScore: formData.get(`${prefix}[finalExamScore]`)
+      ? parseInt(formData.get(`${prefix}[finalExamScore]`) as string)
+      : undefined,
+    currentlyStudying: String(currentlyStudyingRaw) === "true",
+    diplomaFileUrl,
+    transcriptFileUrl,
+  });
+}
+
 export async function POST(req: NextRequest) {
   await ConnectDB();
 
@@ -12,54 +64,59 @@ export async function POST(req: NextRequest) {
 
     const userId = formData.get("userId") as string;
     const level = formData.get("level") as string;
+    const applicantLevel = level;
 
-    const educationArray = [];
+    const educationArray: Array<Record<string, unknown>> = [];
+
+    // ==================== PRIMARY (middle-school–only) OR 14TH / ASSOCIATE (graduate path, yes) ====================
+    if (formData.get(`primarySchool[fieldOfStudy]`)) {
+      const primaryLevel =
+        applicantLevel === "MiddleSchool" ? "Primary School" : "Associate";
+      const primaryFolder =
+        applicantLevel === "MiddleSchool" ? "primaryschool" : "associate";
+      await appendK12FormPrefix(
+        formData,
+        educationArray,
+        "primarySchool",
+        primaryLevel,
+        primaryFolder,
+      );
+    }
+
+    // ==================== 14TH GRADE / ASSOCIATE (highest level = Associate) ====================
+    await appendK12FormPrefix(
+      formData,
+      educationArray,
+      "associate14thEducation",
+      "Associate",
+      "associate",
+    );
 
     // ==================== PROCESS HIGH SCHOOL EDUCATION ====================
     let index = 0;
     while (formData.get(`highSchoolEducation[${index}][fieldOfStudy]`)) {
-      const prefix = `highSchoolEducation[${index}]`;
+      await appendK12FormPrefix(
+        formData,
+        educationArray,
+        `highSchoolEducation[${index}]`,
+        "High School",
+        "highschool",
+      );
+      index++;
+    }
 
-      // Get files
-      const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
-      const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
-
-      // Upload files
-      let diplomaFileUrl = "";
-      let transcriptFileUrl = "";
-
-      if (diplomaFile && diplomaFile.size > 0) {
-        diplomaFileUrl = await saveFile(diplomaFile, "highschool");
-      }
-
-      if (transcriptFile && transcriptFile.size > 0) {
-        transcriptFileUrl = await saveFile(transcriptFile, "highschool");
-      }
-
-      // Create education object
-      educationArray.push({
-        level: "High School",
-        fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
-        institutionName: formData.get(`${prefix}[institutionName]`) as string,
-        gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
-        academicRank: formData.get(`${prefix}[academicRank]`) as string,
-        academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
-        startDate: formData.get(`${prefix}[startDate]`)
-          ? new Date(formData.get(`${prefix}[startDate]`) as string)
-          : null,
-        graduationDate: formData.get(`${prefix}[graduationDate]`)
-          ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
-          : null,
-        finalExamYear: formData.get(`${prefix}[finalExamYear]`)
-          ? parseInt(formData.get(`${prefix}[finalExamYear]`) as string)
-          : undefined,
-        finalExamScore: formData.get(`${prefix}[finalExamScore]`)
-          ? parseInt(formData.get(`${prefix}[finalExamScore]`) as string)
-          : undefined,
-        diplomaFileUrl,
-        transcriptFileUrl,
-      });
-
+    // ==================== SECONDARY SCHOOL (middle-school–only applicants) ====================
+    index = 0;
+    while (
+      formData.get(`secondarySchoolEducation[${index}][fieldOfStudy]`)
+    ) {
+      await appendK12FormPrefix(
+        formData,
+        educationArray,
+        `secondarySchoolEducation[${index}]`,
+        "Secondary School",
+        "secondaryschool",
+      );
       index++;
     }
 

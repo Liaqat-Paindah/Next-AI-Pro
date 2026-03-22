@@ -5,13 +5,17 @@ import { UseEducationInformation } from "@/hooks/useApplication";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import {
   EducationFormData,
+  Associate14thOptionalRecord,
   BachelorEducation,
   HighSchoolEducation,
-  EducationFormDataField,
   MasterEducation,
+  educationSchema,
 } from "@/types/application";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
@@ -21,6 +25,18 @@ import { PHDEducation as PHDSection } from "./education/PHDSection";
 import { MasterEducation as MasterSection } from "./education/MasterSection";
 import { BachelorEducation as BachelorSection } from "./education/BachelorSection";
 import { HighSchoolEducation as HighSchoolSection } from "./education/HighSchoolSection";
+import { PrimaryMiddleSchoolSection } from "./education/PrimaryMiddleSchoolSection";
+
+function firstFormErrorMessage(err: unknown): string | undefined {
+  if (!err || typeof err !== "object") return undefined;
+  const e = err as Record<string, unknown>;
+  if ("message" in e && typeof e.message === "string") return e.message;
+  for (const v of Object.values(e)) {
+    const msg = firstFormErrorMessage(v);
+    if (msg) return msg;
+  }
+  return undefined;
+}
 
 // Icons
 const Icons = {
@@ -109,19 +125,19 @@ const educationLevelOptions = [
     description: "Doctoral degree program with research focus",
   },
   {
-    value: "Master's",
+    value: "Master",
     label: "Master's",
     description: "Postgraduate degree (MA, MSc, MBA, etc.)",
   },
   {
-    value: "Bachelor's",
+    value: "Bachelor",
     label: "Bachelor's",
     description: "Undergraduate degree (BA, BSc, BEng, etc.)",
   },
   {
     value: "Associate",
-    label: "Associate",
-    description: "",
+    label: "14th degree (Associate Degree)",
+    description: "Associate degree or equivalent",
   },
   {
     value: "HighSchool",
@@ -131,7 +147,7 @@ const educationLevelOptions = [
   {
     value: "MiddleSchool",
     label: "Middle School ",
-    description: "Secondary education completion",
+    description: "Middle school completion",
   },
 ];
 
@@ -139,11 +155,12 @@ const educationLevelOptions = [
 const createEmptyBachelor = (): BachelorEducation => ({
   fieldOfStudy: "",
   institutionName: "",
-  gpa: 0,
+  gpa: undefined as unknown as number,
   academic_gap: "",
   academicRank: "",
   startDate: "",
   graduationDate: "",
+  currentlyStudying: false,
   diplomaFile: undefined,
   transcriptFile: undefined,
 });
@@ -151,11 +168,12 @@ const createEmptyBachelor = (): BachelorEducation => ({
 const createEmptyHighSchool = (): HighSchoolEducation => ({
   fieldOfStudy: "",
   institutionName: "",
-  gpa: 0,
+  gpa: undefined as unknown as number,
   academic_gap: "",
   academicRank: "",
   startDate: "",
   graduationDate: "",
+  currentlyStudying: false,
   finalExamYear: undefined,
   finalExamScore: undefined,
   diplomaFile: undefined,
@@ -165,10 +183,11 @@ const createEmptyHighSchool = (): HighSchoolEducation => ({
 const createEmptyMaster = (): MasterEducation => ({
   fieldOfStudy: "",
   institutionName: "",
-  gpa: 0,
+  gpa: undefined as unknown as number,
   academicRank: "",
   startDate: "",
   graduationDate: "",
+  currentlyStudying: false,
   thesisTopic: "",
   thesisFile: undefined,
   diplomaFile: undefined,
@@ -179,6 +198,21 @@ const createEmptyPhd = (): MasterEducation => ({
   ...createEmptyMaster(),
 });
 
+const createEmptyAssociate14thOptional = (): Associate14thOptionalRecord => ({
+  fieldOfStudy: "",
+  institutionName: "",
+  gpa: undefined,
+  academic_gap: "",
+  academicRank: "",
+  startDate: "",
+  graduationDate: "",
+  currentlyStudying: false,
+  finalExamYear: undefined,
+  finalExamScore: undefined,
+  diplomaFile: undefined,
+  transcriptFile: undefined,
+});
+
 export default function EducationInfo() {
   const router = useRouter();
   const { data: userSession, status } = useSession();
@@ -187,16 +221,14 @@ export default function EducationInfo() {
   // State to track if level is selected
   const [levelSelected, setLevelSelected] = useState(false);
 
-  // State to control section visibility
+  // State to control section visibility (degree sections)
   const [showPhd, setShowPhd] = useState(false);
   const [showMaster, setShowMaster] = useState(false);
   const [showBachelor, setShowBachelor] = useState(false);
-  const [showHighSchool, setShowHighSchool] = useState(false);
 
   // Counts for dynamic sections
   const [bachelorCount, setBachelorCount] = useState(0);
   const [highSchoolCount, setHighSchoolCount] = useState(0);
-
   const {
     register,
     handleSubmit,
@@ -205,12 +237,34 @@ export default function EducationInfo() {
     setValue,
     getValues,
   } = useForm<EducationFormData>({
+    resolver: zodResolver(educationSchema) as Resolver<EducationFormData>,
     defaultValues: {
       level: undefined,
+      hasAssociate14thDegree: "no",
     },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- discriminated union form
+  const formErrors = errors as any;
+
   const selectedLevel = watch("level");
+  const secondarySchoolList = watch("secondarySchoolEducation") || [];
+
+  const levelUsesAssociateGate = (level: string | undefined) =>
+    level === "PHD" || level === "Master" || level === "Bachelor";
+
+  const showAssociate14Block = levelUsesAssociateGate(selectedLevel);
+  const showHighSchoolRecords = selectedLevel !== "MiddleSchool";
+
+  const applyGraduateAssociateDefaults = (enabled: boolean) => {
+    if (enabled) {
+      setValue("hasAssociate14thDegree", "no");
+      setValue("primarySchool", createEmptyAssociate14thOptional());
+    } else {
+      setValue("hasAssociate14thDegree", undefined as never);
+      setValue("primarySchool", createEmptyAssociate14thOptional());
+    }
+  };
 
   // Effect to handle level selection and show appropriate sections
   useEffect(() => {
@@ -219,39 +273,33 @@ export default function EducationInfo() {
       setShowPhd(false);
       setShowMaster(false);
       setShowBachelor(false);
-      setShowHighSchool(false);
       setBachelorCount(0);
       setHighSchoolCount(0);
-
-      // Clear all education data - FIXED: Don't set undefined for masterEducation
       setValue("bachelorEducation", []);
       setValue("highSchoolEducation", []);
+      applyGraduateAssociateDefaults(false);
       return;
     }
 
     setLevelSelected(true);
 
-    // Reset counts and clear previous data
     setBachelorCount(0);
     setHighSchoolCount(0);
     setValue("bachelorEducation", []);
     setValue("highSchoolEducation", []);
 
-    // Set up sections based on selected level
+    const includeAssociate = levelUsesAssociateGate(selectedLevel);
+    applyGraduateAssociateDefaults(includeAssociate);
+
     switch (selectedLevel) {
       case "PHD":
         setShowPhd(true);
         setShowMaster(true);
         setShowBachelor(true);
-        setShowHighSchool(true);
-        // Initialize PhD education
         setValue("phdEducation", createEmptyPhd());
-        // Initialize master education for PhD
         setValue("masterEducation", createEmptyMaster());
-        // Initialize one bachelor education by default for PhD
         setValue("bachelorEducation", [createEmptyBachelor()]);
         setBachelorCount(1);
-        // Initialize one high school education by default
         setValue("highSchoolEducation", [createEmptyHighSchool()]);
         setHighSchoolCount(1);
         break;
@@ -260,13 +308,9 @@ export default function EducationInfo() {
         setShowPhd(false);
         setShowMaster(true);
         setShowBachelor(true);
-        setShowHighSchool(true);
-        // Initialize master education for Master's
         setValue("masterEducation", createEmptyMaster());
-        // Initialize one bachelor education by default for Master
         setValue("bachelorEducation", [createEmptyBachelor()]);
         setBachelorCount(1);
-        // Initialize one high school education by default
         setValue("highSchoolEducation", [createEmptyHighSchool()]);
         setHighSchoolCount(1);
         break;
@@ -275,11 +319,17 @@ export default function EducationInfo() {
         setShowPhd(false);
         setShowMaster(false);
         setShowBachelor(true);
-        setShowHighSchool(true);
-        // Initialize one bachelor education by default
         setValue("bachelorEducation", [createEmptyBachelor()]);
         setBachelorCount(1);
-        // Initialize one high school education by default
+        setValue("highSchoolEducation", [createEmptyHighSchool()]);
+        setHighSchoolCount(1);
+        break;
+
+      case "Associate":
+        setShowPhd(false);
+        setShowMaster(false);
+        setShowBachelor(false);
+        setValue("associate14thEducation", createEmptyHighSchool());
         setValue("highSchoolEducation", [createEmptyHighSchool()]);
         setHighSchoolCount(1);
         break;
@@ -288,10 +338,25 @@ export default function EducationInfo() {
         setShowPhd(false);
         setShowMaster(false);
         setShowBachelor(false);
-        setShowHighSchool(true);
-        // Initialize one high school education by default
         setValue("highSchoolEducation", [createEmptyHighSchool()]);
         setHighSchoolCount(1);
+        break;
+
+      case "MiddleSchool":
+        setShowPhd(false);
+        setShowMaster(false);
+        setShowBachelor(false);
+        setHighSchoolCount(0);
+        setValue("highSchoolEducation", []);
+        setValue("primarySchool", createEmptyHighSchool());
+        setValue("secondarySchoolEducation", [createEmptyHighSchool()]);
+        break;
+
+      default:
+        setShowPhd(false);
+        setShowMaster(false);
+        setShowBachelor(false);
+        setLevelSelected(false);
         break;
     }
   }, [selectedLevel, setValue]);
@@ -309,31 +374,78 @@ export default function EducationInfo() {
   }
 
   const onSubmit = (data: EducationFormData) => {
-    const submissionData: EducationFormDataField = {
-      level: data.level,
-      userId: userSession.user._id as string,
-    };
-
-    // Add level-specific fields based on the selected level
-    if (data.level === "PHD") {
-      submissionData.phdEducation = data.phdEducation;
-      submissionData.masterEducation = data.masterEducation;
-      submissionData.bachelorEducation = data.bachelorEducation;
-      submissionData.highSchoolEducation = data.highSchoolEducation;
-    } else if (data.level === "Master") {
-      submissionData.masterEducation = data.masterEducation;
-      submissionData.bachelorEducation = data.bachelorEducation;
-      submissionData.highSchoolEducation = data.highSchoolEducation;
-    } else if (data.level === "Bachelor") {
-      if (data.bachelorEducation && data.bachelorEducation.length > 0) {
-        submissionData.bachelorEducation = data.bachelorEducation;
-      }
-      submissionData.highSchoolEducation = data.highSchoolEducation;
-    } else if (data.level === "HighSchool") {
-      submissionData.highSchoolEducation = data.highSchoolEducation;
+    const userId = userSession?.user?._id as string | undefined;
+    if (!userId) {
+      toast.error("Unable to save: please sign in again.");
+      return;
     }
 
-    mutation.mutate(submissionData);
+    if (data.level === "MiddleSchool") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        primarySchool: data.primarySchool,
+        secondarySchoolEducation: data.secondarySchoolEducation,
+      });
+      return;
+    }
+
+    if (data.level === "PHD") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        hasAssociate14thDegree: data.hasAssociate14thDegree,
+        primarySchool: data.primarySchool,
+        phdEducation: data.phdEducation,
+        masterEducation: data.masterEducation,
+        bachelorEducation: data.bachelorEducation,
+        highSchoolEducation: data.highSchoolEducation,
+      });
+      return;
+    }
+
+    if (data.level === "Master") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        hasAssociate14thDegree: data.hasAssociate14thDegree,
+        primarySchool: data.primarySchool,
+        masterEducation: data.masterEducation,
+        bachelorEducation: data.bachelorEducation,
+        highSchoolEducation: data.highSchoolEducation,
+      });
+      return;
+    }
+
+    if (data.level === "Bachelor") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        hasAssociate14thDegree: data.hasAssociate14thDegree,
+        primarySchool: data.primarySchool,
+        bachelorEducation: data.bachelorEducation,
+        highSchoolEducation: data.highSchoolEducation,
+      });
+      return;
+    }
+
+    if (data.level === "Associate") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        associate14thEducation: data.associate14thEducation,
+        highSchoolEducation: data.highSchoolEducation,
+      });
+      return;
+    }
+
+    if (data.level === "HighSchool") {
+      mutation.mutate({
+        userId,
+        level: data.level,
+        highSchoolEducation: data.highSchoolEducation,
+      });
+    }
   };
 
   const addBachelorEducation = () => {
@@ -367,6 +479,19 @@ export default function EducationInfo() {
       currentHighSchool.filter((_, i) => i !== index),
     );
     setHighSchoolCount((prev) => prev - 1);
+  };
+
+  const addSecondarySchoolEducation = () => {
+    const current = getValues("secondarySchoolEducation") || [];
+    setValue("secondarySchoolEducation", [...current, createEmptyHighSchool()]);
+  };
+
+  const removeSecondarySchoolEducation = (index: number) => {
+    const current = getValues("secondarySchoolEducation") || [];
+    setValue(
+      "secondarySchoolEducation",
+      current.filter((_, i) => i !== index),
+    );
   };
 
   // Get selected level label for display
@@ -422,7 +547,16 @@ export default function EducationInfo() {
             className="max-w-4xl mx-auto"
           >
             <div className="bg-white dark:bg-[#011b2b] border border-gray-200 dark:border-[#064e78] rounded-sm p-6 md:p-8 relative">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={handleSubmit(onSubmit, (formErrors) => {
+                  const msg = firstFormErrorMessage(formErrors);
+                  toast.error(
+                    msg ??
+                      "Please complete all required fields before continuing.",
+                  );
+                })}
+                className="space-y-8"
+              >
                 {/* Header */}
                 <div className="">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-wider border-b border-gray-200 dark:border-[#064e78] pb-2">
@@ -456,14 +590,7 @@ export default function EducationInfo() {
                     <span className="text-sm text-gray-700 dark:text-gray-300">
                       Selected Level: <strong>{getSelectedLevelLabel()}</strong>{" "}
                       - Please complete the{" "}
-                      {selectedLevel === "PHD"
-                        ? "PhD"
-                        : selectedLevel === "Master"
-                          ? "Master's"
-                          : selectedLevel === "Bachelor"
-                            ? "Bachelor's"
-                            : "High School"}{" "}
-                      details below
+                      <strong>{getSelectedLevelLabel()}</strong> details below
                     </span>
                   </motion.div>
                 )}
@@ -476,18 +603,61 @@ export default function EducationInfo() {
                     transition={{ delay: 0.2 }}
                     className="space-y-8"
                   >
-                    {/* PHD Education Section */}
-                    {showPhd && selectedLevel === "PHD" && (
-                      <div className="space-y-4">
-                        <PHDSection
-                          prefix="phdEducation"
+                    {selectedLevel === "MiddleSchool" && (
+                      <div className="space-y-6">
+                        <HighSchoolSection
+                          prefix="primarySchool"
                           register={register}
-                          showThesis={true}
+                          errors={formErrors.primarySchool}
+                          watch={watch}
+                          heading="Primary School Details"
+                          showFinalExam={false}
                         />
+                        <div className="space-y-4">
+                          {secondarySchoolList.length > 0 ? (
+                            secondarySchoolList.map((_, index) => (
+                              <HighSchoolSection
+                                key={`secondary-school-${index}`}
+                                prefix={`secondarySchoolEducation.${index}`}
+                                onRemove={
+                                  secondarySchoolList.length > 1
+                                    ? () =>
+                                        removeSecondarySchoolEducation(index)
+                                    : undefined
+                                }
+                                register={register}
+                                errors={
+                                  formErrors.secondarySchoolEducation?.[index]
+                                }
+                                showFinalExam={false}
+                                watch={watch}
+                                heading="Secondary School Details"
+                              />
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                              Add at least one secondary school record.
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
 
-                    {/* Master Education Section - shown for PHD and Master */}
+                    {/* Highest → lowest: PhD, Master, Bachelor */}
+                    {selectedLevel !== "MiddleSchool" &&
+                      showPhd &&
+                      selectedLevel === "PHD" && (
+                        <div className="space-y-4">
+                          <PHDSection
+                            prefix="phdEducation"
+                            register={register}
+                            errors={formErrors.phdEducation}
+                            watch={watch}
+                            showThesis={true}
+                          />
+                        </div>
+                      )}
+
                     {showMaster &&
                       (selectedLevel === "PHD" ||
                         selectedLevel === "Master") && (
@@ -495,13 +665,13 @@ export default function EducationInfo() {
                           <MasterSection
                             prefix="masterEducation"
                             register={register}
-                            errors={errors}
+                            errors={formErrors.masterEducation}
+                            watch={watch}
                             showThesis={true}
                           />
                         </div>
                       )}
 
-                    {/* Bachelor Education Sections */}
                     {showBachelor && (
                       <motion.div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -533,6 +703,8 @@ export default function EducationInfo() {
                                     : undefined
                                 }
                                 register={register}
+                                errors={formErrors.bachelorEducation?.[index]}
+                                watch={watch}
                               />
                             ),
                           )
@@ -545,8 +717,39 @@ export default function EducationInfo() {
                       </motion.div>
                     )}
 
-                    {/* High School Education Sections */}
-                    {showHighSchool && (
+                    {/* 14th degree (Associate) — highest level only */}
+                    {selectedLevel === "Associate" && (
+                      <div className="space-y-4">
+                        <HighSchoolSection
+                          prefix="associate14thEducation"
+                          register={register}
+                          errors={formErrors.associate14thEducation}
+                          watch={watch}
+                          heading="14th Degree (Associate) Details"
+                          subheading="Your Associate / 14th degree program details."
+                          showFinalExam={false}
+                        />
+                      </div>
+                    )}
+
+                    {/* After degrees: “Do you have a 14th degree (Associate) degree?” — PHD, Master, Bachelor */}
+                    {showAssociate14Block && (
+                      <div className="space-y-2">
+                        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-[#064e78] pb-2">
+                          14th degree (Associate) Degree Details
+                        </h3>
+                        <PrimaryMiddleSchoolSection
+                          register={register}
+                          watch={watch}
+                          errors={formErrors}
+                          showAssociateBlock
+                          showMiddleSchoolBlock={false}
+                        />
+                      </div>
+                    )}
+
+                    {/* High school (secondary) — hidden when highest level is middle school only */}
+                    {showHighSchoolRecords && (
                       <motion.div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <motion.button
@@ -557,7 +760,7 @@ export default function EducationInfo() {
                             className="flex items-center gap-2 px-3 py-1.5 text-sm bg-[#00A3FF]/10 text-[#00A3FF] rounded-sm hover:bg-[#00A3FF]/20 transition-colors"
                           >
                             <Icons.Add className="w-4 h-4" />
-                            Add Baccalaureate Details
+                            Add High School record
                           </motion.button>
                         </div>
 
@@ -573,15 +776,16 @@ export default function EducationInfo() {
                                     : undefined
                                 }
                                 register={register}
-                                errors={errors.highSchoolEducation?.[index]}
+                                errors={formErrors.highSchoolEducation?.[index]}
                                 showFinalExam={true}
+                                watch={watch}
                               />
                             ),
                           )
                         ) : (
                           <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            No high school education added. Click Add High
-                            School to add your information.
+                            No secondary school record added. Use Add to include
+                            your general secondary / high school period.
                           </p>
                         )}
                       </motion.div>

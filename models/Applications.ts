@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const ScholarshipApplicationSchema = new mongoose.Schema(
   {
     userId: { type: String }, // Link to user account
+    /** Highest education level selected on the education step (form discriminator) */
+    level: { type: String },
     status: {
       type: String,
       enum: ["draft", "submitted", "under_review", "approved", "rejected"],
@@ -110,7 +112,6 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       {
         level: {
           type: String,
-          enum: ["Master", "Bachelor", "PHD", "High School"],
         },
         fieldOfStudy: { type: String },
         institutionName: { type: String },
@@ -118,6 +119,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         academicRank: { type: String }, // Optional rank
         startDate: { type: Date },
         graduationDate: { type: Date },
+        currentlyStudying: { type: Boolean },
         educationGapExplanation: { type: String },
         thesisTopic: { type: String }, // optional
         thesisFileUrl: { type: String }, // optional
