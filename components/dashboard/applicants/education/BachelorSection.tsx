@@ -6,6 +6,7 @@ import type { Path } from "react-hook-form";
 import { FormInput } from "./FormInput";
 import { FileUpload } from "@/components/shared/drop_zone";
 import { BachelorEducationProps, EducationFormData } from "@/types/application";
+import { PeriodEndDateRow } from "./PeriodEndDateRow";
 
 // Icons
 const Icons = {
@@ -82,6 +83,7 @@ export const BachelorEducation = ({
   register,
   errors,
   onRemove,
+  watch,
 }: BachelorEducationProps) => {
   return (
     <motion.div
@@ -167,16 +169,27 @@ export const BachelorEducation = ({
           icon={<Icons.Calendar className="w-4 h-4" />}
         />
 
-        <FormInput
-          label="Graduation Date"
-          type="date"
-          id={`${prefix}.graduationDate`}
-          placeholder=""
-          required
-          register={register}
-          error={errors?.graduationDate}
-          icon={<Icons.Calendar className="w-4 h-4" />}
-        />
+        {watch ? (
+          <PeriodEndDateRow
+            prefix={prefix}
+            endFieldName="graduationDate"
+            endLabel="Graduation date"
+            register={register}
+            watch={watch}
+            endDateError={errors?.graduationDate}
+          />
+        ) : (
+          <FormInput
+            label="Graduation Date"
+            type="date"
+            id={`${prefix}.graduationDate`}
+            placeholder=""
+            required={false}
+            register={register}
+            error={errors?.graduationDate}
+            icon={<Icons.Calendar className="w-4 h-4" />}
+          />
+        )}
 
         <FormInput
           label="Official Duration of the Bachelor's Program (In Yeas)"

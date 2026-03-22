@@ -11,6 +11,7 @@ import { AcademicPreferencesData } from "@/types/academicPreferences";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
+  K12SchoolRecord,
   PersonalInfoFormData,
   VisionGoalsFormData,
 } from "@/types/application";
@@ -71,20 +72,56 @@ export const UseEducationInformation = () => {
       appendText("userId", data.userId);
       appendText("level", data.level);
 
+      const appendK12Record = (
+        prefix: string,
+        item: Partial<K12SchoolRecord>,
+      ) => {
+        appendText(`${prefix}[fieldOfStudy]`, item.fieldOfStudy);
+        appendText(`${prefix}[institutionName]`, item.institutionName);
+        appendText(`${prefix}[gpa]`, item.gpa);
+        appendText(`${prefix}[academicRank]`, item.academicRank);
+        appendText(`${prefix}[academic_gap]`, item.academic_gap);
+        appendText(`${prefix}[startDate]`, item.startDate);
+        appendText(`${prefix}[graduationDate]`, item.graduationDate);
+        appendText(`${prefix}[currentlyStudying]`, item.currentlyStudying);
+        appendText(`${prefix}[finalExamYear]`, item.finalExamYear);
+        appendText(`${prefix}[finalExamScore]`, item.finalExamScore);
+        appendFile(`${prefix}[diplomaFile]`, item.diplomaFile);
+        appendFile(`${prefix}[transcriptFile]`, item.transcriptFile);
+      };
+
+      if (data.hasAssociate14thDegree) {
+        appendText("hasAssociate14thDegree", data.hasAssociate14thDegree);
+      }
+
+      if (data.level === "MiddleSchool" && data.primarySchool) {
+        appendK12Record("primarySchool", data.primarySchool as K12SchoolRecord);
+      } else if (
+        (data.level === "PHD" ||
+          data.level === "Master" ||
+          data.level === "Bachelor") &&
+        data.hasAssociate14thDegree === "yes" &&
+        data.primarySchool
+      ) {
+        appendK12Record("primarySchool", data.primarySchool as K12SchoolRecord);
+      }
+
+      if (data.level === "Associate" && data.associate14thEducation) {
+        appendK12Record(
+          "associate14thEducation",
+          data.associate14thEducation,
+        );
+      }
+
+      if (data.secondarySchoolEducation?.length) {
+        data.secondarySchoolEducation.forEach((item, index) => {
+          appendK12Record(`secondarySchoolEducation[${index}]`, item);
+        });
+      }
+
       if (data.highSchoolEducation && data.highSchoolEducation.length > 0) {
         data.highSchoolEducation.forEach((item, index) => {
-          const prefix = `highSchoolEducation[${index}]`;
-          appendText(`${prefix}[fieldOfStudy]`, item.fieldOfStudy);
-          appendText(`${prefix}[institutionName]`, item.institutionName);
-          appendText(`${prefix}[gpa]`, item.gpa);
-          appendText(`${prefix}[academicRank]`, item.academicRank);
-          appendText(`${prefix}[academic_gap]`, item.academic_gap);
-          appendText(`${prefix}[startDate]`, item.startDate);
-          appendText(`${prefix}[graduationDate]`, item.graduationDate);
-          appendText(`${prefix}[finalExamYear]`, item.finalExamYear);
-          appendText(`${prefix}[finalExamScore]`, item.finalExamScore);
-          appendFile(`${prefix}[diplomaFile]`, item.diplomaFile);
-          appendFile(`${prefix}[transcriptFile]`, item.transcriptFile);
+          appendK12Record(`highSchoolEducation[${index}]`, item);
         });
       }
 
