@@ -509,6 +509,30 @@ export const UseSkills = () => {
         formData.append("computerSkillsFile", data.computerSkillsFile);
       }
 
+      if (data.communicationSkillsFile instanceof File) {
+        formData.append("communicationSkillsFile", data.communicationSkillsFile);
+      }
+
+      if (data.teamworkSkillsFile instanceof File) {
+        formData.append("teamworkSkillsFile", data.teamworkSkillsFile);
+      }
+
+      if (data.leadershipSkillsFile instanceof File) {
+        formData.append("leadershipSkillsFile", data.leadershipSkillsFile);
+      }
+
+      if (data.problemSolvingFile instanceof File) {
+        formData.append("problemSolvingFile", data.problemSolvingFile);
+      }
+
+      if (data.timeManagementFile instanceof File) {
+        formData.append("timeManagementFile", data.timeManagementFile);
+      }
+
+      if (data.presentationSkillsFile instanceof File) {
+        formData.append("presentationSkillsFile", data.presentationSkillsFile);
+      }
+
       const response = await axios.post("/api/application/skills", formData);
 
       if (!response.data) {

@@ -1,6 +1,6 @@
 "use client";
 
-import {  useEffect } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -23,8 +23,17 @@ export interface SkillsPayload {
   hasTimeManagement: "Yes" | "No";
   hasPresentationSkills: "Yes" | "No";
   computerSkillsFile?: File;
+  communicationSkillsFile?: File;
+  teamworkSkillsFile?: File;
+  leadershipSkillsFile?: File;
+  problemSolvingFile?: File;
+  timeManagementFile?: File;
+  presentationSkillsFile?: File;
   userId: string;
 }
+
+// Define file field keys type
+type FileFieldKeys = Extract<keyof SkillsPayload, `${string}File`>;
 
 // Zod Validation Schema
 const skillsSchema = z
@@ -43,22 +52,49 @@ const skillsSchema = z
     hasTimeManagement: z.enum(["Yes", "No"]),
     hasPresentationSkills: z.enum(["Yes", "No"]),
     computerSkillsFile: z
-      .instanceof(File, { message: "Document is required" })
-      .refine((file) => file.size <= 10 * 1024 * 1024, {
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
         message: "File size must be less than 10MB",
-      })
-      .optional(),
+      }),
+    communicationSkillsFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
+    teamworkSkillsFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
+    leadershipSkillsFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
+    problemSolvingFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
+    timeManagementFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
+    presentationSkillsFile: z
+      .instanceof(File)
+      .optional()
+      .refine((file) => !file || file.size <= 10 * 1024 * 1024, {
+        message: "File size must be less than 10MB",
+      }),
   })
   .superRefine((data, ctx) => {
-    // If hasComputerSkills is "Yes", validate that a file is provided
-    if (data.hasComputerSkills === "Yes" && !data.computerSkillsFile) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Computer skills document is required",
-        path: ["computerSkillsFile"],
-      });
-    }
-
     // If hasMediaContentCreation is "Yes", validate that youtubeLink is provided
     if (data.hasMediaContentCreation === "Yes" && !data.youtubeLink) {
       ctx.addIssue({
@@ -75,8 +111,8 @@ interface Props {
   onChange?: (data: Partial<SkillsPayload>) => void;
 }
 
-// Icons
-const Icons = {
+// Icons organized like LanguageIcons
+export const SkillIcons = {
   Computer: ({ className = "w-4 h-4" }) => (
     <svg
       className={className}
@@ -271,29 +307,38 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
       hasTimeManagement: "No",
       hasPresentationSkills: "No",
       computerSkillsFile: undefined,
+      communicationSkillsFile: undefined,
+      teamworkSkillsFile: undefined,
+      leadershipSkillsFile: undefined,
+      problemSolvingFile: undefined,
+      timeManagementFile: undefined,
+      presentationSkillsFile: undefined,
     },
   });
 
-  const hasComputerSkills = watch("hasComputerSkills");
   const hasMediaContentCreation = watch("hasMediaContentCreation");
 
-  // Handle file changes
-  const handleFileChange = (file: File) => {
-    setValue("computerSkillsFile", file);
-    trigger("computerSkillsFile");
-    onChange?.({
-      hasComputerSkills,
-      computerSkillsFile: file,
-    });
+  // Handle file changes with proper typing
+  const handleFileChange = (field: FileFieldKeys) => (file: File) => {
+    setValue(field as keyof SkillsFormData, file);
+    trigger(field as keyof SkillsFormData);
+
+    // Create partial payload for onChange callback
+    const partialPayload: Partial<SkillsPayload> = {
+      [field]: file,
+    };
+    onChange?.(partialPayload);
   };
 
-  const handleFileRemove = () => {
-    setValue("computerSkillsFile", undefined);
-    trigger("computerSkillsFile");
-    onChange?.({
-      hasComputerSkills,
-      computerSkillsFile: undefined,
-    });
+  const handleFileRemove = (field: FileFieldKeys) => () => {
+    setValue(field as keyof SkillsFormData, undefined);
+    trigger(field as keyof SkillsFormData);
+
+    // Create partial payload for onChange callback
+    const partialPayload: Partial<SkillsPayload> = {
+      [field]: undefined,
+    };
+    onChange?.(partialPayload);
   };
 
   useEffect(() => {
@@ -311,7 +356,6 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
   }
 
   const onSubmit = async (data: SkillsFormData) => {
-    // Trigger validation first
     const isValid = await trigger();
 
     if (!isValid) {
@@ -329,7 +373,13 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
       hasTimeManagement: data.hasTimeManagement,
       hasPresentationSkills: data.hasPresentationSkills,
       computerSkillsFile: data.computerSkillsFile,
-      userId: userSession?.user?._id || '',
+      communicationSkillsFile: data.communicationSkillsFile,
+      teamworkSkillsFile: data.teamworkSkillsFile,
+      leadershipSkillsFile: data.leadershipSkillsFile,
+      problemSolvingFile: data.problemSolvingFile,
+      timeManagementFile: data.timeManagementFile,
+      presentationSkillsFile: data.presentationSkillsFile,
+      userId: userSession?.user?._id || "",
     };
 
     mutation.mutate(submissionData);
@@ -340,63 +390,89 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
     name,
     label,
     icon,
+    showFileUpload = false,
+    fileFieldName,
   }: {
     name: keyof SkillsFormData;
     label: string;
     icon: React.ReactNode;
+    showFileUpload?: boolean;
+    fileFieldName?: FileFieldKeys;
   }) => {
     const value = watch(name) as "Yes" | "No";
+    const showUpload = showFileUpload && value === "Yes";
+    const currentFile = fileFieldName
+      ? getValues(fileFieldName as keyof SkillsFormData)
+      : undefined;
+    const fileError = fileFieldName
+      ? errors[fileFieldName as keyof SkillsFormData]?.message
+      : undefined;
 
     return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          {icon}
-          <span className="text-sm font-medium">{label}</span>
-        </div>
-        <div className="flex gap-6">
-          {["Yes", "No"].map((option) => (
-            <label
-              key={option}
-              className="flex items-center gap-2 cursor-pointer group"
-            >
-              <div className="relative">
-                <input
-                  type="radio"
-                  value={option}
-                  checked={value === option}
-                  onChange={(e) =>
-                    setValue(name, e.target.value as "Yes" | "No")
-                  }
-                  className="sr-only"
-                />
-                <div
-                  className={`w-4 h-4 rounded-sm transition-all duration-300 ${
-                    value === option
-                      ? "border-[#00A3FF] bg-[#00A3FF]"
-                      : "border border-gray-300 dark:border-[#064e78] group-hover:border-[#00A3FF]"
-                  }`}
-                >
-                  {value === option && (
-                    <svg
-                      className="w-full h-full text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            {icon}
+            <span className="text-sm font-medium">{label}</span>
+          </div>
+          <div className="flex gap-6">
+            {["Yes", "No"].map((option) => (
+              <label
+                key={option}
+                className="flex items-center gap-2 cursor-pointer group"
+              >
+                <div className="relative">
+                  <input
+                    type="radio"
+                    value={option}
+                    checked={value === option}
+                    onChange={(e) =>
+                      setValue(name, e.target.value as "Yes" | "No")
+                    }
+                    className="sr-only"
+                  />
+                  <div
+                    className={`w-4 h-4 rounded-sm transition-all duration-300 ${
+                      value === option
+                        ? "border-[#00A3FF] bg-[#00A3FF]"
+                        : "border border-gray-300 dark:border-[#064e78] group-hover:border-[#00A3FF]"
+                    }`}
+                  >
+                    {value === option && (
+                      <svg
+                        className="w-full h-full text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <span className="text-xs text-gray-600 dark:text-gray-400">
-                {option}
-              </span>
-            </label>
-          ))}
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {option}
+                </span>
+              </label>
+            ))}
+          </div>
+          {errors[name] && (
+            <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>
+          )}
         </div>
-        {errors[name] && (
-          <p className="text-red-500 text-xs mt-1">{errors[name]?.message}</p>
+
+        {showUpload && fileFieldName && (
+          <div className="pl-4 border-l-2 border-[#00A3FF]">
+            <FileUpload
+              id={`${String(fileFieldName)}-upload`}
+              label="Upload Document"
+              onFileAccepted={handleFileChange(fileFieldName)}
+              onFileRemove={handleFileRemove(fileFieldName)}
+              error={fileError}
+              currentFile={currentFile as File | undefined}
+            />
+          </div>
         )}
       </div>
     );
@@ -422,32 +498,25 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
               {/* Skills Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Computer Skills */}
-                <div className="space-y-4">
-                  <RadioOption
-                    name="hasComputerSkills"
-                    label="Computer Skills"
-                    icon={<Icons.Computer className="w-4 h-4 text-[#00A3FF]" />}
-                  />
-
-                  {hasComputerSkills === "Yes" && (
-                    <div className="mt-4 pl-4 border-l-2 border-[#00A3FF]">
-                      <FileUpload
-                        id="computer-skills-file"
-                        label="Upload Document (Certificate)"
-                        onFileAccepted={handleFileChange}
-                        onFileRemove={handleFileRemove}
-                        error={errors.computerSkillsFile?.message}
-                        currentFile={getValues("computerSkillsFile")}
-                      />
-                    </div>
-                  )}
-                </div>
+                <RadioOption
+                  name="hasComputerSkills"
+                  label="Computer Skills"
+                  icon={
+                    <SkillIcons.Computer className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="computerSkillsFile"
+                />
 
                 {/* Communication Skills */}
                 <RadioOption
                   name="hasCommunicationSkills"
                   label="Communication Skills"
-                  icon={<Icons.Communication className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.Communication className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="communicationSkillsFile"
                 />
 
                 {/* Media Content Creation */}
@@ -455,7 +524,9 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
                   <RadioOption
                     name="hasMediaContentCreation"
                     label="Media Content Creation"
-                    icon={<Icons.Media className="w-4 h-4 text-[#00A3FF]" />}
+                    icon={
+                      <SkillIcons.Media className="w-4 h-4 text-[#00A3FF]" />
+                    }
                   />
 
                   {hasMediaContentCreation === "Yes" && (
@@ -465,7 +536,7 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
                         type="url"
                         register={register("youtubeLink")}
                         placeholder="https://youtube.com/..."
-                        icon={<Icons.Media className="w-4 h-4" />}
+                        icon={<SkillIcons.Media className="w-4 h-4" />}
                         error={errors.youtubeLink?.message}
                       />
                     </div>
@@ -476,35 +547,55 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
                 <RadioOption
                   name="hasTeamworkSkills"
                   label="Teamwork Skills"
-                  icon={<Icons.Teamwork className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.Teamwork className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="teamworkSkillsFile"
                 />
 
                 {/* Leadership Skills */}
                 <RadioOption
                   name="hasLeadershipSkills"
                   label="Leadership Skills"
-                  icon={<Icons.Leadership className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.Leadership className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="leadershipSkillsFile"
                 />
 
                 {/* Problem Solving */}
                 <RadioOption
                   name="hasProblemSolving"
                   label="Problem Solving"
-                  icon={<Icons.ProblemSolving className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.ProblemSolving className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="problemSolvingFile"
                 />
 
                 {/* Time Management */}
                 <RadioOption
                   name="hasTimeManagement"
                   label="Time Management"
-                  icon={<Icons.TimeManagement className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.TimeManagement className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="timeManagementFile"
                 />
 
                 {/* Presentation Skills */}
                 <RadioOption
                   name="hasPresentationSkills"
                   label="Presentation Skills"
-                  icon={<Icons.Presentation className="w-4 h-4 text-[#00A3FF]" />}
+                  icon={
+                    <SkillIcons.Presentation className="w-4 h-4 text-[#00A3FF]" />
+                  }
+                  showFileUpload={true}
+                  fileFieldName="presentationSkillsFile"
                 />
               </div>
 
@@ -535,7 +626,7 @@ const SkillsForm: React.FC<Props> = ({ onChange }) => {
                     ) : (
                       <>
                         <span>Save & Continue</span>
-                        <Icons.ArrowRight className="w-4 h-4" />
+                        <SkillIcons.ArrowRight className="w-4 h-4" />
                       </>
                     )}
                   </div>

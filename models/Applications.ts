@@ -186,6 +186,7 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
+    // models/Applications.ts (or wherever your model is defined)
     skills: {
       steps: { type: String, default: "false" },
       computerSkills: {
@@ -198,8 +199,13 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         },
       },
       communicationSkills: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
       mediaContentCreation: {
         hasSkill: {
@@ -212,24 +218,49 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
         },
       },
       teamworkSkills: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
       leadershipSkills: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
       problemSolving: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
       timeManagement: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
       presentationSkills: {
-        type: Boolean,
-        default: false,
+        hasSkill: {
+          type: Boolean,
+          default: false,
+        },
+        fileUrl: {
+          type: String,
+        },
       },
     },
 
