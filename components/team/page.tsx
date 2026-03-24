@@ -233,8 +233,6 @@ const TeamMemberCard = ({
               </div>
             )}
           </div>
-
-   
         </div>
 
         {/* Content */}
@@ -257,8 +255,6 @@ const TeamMemberCard = ({
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
             {bio}
           </p>
-
-
 
           {/* Social Links */}
           <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-200 dark:border-[#064e78]">
@@ -351,7 +347,6 @@ const StatCard = ({
     </motion.div>
   );
 };
-
 
 export default function AyandahaDigitalTeam() {
   const textVariants: Variants = {
@@ -497,10 +492,10 @@ export default function AyandahaDigitalTeam() {
               variants={textVariants}
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 font-mono leading-tight"
             >
-              Team{" "}
+              Our{" "}
               <span className="relative">
                 <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
-                  Members
+                  Team
                 </span>
                 <motion.span
                   className="absolute -bottom-2 left-0 w-full h-0.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF]"
@@ -516,12 +511,12 @@ export default function AyandahaDigitalTeam() {
               variants={textVariants}
               className="text-sm  text-justify text-gray-600 dark:text-gray-400 max-w-4xl mx-auto leading-relaxed"
             >
-              Our team of dedicated professionals is committed to transforming
-              educational journeys through innovation, personalized guidance,
-              and advanced technological solutions. With deep expertise and a
-              forward-thinking approach, we design strategic pathways that
-              empower students and institutions to achieve sustainable success
-              in an evolving academic landscape.
+              Our team is made up of dedicated professionals with years of
+              experience in education and academic consulting. Each member
+              brings valuable expertise and a strong understanding of
+              international education pathways—particularly scholarship
+              opportunities—enabling us to guide students with confidence and
+              insight.
             </motion.p>
 
             {/* Digital Pulse Dots */}
