@@ -1,12 +1,13 @@
 export interface Education {
-  level: string;
   fieldOfStudy?: string;
   institutionName?: string;
   gpa?: number;
   academicRank?: string;
   startDate?: Date;
+  level: string;
   graduationDate?: Date;
   educationGapExplanation?: string;
+  currentlyStudying: boolean;
   thesisTopic?: string;
   thesisFileUrl?: string;
   diplomaFileUrl?: string;
@@ -56,6 +57,7 @@ export interface Address {
 export interface Application {
   _id: string;
   userId: string;
+  level:string;
   status: "draft" | "submitted" | "under_review" | "approved" | "rejected";
   stage: string;
   personal: {
@@ -83,6 +85,7 @@ export interface Application {
     hasProjects: boolean;
     hasConferences: boolean;
     hasLabs: boolean;
+    currentlyStudying: boolean;
     hasResearchSkills: boolean;
     hasAcademicAwards: boolean;
     articles: Article[];

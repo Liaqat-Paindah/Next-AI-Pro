@@ -238,7 +238,7 @@ const GetApplicationDetails = () => {
       case "personal":
         return <PersonalInfoTab data={app.personal} />;
       case "education":
-        return <EducationTab data={app.education} />;
+        return <EducationTab data={app.education} EducationLevel ={app?.level} />;
       case "research":
         return <ResearchTab data={app.research} />;
       case "skills":
