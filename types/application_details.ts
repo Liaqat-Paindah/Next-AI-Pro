@@ -65,6 +65,10 @@ export interface Application {
     firstName: string;
     lastName: string;
     fatherName: string;
+    mother_name: string;
+    siblings: string;
+    dependents: string;
+    children: string;
     birthDate: Date;
     nationality: string;
     nationalId: string;

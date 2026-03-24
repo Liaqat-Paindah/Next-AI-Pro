@@ -77,7 +77,7 @@ class ErrorBoundary extends React.Component<
                 System Alert
               </p>
               <p className="text-sm text-red-400/80 dark:text-red-300/70">
-                Failed to load application details
+                No application details are available at the moment
               </p>
             </div>
           </div>

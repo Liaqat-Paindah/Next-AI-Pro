@@ -9,6 +9,8 @@ import {
   Fingerprint,
   CreditCard,
   CalendarClock,
+  Baby,
+  UserRound,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -23,6 +25,20 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const calculateAge = (birthDate: Date | string) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
   };
 
   return (
@@ -65,15 +81,15 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                   {`${data.firstName} ${data.lastName}`}
                 </h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {data.nationality || "Nationality not specified"}
+                  {data.nationality}
                 </p>
               </div>
             </div>
 
             {/* Age Badge */}
-            {data.age && (
+            {data.birthDate && (
               <div className="rounded-sm bg-[#00A3FF]/10 px-3 py-1 text-xs font-medium text-[#00A3FF] dark:bg-[#00A3FF]/20 dark:text-[#00A3FF]">
-                {data.age} years old
+                {calculateAge(data.birthDate)} years old
               </div>
             )}
           </div>
@@ -107,11 +123,22 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Father Name
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.fatherName || (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.fatherName}
+                  </p>
+                </div>
+              </div>
+
+              {/* Mother Name */}
+              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                  <UserRound className="h-4 w-4 text-[#00A3FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                    Mother Name
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {data.mother_name}
                   </p>
                 </div>
               </div>
@@ -126,11 +153,7 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Date of Birth
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.birthDate ? formatDate(data.birthDate) : (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {formatDate(data.birthDate)}
                   </p>
                 </div>
               </div>
@@ -145,13 +168,7 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Gender
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.gender ? (
-                      data.gender.charAt(0).toUpperCase() + data.gender.slice(1).toLowerCase()
-                    ) : (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.gender}
                   </p>
                 </div>
               </div>
@@ -166,15 +183,22 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Marital Status
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.maritalStatus ? (
-                      data.maritalStatus.split(" ").map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                      ).join(" ")
-                    ) : (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.maritalStatus}
+                  </p>
+                </div>
+              </div>
+
+              {/* Dependents */}
+              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                  <Users className="h-4 w-4 text-[#00A3FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                    Dependents
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {data.dependents}
                   </p>
                 </div>
               </div>
@@ -192,15 +216,7 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Nationality
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.nationality ? (
-                      data.nationality.split(" ").map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                      ).join(" ")
-                    ) : (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.nationality}
                   </p>
                 </div>
               </div>
@@ -215,11 +231,7 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     National ID
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white font-mono">
-                    {data.nationalId || (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.nationalId}
                   </p>
                 </div>
               </div>
@@ -234,11 +246,22 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Passport ID
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white font-mono">
-                    {data.passportId || (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
-                      </span>
-                    )}
+                    {data.passportId}
+                  </p>
+                </div>
+              </div>
+
+              {/* Passport Issue Date */}
+              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                  <CalendarClock className="h-4 w-4 text-[#00A3FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                    Passport Issue Date
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {formatDate(data.dateofIssue)}
                   </p>
                 </div>
               </div>
@@ -253,27 +276,45 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
                     Passport Expiry
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {data.dataofExpire ? (
-                      <>
-                        {formatDate(data.dataofExpire)}
-                        {new Date(data.dataofExpire) < new Date() && (
-                          <span className="ml-2 inline-flex items-center rounded-sm bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
-                            Expired
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <span className="italic text-gray-400 dark:text-gray-500">
-                        Not provided
+                    {formatDate(data.dataofExpire)}
+                    {new Date(data.dataofExpire) < new Date() && (
+                      <span className="ml-2 inline-flex items-center rounded-sm bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">
+                        Expired
                       </span>
                     )}
                   </p>
                 </div>
               </div>
+              {/* Siblings */}
+              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                  <Users className="h-4 w-4 text-[#00A3FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                    Siblings
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {data.siblings}
+                  </p>
+                </div>
+              </div>
+              {/* Children */}
+              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                  <Baby className="h-4 w-4 text-[#00A3FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                    Children
+                  </p>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {data.children || 0}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-
-  
         </div>
 
         {/* Subtle Hover Effect */}
@@ -284,6 +325,5 @@ const PersonalInfoTab = ({ data }: PersonalInfoTabProps) => {
     </div>
   );
 };
-
 
 export default PersonalInfoTab;
