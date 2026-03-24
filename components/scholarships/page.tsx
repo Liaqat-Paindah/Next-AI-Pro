@@ -3,7 +3,6 @@ import React, { useState, useMemo } from "react";
 import {
   CalendarDays,
   MapPin,
-  Sparkles,
   Trophy,
   Star,
   GraduationCap,
@@ -184,7 +183,7 @@ export default function NexusScholarships() {
   }
 
   return (
-    <section className="w-full py-4 sm:py-6 md:py-8 lg:py-12 px-3 sm:px-4 lg:px-6 xl:px-8 font-sans antialiased">
+    <section className="w-full  px-3 sm:px-4 lg:px-6 xl:px-8 antialiased">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <motion.div
