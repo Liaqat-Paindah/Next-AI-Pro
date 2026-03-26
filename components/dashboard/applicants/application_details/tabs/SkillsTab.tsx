@@ -29,13 +29,13 @@ const SkillsTab = ({ data }: SkillsTabProps) => {
   const hasAnySkills =
     data.steps !== "false" ||
     data.computerSkills.hasSkill ||
-    data.communicationSkills ||
+    data.communicationSkills.hasSkill ||
     data.mediaContentCreation.hasSkill ||
-    data.teamworkSkills ||
-    data.leadershipSkills ||
-    data.problemSolving ||
-    data.timeManagement ||
-    data.presentationSkills;
+    data.teamworkSkills.hasSkill ||
+    data.leadershipSkills.hasSkill ||
+    data.problemSolving.hasSkill ||
+    data.timeManagement.hasSkill ||
+    data.presentationSkills.hasSkill;
 
   if (!hasAnySkills) {
     return (
@@ -105,7 +105,9 @@ const SkillsTab = ({ data }: SkillsTabProps) => {
               <SkillItem
                 icon={<Mic2 className="h-4 w-4 text-[#00A3FF]" />}
                 label="Communication Skills"
-                hasSkill={data.communicationSkills}
+                hasSkill={data.communicationSkills.hasSkill}
+                fileUrl={data.communicationSkills.fileUrl}
+                fileName="Communication Skills Certificate"
               />
 
               {/* Media Content Creation */}
@@ -149,7 +151,9 @@ const SkillsTab = ({ data }: SkillsTabProps) => {
               <SkillItem
                 icon={<Users className="h-4 w-4 text-[#00A3FF]" />}
                 label="Teamwork Skills"
-                hasSkill={data.teamworkSkills}
+                hasSkill={data.teamworkSkills.hasSkill}
+                fileUrl={data.teamworkSkills.fileUrl}
+                fileName="Teamwork Skills Certificate"
               />
             </div>
 
@@ -159,28 +163,36 @@ const SkillsTab = ({ data }: SkillsTabProps) => {
               <SkillItem
                 icon={<Crown className="h-4 w-4 text-[#00A3FF]" />}
                 label="Leadership Skills"
-                hasSkill={data.leadershipSkills}
+                hasSkill={data.leadershipSkills.hasSkill}
+                fileUrl={data.leadershipSkills.fileUrl}
+                fileName="Leadership Skills Certificate"
               />
 
               {/* Problem Solving */}
               <SkillItem
                 icon={<Lightbulb className="h-4 w-4 text-[#00A3FF]" />}
                 label="Problem Solving"
-                hasSkill={data.problemSolving}
+                hasSkill={data.problemSolving.hasSkill}
+                fileUrl={data.problemSolving.fileUrl}
+                fileName="Problem Solving Certificate"
               />
 
               {/* Time Management */}
               <SkillItem
                 icon={<Clock className="h-4 w-4 text-[#00A3FF]" />}
                 label="Time Management"
-                hasSkill={data.timeManagement}
+                hasSkill={data.timeManagement.hasSkill}
+                fileUrl={data.timeManagement.fileUrl}
+                fileName="Time Management Certificate"
               />
 
               {/* Presentation Skills */}
               <SkillItem
                 icon={<Presentation className="h-4 w-4 text-[#00A3FF]" />}
                 label="Presentation Skills"
-                hasSkill={data.presentationSkills}
+                hasSkill={data.presentationSkills.hasSkill}
+                fileUrl={data.presentationSkills.fileUrl}
+                fileName="Presentation Skills Certificate"
               />
             </div>
           </div>
@@ -209,7 +221,6 @@ const SkillItem = ({
   fileUrl?: string;
   fileName?: string;
 }) => {
-
   return (
     <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
