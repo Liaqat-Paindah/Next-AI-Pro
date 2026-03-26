@@ -1,419 +1,762 @@
 import { ConnectDB } from "@/lib/config";
 import { NextRequest, NextResponse } from "next/server";
 import Applications from "@/models/Applications";
-import { saveFile } from "@/lib/file_upload"; // Path to your Vercel Blob utility
+import { saveFile } from "@/lib/file_upload";
+import type { EducationStepKey } from "@/types/application";
 
+type EducationRecord = Record<string, unknown>;
+type AssociateDecision = "yes" | "no";
+type EducationLevel =
+  | "PHD"
+  | "Master"
+  | "Bachelor"
+  | "Associate"
+  | "HighSchool"
+  | "MiddleSchool";
 
+const EDUCATION_SORT_ORDER: Record<string, number> = {
+  PHD: 0,
+  Master: 1,
+  Bachelor: 2,
+  Associate: 3,
+  "High School": 4,
+  "Secondary School": 5,
+  "Primary School": 6,
+};
 
-async function appendK12FormPrefix(
+function asString(value: FormDataEntryValue | null): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function asOptionalNumber(value: FormDataEntryValue | null): number | undefined {
+  const text = asString(value);
+  if (!text) return undefined;
+  const parsed = Number(text);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+
+function asOptionalDate(value: FormDataEntryValue | null): Date | null {
+  const text = asString(value);
+  return text ? new Date(text) : null;
+}
+
+function asBoolean(value: FormDataEntryValue | null): boolean {
+  const text = asString(value).toLowerCase();
+  return text === "true" || text === "on" || text === "1";
+}
+
+function asFile(value: FormDataEntryValue | null): File | null {
+  if (value instanceof File && value.size > 0) {
+    return value;
+  }
+  return null;
+}
+
+function hasLevel(records: EducationRecord[], level: string): boolean {
+  return records.some((record) => record.level === level);
+}
+
+function upsertEducationByLevel(
+  records: EducationRecord[],
+  level: string,
+  newRecords: EducationRecord[],
+): EducationRecord[] {
+  const filtered = records.filter((record) => record.level !== level);
+  return [...filtered, ...newRecords];
+}
+
+function sortEducation(records: EducationRecord[]): EducationRecord[] {
+  return [...records].sort((a, b) => {
+    const aLevel = typeof a.level === "string" ? a.level : "";
+    const bLevel = typeof b.level === "string" ? b.level : "";
+    const aRank = EDUCATION_SORT_ORDER[aLevel] ?? 999;
+    const bRank = EDUCATION_SORT_ORDER[bLevel] ?? 999;
+    return aRank - bRank;
+  });
+}
+
+function normalizeAssociateDecision(
+  value: FormDataEntryValue | null,
+): AssociateDecision | undefined {
+  const text = asString(value).toLowerCase();
+  if (text === "yes" || text === "no") {
+    return text;
+  }
+  return undefined;
+}
+
+function getAllowedSteps(level: EducationLevel): EducationStepKey[] {
+  switch (level) {
+    case "PHD":
+      return [
+        "phd",
+        "master",
+        "bachelor",
+        "associate-question",
+        "associate",
+        "highschool",
+      ];
+    case "Master":
+      return ["master", "bachelor", "associate-question", "associate", "highschool"];
+    case "Bachelor":
+      return ["bachelor", "associate-question", "associate", "highschool"];
+    case "Associate":
+      return ["associate", "highschool"];
+    case "HighSchool":
+      return ["highschool"];
+    case "MiddleSchool":
+      return ["primary-school", "secondary-school"];
+    default:
+      return [];
+  }
+}
+
+function nextStepForLevel(
+  level: EducationLevel,
+  step: EducationStepKey,
+  hasAssociate?: AssociateDecision,
+): EducationStepKey | "complete" | null {
+  switch (level) {
+    case "PHD":
+      if (step === "phd") return "master";
+      if (step === "master") return "bachelor";
+      if (step === "bachelor") return "associate-question";
+      if (step === "associate-question") {
+        return hasAssociate === "yes" ? "associate" : "highschool";
+      }
+      if (step === "associate") return "highschool";
+      if (step === "highschool") return "complete";
+      return null;
+    case "Master":
+      if (step === "master") return "bachelor";
+      if (step === "bachelor") return "associate-question";
+      if (step === "associate-question") {
+        return hasAssociate === "yes" ? "associate" : "highschool";
+      }
+      if (step === "associate") return "highschool";
+      if (step === "highschool") return "complete";
+      return null;
+    case "Bachelor":
+      if (step === "bachelor") return "associate-question";
+      if (step === "associate-question") {
+        return hasAssociate === "yes" ? "associate" : "highschool";
+      }
+      if (step === "associate") return "highschool";
+      if (step === "highschool") return "complete";
+      return null;
+    case "Associate":
+      if (step === "associate") return "highschool";
+      if (step === "highschool") return "complete";
+      return null;
+    case "HighSchool":
+      if (step === "highschool") return "complete";
+      return null;
+    case "MiddleSchool":
+      if (step === "primary-school") return "secondary-school";
+      if (step === "secondary-school") return "complete";
+      return null;
+    default:
+      return null;
+  }
+}
+
+function validateStepOrder(
+  level: EducationLevel,
+  step: EducationStepKey,
+  education: EducationRecord[],
+  associateDecision: AssociateDecision | undefined,
+): string | null {
+  if (!getAllowedSteps(level).includes(step)) {
+    return `Step '${step}' is not allowed for ${level}.`;
+  }
+
+  if (level === "PHD") {
+    if (step !== "phd" && !hasLevel(education, "PHD")) {
+      return "PHD information must be saved first.";
+    }
+    if (
+      (step === "bachelor" ||
+        step === "associate-question" ||
+        step === "associate" ||
+        step === "highschool") &&
+      !hasLevel(education, "Master")
+    ) {
+      return "Master information must be saved before continuing.";
+    }
+    if (
+      (step === "associate-question" || step === "associate" || step === "highschool") &&
+      !hasLevel(education, "Bachelor")
+    ) {
+      return "Bachelor information must be saved before continuing.";
+    }
+  }
+
+  if (level === "Master") {
+    if (step !== "master" && !hasLevel(education, "Master")) {
+      return "Master information must be saved first.";
+    }
+    if (
+      (step === "associate-question" || step === "associate" || step === "highschool") &&
+      !hasLevel(education, "Bachelor")
+    ) {
+      return "Bachelor information must be saved before continuing.";
+    }
+  }
+
+  if (level === "Bachelor") {
+    if (step !== "bachelor" && !hasLevel(education, "Bachelor")) {
+      return "Bachelor information must be saved first.";
+    }
+  }
+
+  if (level === "Associate") {
+    if (step === "highschool" && !hasLevel(education, "Associate")) {
+      return "Associate information must be saved before High School.";
+    }
+  }
+
+  if (level === "MiddleSchool") {
+    if (step === "secondary-school" && !hasLevel(education, "Primary School")) {
+      return "Primary school information must be saved first.";
+    }
+  }
+
+  if (step === "associate" && (level === "PHD" || level === "Master" || level === "Bachelor")) {
+    if (associateDecision !== "yes") {
+      return "Please confirm Associate Degree availability before this step.";
+    }
+  }
+
+  if (
+    step === "highschool" &&
+    (level === "PHD" || level === "Master" || level === "Bachelor") &&
+    associateDecision === "yes" &&
+    !hasLevel(education, "Associate")
+  ) {
+    return "Associate information must be saved before High School.";
+  }
+
+  return null;
+}
+
+async function buildK12Record(
   formData: FormData,
-  educationArray: Array<Record<string, unknown>>,
   prefix: string,
   level: string,
   uploadFolder: string,
-) {
-  if (!formData.get(`${prefix}[fieldOfStudy]`)) {
-    return;
+): Promise<EducationRecord | null> {
+  const fieldOfStudy = asString(formData.get(`${prefix}[fieldOfStudy]`));
+  if (!fieldOfStudy) {
+    return null;
   }
 
-  const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
-  const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
+  const diplomaFile = asFile(formData.get(`${prefix}[diplomaFile]`));
+  const transcriptFile = asFile(formData.get(`${prefix}[transcriptFile]`));
 
-  let diplomaFileUrl = "";
-  let transcriptFileUrl = "";
+  const diplomaFileUrl = diplomaFile
+    ? await saveFile(diplomaFile, uploadFolder)
+    : "";
+  const transcriptFileUrl = transcriptFile
+    ? await saveFile(transcriptFile, uploadFolder)
+    : "";
 
-  if (diplomaFile && diplomaFile.size > 0) {
-    diplomaFileUrl = await saveFile(diplomaFile, uploadFolder);
-  }
-
-  if (transcriptFile && transcriptFile.size > 0) {
-    transcriptFileUrl = await saveFile(transcriptFile, uploadFolder);
-  }
-
-  const currentlyStudyingRaw = formData.get(`${prefix}[currentlyStudying]`);
-
-  educationArray.push({
+  return {
     level,
-    fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
-    institutionName: formData.get(`${prefix}[institutionName]`) as string,
-    gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
-    academicRank: formData.get(`${prefix}[academicRank]`) as string,
-    academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
-    startDate: formData.get(`${prefix}[startDate]`)
-      ? new Date(formData.get(`${prefix}[startDate]`) as string)
-      : null,
-    graduationDate: formData.get(`${prefix}[graduationDate]`)
-      ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
-      : null,
-    finalExamYear: formData.get(`${prefix}[finalExamYear]`)
-      ? parseInt(formData.get(`${prefix}[finalExamYear]`) as string)
-      : undefined,
-    finalExamScore: formData.get(`${prefix}[finalExamScore]`)
-      ? parseInt(formData.get(`${prefix}[finalExamScore]`) as string)
-      : undefined,
-    currentlyStudying: String(currentlyStudyingRaw) === "true",
+    fieldOfStudy,
+    institutionName: asString(formData.get(`${prefix}[institutionName]`)),
+    gpa: asOptionalNumber(formData.get(`${prefix}[gpa]`)),
+    academicRank: asString(formData.get(`${prefix}[academicRank]`)),
+    educationGapExplanation: asString(formData.get(`${prefix}[academic_gap]`)),
+    startDate: asOptionalDate(formData.get(`${prefix}[startDate]`)),
+    graduationDate: asOptionalDate(formData.get(`${prefix}[graduationDate]`)),
+    finalExamYear: asOptionalNumber(formData.get(`${prefix}[finalExamYear]`)),
+    finalExamScore: asOptionalNumber(
+      formData.get(`${prefix}[finalExamScore]`),
+    ),
+    currentlyStudying: asBoolean(formData.get(`${prefix}[currentlyStudying]`)),
     diplomaFileUrl,
     transcriptFileUrl,
+  };
+}
+
+async function buildHigherEducationRecord(
+  formData: FormData,
+  prefix: string,
+  level: string,
+  uploadFolder: string,
+): Promise<EducationRecord | null> {
+  const fieldOfStudy = asString(formData.get(`${prefix}[fieldOfStudy]`));
+  if (!fieldOfStudy) {
+    return null;
+  }
+
+  const diplomaFile = asFile(formData.get(`${prefix}[diplomaFile]`));
+  const transcriptFile = asFile(formData.get(`${prefix}[transcriptFile]`));
+  const thesisFile = asFile(formData.get(`${prefix}[thesisFile]`));
+
+  const diplomaFileUrl = diplomaFile
+    ? await saveFile(diplomaFile, uploadFolder)
+    : "";
+  const transcriptFileUrl = transcriptFile
+    ? await saveFile(transcriptFile, uploadFolder)
+    : "";
+  const thesisFileUrl = thesisFile
+    ? await saveFile(thesisFile, `${uploadFolder}/theses`)
+    : "";
+
+  return {
+    level,
+    fieldOfStudy,
+    institutionName: asString(formData.get(`${prefix}[institutionName]`)),
+    gpa: asOptionalNumber(formData.get(`${prefix}[gpa]`)),
+    academicRank: asString(formData.get(`${prefix}[academicRank]`)),
+    educationGapExplanation: asString(formData.get(`${prefix}[academic_gap]`)),
+    startDate: asOptionalDate(formData.get(`${prefix}[startDate]`)),
+    graduationDate: asOptionalDate(formData.get(`${prefix}[graduationDate]`)),
+    currentlyStudying: asBoolean(formData.get(`${prefix}[currentlyStudying]`)),
+    thesisTopic: asString(formData.get(`${prefix}[thesisTopic]`)),
+    thesisFileUrl,
+    diplomaFileUrl,
+    transcriptFileUrl,
+  };
+}
+
+async function collectIndexedK12(
+  formData: FormData,
+  basePrefix: string,
+  level: string,
+  folder: string,
+): Promise<EducationRecord[]> {
+  const records: EducationRecord[] = [];
+  let index = 0;
+  while (formData.get(`${basePrefix}[${index}][fieldOfStudy]`)) {
+    const record = await buildK12Record(
+      formData,
+      `${basePrefix}[${index}]`,
+      level,
+      folder,
+    );
+    if (record) {
+      records.push(record);
+    }
+    index += 1;
+  }
+  return records;
+}
+
+async function collectIndexedHigherEducation(
+  formData: FormData,
+  basePrefix: string,
+  level: string,
+  folder: string,
+): Promise<EducationRecord[]> {
+  const records: EducationRecord[] = [];
+  let index = 0;
+  while (formData.get(`${basePrefix}[${index}][fieldOfStudy]`)) {
+    const record = await buildHigherEducationRecord(
+      formData,
+      `${basePrefix}[${index}]`,
+      level,
+      folder,
+    );
+    if (record) {
+      records.push(record);
+    }
+    index += 1;
+  }
+  return records;
+}
+
+async function parseLegacyEducation(
+  formData: FormData,
+  applicantLevel: string,
+): Promise<EducationRecord[]> {
+  const education: EducationRecord[] = [];
+
+  const primaryLevel =
+    applicantLevel === "MiddleSchool" ? "Primary School" : "Associate";
+  const primaryFolder =
+    applicantLevel === "MiddleSchool" ? "primaryschool" : "associate";
+  const primaryRecord = await buildK12Record(
+    formData,
+    "primarySchool",
+    primaryLevel,
+    primaryFolder,
+  );
+  if (primaryRecord) {
+    education.push(primaryRecord);
+  }
+
+  const associate14thRecord = await buildK12Record(
+    formData,
+    "associate14thEducation",
+    "Associate",
+    "associate",
+  );
+  if (associate14thRecord) {
+    education.push(associate14thRecord);
+  }
+
+  education.push(
+    ...(await collectIndexedK12(
+      formData,
+      "highSchoolEducation",
+      "High School",
+      "highschool",
+    )),
+  );
+  education.push(
+    ...(await collectIndexedK12(
+      formData,
+      "secondarySchoolEducation",
+      "Secondary School",
+      "secondaryschool",
+    )),
+  );
+
+  const bachelorSingle = await buildHigherEducationRecord(
+    formData,
+    "bachelorEducation",
+    "Bachelor",
+    "bachelor",
+  );
+  if (bachelorSingle) {
+    education.push(bachelorSingle);
+  }
+  education.push(
+    ...(await collectIndexedHigherEducation(
+      formData,
+      "bachelorEducation",
+      "Bachelor",
+      "bachelor",
+    )),
+  );
+
+  const masterSingle = await buildHigherEducationRecord(
+    formData,
+    "masterEducation",
+    "Master",
+    "master",
+  );
+  if (masterSingle) {
+    education.push(masterSingle);
+  }
+  education.push(
+    ...(await collectIndexedHigherEducation(
+      formData,
+      "masterEducation",
+      "Master",
+      "master",
+    )),
+  );
+
+  const phdSingle = await buildHigherEducationRecord(
+    formData,
+    "phdEducation",
+    "PHD",
+    "phd",
+  );
+  if (phdSingle) {
+    education.push(phdSingle);
+  }
+  education.push(
+    ...(await collectIndexedHigherEducation(
+      formData,
+      "phdEducation",
+      "PHD",
+      "phd",
+    )),
+  );
+
+  return sortEducation(education);
+}
+
+function getMongooseEducationRecords(value: unknown): EducationRecord[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((entry) => {
+    if (
+      entry &&
+      typeof entry === "object" &&
+      "toObject" in entry &&
+      typeof (entry as { toObject?: () => unknown }).toObject === "function"
+    ) {
+      return (entry as { toObject: () => EducationRecord }).toObject();
+    }
+    return entry as EducationRecord;
   });
+}
+
+function toEducationLevel(value: string): EducationLevel | null {
+  if (
+    value === "PHD" ||
+    value === "Master" ||
+    value === "Bachelor" ||
+    value === "Associate" ||
+    value === "HighSchool" ||
+    value === "MiddleSchool"
+  ) {
+    return value;
+  }
+  return null;
 }
 
 export async function POST(req: NextRequest) {
   await ConnectDB();
 
   try {
-    // Parse FormData
     const formData = await req.formData();
-
-    const userId = formData.get("userId") as string;
-    const level = formData.get("level") as string;
-    const applicantLevel = level;
-
-    const educationArray: Array<Record<string, unknown>> = [];
-
-    // ==================== PRIMARY (middle-school–only) OR 14TH / ASSOCIATE (graduate path, yes) ====================
-    if (formData.get(`primarySchool[fieldOfStudy]`)) {
-      const primaryLevel =
-        applicantLevel === "MiddleSchool" ? "Primary School" : "Associate";
-      const primaryFolder =
-        applicantLevel === "MiddleSchool" ? "primaryschool" : "associate";
-      await appendK12FormPrefix(
-        formData,
-        educationArray,
-        "primarySchool",
-        primaryLevel,
-        primaryFolder,
-      );
-    }
-
-    // ==================== 14TH GRADE / ASSOCIATE (highest level = Associate) ====================
-    await appendK12FormPrefix(
-      formData,
-      educationArray,
-      "associate14thEducation",
-      "Associate",
-      "associate",
+    const userId = asString(formData.get("userId"));
+    const levelRaw = asString(formData.get("level"));
+    const level = toEducationLevel(levelRaw);
+    const rawStep = asString(formData.get("step"));
+    const step = (rawStep || undefined) as EducationStepKey | undefined;
+    const hasAssociateFromRequest = normalizeAssociateDecision(
+      formData.get("hasAssociate14thDegree"),
     );
 
-    // ==================== PROCESS HIGH SCHOOL EDUCATION ====================
-    let index = 0;
-    while (formData.get(`highSchoolEducation[${index}][fieldOfStudy]`)) {
-      await appendK12FormPrefix(
-        formData,
-        educationArray,
-        `highSchoolEducation[${index}]`,
-        "High School",
-        "highschool",
+    if (!userId || !level) {
+      return NextResponse.json(
+        { success: false, message: "Valid userId and level are required." },
+        { status: 400 },
       );
-      index++;
     }
 
-    // ==================== SECONDARY SCHOOL (middle-school–only applicants) ====================
-    index = 0;
-    while (
-      formData.get(`secondarySchoolEducation[${index}][fieldOfStudy]`)
-    ) {
-      await appendK12FormPrefix(
-        formData,
-        educationArray,
-        `secondarySchoolEducation[${index}]`,
-        "Secondary School",
-        "secondaryschool",
+    if (step) {
+      const existingApplication = await Applications.findOne({ userId });
+      if (!existingApplication) {
+        return NextResponse.json(
+          { success: false, message: "Application not found for this user." },
+          { status: 404 },
+        );
+      }
+
+      let education = getMongooseEducationRecords(existingApplication.education);
+      let associateDecision: AssociateDecision | undefined =
+        hasAssociateFromRequest ||
+        (existingApplication.hasAssociate14thDegree as AssociateDecision | undefined);
+
+      const guardError = validateStepOrder(
+        level,
+        step,
+        education,
+        associateDecision,
       );
-      index++;
-    }
-
-    // ==================== PROCESS BACHELOR EDUCATION (Multiple) ====================
-    index = 0;
-    while (formData.get(`bachelorEducation[${index}][fieldOfStudy]`)) {
-      const prefix = `bachelorEducation[${index}]`;
-
-      // Get files
-      const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
-      const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
-      const thesisFile = formData.get(`${prefix}[thesisFile]`) as File; // Bachelor might have thesis in your data
-
-      // Upload files
-      let diplomaFileUrl = "";
-      let transcriptFileUrl = "";
-      let thesisFileUrl = "";
-
-      if (diplomaFile && diplomaFile.size > 0) {
-        diplomaFileUrl = await saveFile(diplomaFile, "bachelor");
+      if (guardError) {
+        return NextResponse.json(
+          { success: false, message: guardError },
+          { status: 400 },
+        );
       }
 
-      if (transcriptFile && transcriptFile.size > 0) {
-        transcriptFileUrl = await saveFile(transcriptFile, "bachelor");
+      switch (step) {
+        case "phd": {
+          const phdRecord = await buildHigherEducationRecord(
+            formData,
+            "phdEducation",
+            "PHD",
+            "phd",
+          );
+          if (!phdRecord) {
+            return NextResponse.json(
+              { success: false, message: "PHD details are required for this step." },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "PHD", [phdRecord]);
+          break;
+        }
+        case "master": {
+          const masterRecord = await buildHigherEducationRecord(
+            formData,
+            "masterEducation",
+            "Master",
+            "master",
+          );
+          if (!masterRecord) {
+            return NextResponse.json(
+              { success: false, message: "Master details are required for this step." },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "Master", [masterRecord]);
+          break;
+        }
+        case "bachelor": {
+          const bachelorRecord =
+            (await buildHigherEducationRecord(
+              formData,
+              "bachelorEducation[0]",
+              "Bachelor",
+              "bachelor",
+            )) ||
+            (await buildHigherEducationRecord(
+              formData,
+              "bachelorEducation",
+              "Bachelor",
+              "bachelor",
+            ));
+          if (!bachelorRecord) {
+            return NextResponse.json(
+              { success: false, message: "Bachelor details are required for this step." },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "Bachelor", [bachelorRecord]);
+          break;
+        }
+        case "associate-question": {
+          if (!associateDecision) {
+            return NextResponse.json(
+              {
+                success: false,
+                message:
+                  "Please answer whether you have an Associate Degree (14th Grade).",
+              },
+              { status: 400 },
+            );
+          }
+          if (associateDecision === "no") {
+            education = education.filter((record) => record.level !== "Associate");
+          }
+          break;
+        }
+        case "associate": {
+          const prefix = level === "Associate" ? "associate14thEducation" : "primarySchool";
+          const associateRecord = await buildK12Record(
+            formData,
+            prefix,
+            "Associate",
+            "associate",
+          );
+          if (!associateRecord) {
+            return NextResponse.json(
+              { success: false, message: "Associate details are required for this step." },
+              { status: 400 },
+            );
+          }
+          if (level !== "Associate") {
+            associateDecision = "yes";
+          }
+          education = upsertEducationByLevel(education, "Associate", [associateRecord]);
+          break;
+        }
+        case "highschool": {
+          const highSchoolRecord =
+            (await buildK12Record(
+              formData,
+              "highSchoolEducation[0]",
+              "High School",
+              "highschool",
+            )) ||
+            (await buildK12Record(
+              formData,
+              "highSchoolEducation",
+              "High School",
+              "highschool",
+            ));
+          if (!highSchoolRecord) {
+            return NextResponse.json(
+              { success: false, message: "High School details are required for this step." },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "High School", [highSchoolRecord]);
+          break;
+        }
+        case "primary-school": {
+          const primaryRecord = await buildK12Record(
+            formData,
+            "primarySchool",
+            "Primary School",
+            "primaryschool",
+          );
+          if (!primaryRecord) {
+            return NextResponse.json(
+              {
+                success: false,
+                message: "Primary School details are required for this step.",
+              },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "Primary School", [
+            primaryRecord,
+          ]);
+          break;
+        }
+        case "secondary-school": {
+          const secondaryRecord =
+            (await buildK12Record(
+              formData,
+              "secondarySchoolEducation[0]",
+              "Secondary School",
+              "secondaryschool",
+            )) ||
+            (await buildK12Record(
+              formData,
+              "secondarySchoolEducation",
+              "Secondary School",
+              "secondaryschool",
+            ));
+          if (!secondaryRecord) {
+            return NextResponse.json(
+              {
+                success: false,
+                message: "Secondary School details are required for this step.",
+              },
+              { status: 400 },
+            );
+          }
+          education = upsertEducationByLevel(education, "Secondary School", [
+            secondaryRecord,
+          ]);
+          break;
+        }
+        default: {
+          return NextResponse.json(
+            { success: false, message: "Invalid step supplied for education save." },
+            { status: 400 },
+          );
+        }
       }
 
-      if (thesisFile && thesisFile.size > 0) {
-        thesisFileUrl = await saveFile(thesisFile, "bachelor/theses");
+      education = sortEducation(education);
+
+      const updatePayload: Record<string, unknown> = {
+        level,
+        education,
+      };
+      if (associateDecision) {
+        updatePayload.hasAssociate14thDegree = associateDecision;
       }
 
-      // Create education object
-      educationArray.push({
-        level: "Bachelor",
-        fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
-        institutionName: formData.get(`${prefix}[institutionName]`) as string,
-        gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
-        academicRank: formData.get(`${prefix}[academicRank]`) as string,
-        academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
-        startDate: formData.get(`${prefix}[startDate]`)
-          ? new Date(formData.get(`${prefix}[startDate]`) as string)
-          : null,
-        graduationDate: formData.get(`${prefix}[graduationDate]`)
-          ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
-          : null,
-        thesisTopic: formData.get(`${prefix}[thesisTopic]`) as string,
-        thesisFileUrl,
-        diplomaFileUrl,
-        transcriptFileUrl,
+      const updatedApplication = await Applications.findOneAndUpdate(
+        { userId },
+        updatePayload,
+        { returnDocument: "after", runValidators: true },
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: "Education step saved successfully.",
+        data: updatedApplication,
+        educationCount: education.length,
+        nextStep: nextStepForLevel(level, step, associateDecision),
       });
-
-      index++;
     }
 
-    // ==================== PROCESS MASTER EDUCATION ====================
-    index = 0;
-    while (formData.get(`masterEducation[${index}][fieldOfStudy]`)) {
-      const prefix = `masterEducation[${index}]`;
-
-      const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
-      const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
-      const thesisFile = formData.get(`${prefix}[thesisFile]`) as File;
-
-      let diplomaFileUrl = "";
-      let transcriptFileUrl = "";
-      let thesisFileUrl = "";
-
-      if (diplomaFile && diplomaFile.size > 0) {
-        diplomaFileUrl = await saveFile(diplomaFile, "master");
-      }
-
-      if (transcriptFile && transcriptFile.size > 0) {
-        transcriptFileUrl = await saveFile(transcriptFile, "master");
-      }
-
-      if (thesisFile && thesisFile.size > 0) {
-        thesisFileUrl = await saveFile(thesisFile, "master/theses");
-      }
-
-      educationArray.push({
-        level: "Master",
-        fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
-        institutionName: formData.get(`${prefix}[institutionName]`) as string,
-        gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
-        academicRank: formData.get(`${prefix}[academicRank]`) as string,
-        academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
-        startDate: formData.get(`${prefix}[startDate]`)
-          ? new Date(formData.get(`${prefix}[startDate]`) as string)
-          : null,
-        graduationDate: formData.get(`${prefix}[graduationDate]`)
-          ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
-          : null,
-        thesisTopic: formData.get(`${prefix}[thesisTopic]`) as string,
-        thesisFileUrl,
-        diplomaFileUrl,
-        transcriptFileUrl,
-      });
-
-      index++;
+    const education = await parseLegacyEducation(formData, level);
+    const updatePayload: Record<string, unknown> = { level, education };
+    if (hasAssociateFromRequest) {
+      updatePayload.hasAssociate14thDegree = hasAssociateFromRequest;
     }
 
-    // ==================== PROCESS PHD EDUCATION ====================
-    index = 0;
-    while (formData.get(`phdEducation[${index}][fieldOfStudy]`)) {
-      const prefix = `phdEducation[${index}]`;
-
-      const diplomaFile = formData.get(`${prefix}[diplomaFile]`) as File;
-      const transcriptFile = formData.get(`${prefix}[transcriptFile]`) as File;
-      const thesisFile = formData.get(`${prefix}[thesisFile]`) as File;
-
-      let diplomaFileUrl = "";
-      let transcriptFileUrl = "";
-      let thesisFileUrl = "";
-
-      if (diplomaFile && diplomaFile.size > 0) {
-        diplomaFileUrl = await saveFile(diplomaFile, "phd");
-      }
-
-      if (transcriptFile && transcriptFile.size > 0) {
-        transcriptFileUrl = await saveFile(transcriptFile, "phd");
-      }
-
-      if (thesisFile && thesisFile.size > 0) {
-        thesisFileUrl = await saveFile(thesisFile, "phd/theses");
-      }
-
-      educationArray.push({
-        level: "PHD",
-        fieldOfStudy: formData.get(`${prefix}[fieldOfStudy]`) as string,
-        institutionName: formData.get(`${prefix}[institutionName]`) as string,
-        gpa: parseFloat(formData.get(`${prefix}[gpa]`) as string),
-        academicRank: formData.get(`${prefix}[academicRank]`) as string,
-        academic_gap: formData.get(`${prefix}[academic_gap]`) as string,
-        startDate: formData.get(`${prefix}[startDate]`)
-          ? new Date(formData.get(`${prefix}[startDate]`) as string)
-          : null,
-        graduationDate: formData.get(`${prefix}[graduationDate]`)
-          ? new Date(formData.get(`${prefix}[graduationDate]`) as string)
-          : null,
-        thesisTopic: formData.get(`${prefix}[thesisTopic]`) as string,
-        thesisFileUrl,
-        diplomaFileUrl,
-        transcriptFileUrl,
-      });
-
-      index++;
-    }
-
-    // ==================== JSON FALLBACK FOR BACHELOR ====================
-    if (
-      !educationArray.some((edu) => edu.level === "Bachelor") &&
-      formData.get("bachelorEducation")
-    ) {
-      const bachelorData = JSON.parse(
-        formData.get("bachelorEducation") as string,
-      );
-      if (Array.isArray(bachelorData)) {
-        for (const bachelor of bachelorData) {
-          educationArray.push({
-            level: "Bachelor",
-            fieldOfStudy: bachelor.fieldOfStudy || "",
-            institutionName: bachelor.institutionName || "",
-            gpa: bachelor.gpa ? parseFloat(bachelor.gpa) : 0,
-            academicRank: bachelor.academicRank || "",
-            academic_gap: bachelor.academic_gap || "",
-            startDate: bachelor.startDate ? new Date(bachelor.startDate) : null,
-            graduationDate: bachelor.graduationDate
-              ? new Date(bachelor.graduationDate)
-              : null,
-            thesisTopic: bachelor.thesisTopic || "",
-            // Files would need to be handled separately
-          });
-        }
-      }
-    }
-
-    // ==================== JSON FALLBACK FOR MASTER ====================
-    if (
-      !educationArray.some((edu) => edu.level === "Master") &&
-      formData.get("masterEducation")
-    ) {
-      const masterData = JSON.parse(formData.get("masterEducation") as string);
-      if (Array.isArray(masterData)) {
-        for (const master of masterData) {
-          educationArray.push({
-            level: "Master",
-            fieldOfStudy: master.fieldOfStudy || "",
-            institutionName: master.institutionName || "",
-            gpa: master.gpa ? parseFloat(master.gpa) : 0,
-            academicRank: master.academicRank || "",
-            academic_gap: master.academic_gap || "",
-            startDate: master.startDate ? new Date(master.startDate) : null,
-            graduationDate: master.graduationDate
-              ? new Date(master.graduationDate)
-              : null,
-            thesisTopic: master.thesisTopic || "",
-          });
-        }
-      } else if (typeof masterData === "object") {
-        // Single master object
-        educationArray.push({
-          level: "Master",
-          fieldOfStudy: masterData.fieldOfStudy || "",
-          institutionName: masterData.institutionName || "",
-          gpa: masterData.gpa ? parseFloat(masterData.gpa) : 0,
-          academicRank: masterData.academicRank || "",
-          academic_gap: masterData.academic_gap || "",
-          startDate: masterData.startDate
-            ? new Date(masterData.startDate)
-            : null,
-          graduationDate: masterData.graduationDate
-            ? new Date(masterData.graduationDate)
-            : null,
-          thesisTopic: masterData.thesisTopic || "",
-        });
-      }
-    }
-
-    // ==================== JSON FALLBACK FOR PHD ====================
-    if (
-      !educationArray.some((edu) => edu.level === "PHD") &&
-      formData.get("phdEducation")
-    ) {
-      const phdData = JSON.parse(formData.get("phdEducation") as string);
-      if (Array.isArray(phdData)) {
-        for (const phd of phdData) {
-          educationArray.push({
-            level: "PHD",
-            fieldOfStudy: phd.fieldOfStudy || "",
-            institutionName: phd.institutionName || "",
-            gpa: phd.gpa ? parseFloat(phd.gpa) : 0,
-            academicRank: phd.academicRank || "",
-            academic_gap: phd.academic_gap || "",
-            startDate: phd.startDate ? new Date(phd.startDate) : null,
-            graduationDate: phd.graduationDate
-              ? new Date(phd.graduationDate)
-              : null,
-            thesisTopic: phd.thesisTopic || "",
-          });
-        }
-      } else if (typeof phdData === "object") {
-        // Single phd object
-        educationArray.push({
-          level: "PHD",
-          fieldOfStudy: phdData.fieldOfStudy || "",
-          institutionName: phdData.institutionName || "",
-          gpa: phdData.gpa ? parseFloat(phdData.gpa) : 0,
-          academicRank: phdData.academicRank || "",
-          academic_gap: phdData.academic_gap || "",
-          startDate: phdData.startDate ? new Date(phdData.startDate) : null,
-          graduationDate: phdData.graduationDate
-            ? new Date(phdData.graduationDate)
-            : null,
-          thesisTopic: phdData.thesisTopic || "",
-        });
-      }
-    }
-
-    // ==================== JSON FALLBACK FOR HIGH SCHOOL ====================
-    if (
-      !educationArray.some((edu) => edu.level === "High School") &&
-      formData.get("highSchoolEducation")
-    ) {
-      const highSchoolData = JSON.parse(
-        formData.get("highSchoolEducation") as string,
-      );
-      if (Array.isArray(highSchoolData)) {
-        for (const highSchool of highSchoolData) {
-          educationArray.push({
-            level: "High School",
-            fieldOfStudy: highSchool.fieldOfStudy || "",
-            institutionName: highSchool.institutionName || "",
-            gpa: highSchool.gpa ? parseFloat(highSchool.gpa) : 0,
-            academicRank: highSchool.academicRank || "",
-            academic_gap: highSchool.academic_gap || "",
-            startDate: highSchool.startDate
-              ? new Date(highSchool.startDate)
-              : null,
-            graduationDate: highSchool.graduationDate
-              ? new Date(highSchool.graduationDate)
-              : null,
-            finalExamYear: highSchool.finalExamYear
-              ? parseInt(highSchool.finalExamYear)
-              : undefined,
-            finalExamScore: highSchool.finalExamScore
-              ? parseInt(highSchool.finalExamScore)
-              : undefined,
-          });
-        }
-      }
-    }
-
-    // ==================== SAVE TO DATABASE ====================
     const application = await Applications.findOneAndUpdate(
       { userId },
-      { level, education: educationArray },
+      updatePayload,
       { returnDocument: "after", runValidators: true },
     );
 
@@ -421,7 +764,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Education saved successfully",
       data: application,
-      educationCount: educationArray.length,
+      educationCount: education.length,
     });
   } catch (error) {
     return NextResponse.json(
@@ -435,5 +778,4 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Add this if you need to handle large files
-export const maxDuration = 60; // Increase timeout if needed
+export const maxDuration = 60;

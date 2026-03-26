@@ -11,6 +11,7 @@ import { AcademicPreferencesData } from "@/types/academicPreferences";
 import {
   AcademicArticlesPayload,
   EducationFormDataField,
+  EducationStepKey,
   K12SchoolRecord,
   PersonalInfoFormData,
   VisionGoalsFormData,
@@ -53,7 +54,14 @@ export const UseEducationInformation = () => {
 
   return useMutation({
     mutationKey: ["UsePersonalInformation"],
-    mutationFn: async (data: EducationFormDataField) => {
+    mutationFn: async ({
+      data,
+      stepKey,
+    }: {
+      data: EducationFormDataField;
+      stepKey?: EducationStepKey;
+      finalizeFlow?: boolean;
+    }) => {
       const formData = new FormData();
 
       const appendText = (key: string, value: unknown) => {
@@ -71,6 +79,9 @@ export const UseEducationInformation = () => {
 
       appendText("userId", data.userId);
       appendText("level", data.level);
+      if (stepKey) {
+        appendText("step", stepKey);
+      }
 
       const appendK12Record = (
         prefix: string,
@@ -201,13 +212,15 @@ export const UseEducationInformation = () => {
       }
       return response.data;
     },
-    onSuccess: () => {
-      toast.success("Educational information has been successfully saved");
-      router.push("/dashboard/applicants/academicArticales");
+    onSuccess: (_response, variables) => {
+      if (variables.finalizeFlow) {
+        toast.success("Educational information has been successfully saved");
+        router.push("/dashboard/applicants/academicArticales");
+      }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error("Upload error:", error);
-      toast.error(`Failed to save educational information ${error}`);
+      toast.error(error.message || "Failed to save educational information");
     },
   });
 };
