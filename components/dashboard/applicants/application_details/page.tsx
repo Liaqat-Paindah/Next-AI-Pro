@@ -17,6 +17,7 @@ import {
   Wrench,
   Calendar,
   Award,
+  Briefcase,
   AlertCircle,
   Download,
   ChevronDown,
@@ -41,6 +42,7 @@ import FinancialTab from "@/components/dashboard/applicants/application_details/
 import GoalsTab from "@/components/dashboard/applicants/application_details/tabs/GoalsTab";
 import DocumentsTab from "@/components/dashboard/applicants/application_details/tabs/DocumentsTab";
 import ContactTab from "@/components/dashboard/applicants/application_details/tabs/ContactTab";
+import ActivitiesTab from "@/components/dashboard/applicants/application_details/tabs/ActivitiesTab";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -155,6 +157,7 @@ const GetApplicationDetails = () => {
     { id: "personal", label: "Personal Info", icon: User },
     { id: "education", label: "Education", icon: GraduationCap },
     { id: "research", label: "Research", icon: FlaskConical },
+    { id: "activities", label: "Activities", icon: Briefcase },
     { id: "skills", label: "Skills", icon: Wrench },
     { id: "languages", label: "Languages", icon: Languages },
     { id: "health", label: "Health", icon: Heart },
@@ -241,6 +244,8 @@ const GetApplicationDetails = () => {
         return <EducationTab data={app.education} EducationLevel ={app?.level} />;
       case "research":
         return <ResearchTab data={app.research} />;
+      case "activities":
+        return <ActivitiesTab data={app.activities} />;
       case "skills":
         return <SkillsTab data={app.skills} />;
       case "languages":

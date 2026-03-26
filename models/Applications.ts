@@ -191,7 +191,6 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
-    // models/Applications.ts (or wherever your model is defined)
     skills: {
       steps: { type: String, default: "false" },
       computerSkills: {

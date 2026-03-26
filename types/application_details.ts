@@ -152,7 +152,7 @@ languages: {
     level?: "Basic" | "Intermediate" | "Advanced" | "Fluent";
   };
 };
-  activities: Array<{ type: string; fileUrl?: string }>;
+  activities: Array<{ type: string; fileUrl?: string | null }>;
   health: {
     specialDiseases?: string;
     disabilityNeeds?: string;
