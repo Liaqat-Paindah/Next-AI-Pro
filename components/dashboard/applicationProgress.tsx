@@ -322,24 +322,21 @@ const ApplicationProgress = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm  transition-colors duration-200">
-                <Link
-                  href="/dashboard/applicants/application_details"
-                  className="text-sm font-medium capitalize text-gray-600 dark:text-gray-300 hover:text-[#00A3FF] dark:hover:text-[#00A3FF] transition-colors duration-200"
-                >
-                  My Application
-                </Link>
-              </div>
-              <div className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-sm">
-                <span className="text-sm font-medium capitalize text-gray-600 dark:text-gray-300">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/dashboard/applicants/application_details"
+                className="inline-flex min-h-10 items-center justify-center rounded-sm bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors touch-manipulation hover:text-[#00A3FF] dark:bg-white/5 dark:text-gray-300 dark:hover:text-[#00A3FF]"
+              >
+                View Application
+              </Link>
+              <div className="px-3 py-1.5 bg-gray-100 dark:bg-white/5 rounded-sm">
+                <span className="text-sm font-medium capitalize text-gray-700 dark:text-gray-300">
                   {application?.status || "draft"}
                 </span>
               </div>
-
-              <div className="px-3 py-1.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm">
+              <div className="px-4 py-1.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] rounded-sm">
                 <span className="text-sm font-semibold text-white">
-                  {completed}/{total}
+                  {completed}/{total} Steps
                 </span>
               </div>
             </div>
