@@ -22,7 +22,7 @@ const TabNavigation = ({
       <div className="w-full max-w-7xl">
         <div className="bg-linear-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-sm  mb-8 border border-gray-200 dark:border-gray-700">
           <div className="p-2">
-            <nav className="flex flex-wrap items-center justify-center gap-2">
+            <nav className="flex flex-wrap items-center justify-center ">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;

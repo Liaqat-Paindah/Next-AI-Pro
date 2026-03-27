@@ -18,14 +18,10 @@ import {
   Calendar,
   Award,
   Briefcase,
-  AlertCircle,
   Download,
   ChevronDown,
   Clock,
   FileDown,
-  Printer,
-  Mail,
-  Share2,
   Sparkles,
 } from "lucide-react";
 import Loading from "@/app/loading";
@@ -39,10 +35,12 @@ import SkillsTab from "@/components/dashboard/applicants/application_details/tab
 import LanguagesTab from "@/components/dashboard/applicants/application_details/tabs/LanguagesTab";
 import HealthTab from "@/components/dashboard/applicants/application_details/tabs/HealthTab";
 import FinancialTab from "@/components/dashboard/applicants/application_details/tabs/FinancialTab";
-import GoalsTab from "@/components/dashboard/applicants/application_details/tabs/GoalsTab";
 import DocumentsTab from "@/components/dashboard/applicants/application_details/tabs/DocumentsTab";
 import ContactTab from "@/components/dashboard/applicants/application_details/tabs/ContactTab";
 import ActivitiesTab from "@/components/dashboard/applicants/application_details/tabs/ActivitiesTab";
+import HobbiesTab from "@/components/dashboard/applicants/application_details/tabs/HobbiesTab";
+import PreferencesTab from "@/components/dashboard/applicants/application_details/tabs/PreferencesTab";
+import DistinctionTab from "@/components/dashboard/applicants/application_details/tabs/DistinctionTab";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -67,20 +65,25 @@ class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      const standardErrorType =
+        this.state.error?.name || "ApplicationDataError";
+
       return (
-        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-6 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
-          <div className="relative flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-red-500/20 dark:bg-red-500/30">
-              <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-300" />
-            </div>
-            <div>
-              <p className="font-medium text-red-400 dark:text-red-300">
-                System Alert
-              </p>
-              <p className="text-sm text-red-400/80 dark:text-red-300/70">
-                No application details are available at the moment
-              </p>
+        <div className="flex min-h-[60vh] items-center justify-center p-4">
+          <div className="relative w-full max-w-md overflow-hidden rounded-sm border border-gray-200 bg-white/70 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+            <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
+            <div className="relative flex items-center space-x-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/10">
+                <FileText className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-800 dark:text-gray-100">
+                  {standardErrorType}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Unable to display application details due to incomplete data.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -162,7 +165,9 @@ const GetApplicationDetails = () => {
     { id: "languages", label: "Languages", icon: Languages },
     { id: "health", label: "Health", icon: Heart },
     { id: "financial", label: "Financial", icon: DollarSign },
-    { id: "goals", label: "Goals", icon: Target },
+    { id: "preferences", label: "Preferences", icon: Target },
+    { id: "hobbies", label: "Hobbies", icon: Heart },
+    { id: "distinction", label: "Plan & Goals", icon: Award },
     { id: "documents", label: "Documents", icon: FileText },
     { id: "contact", label: "Contact", icon: Phone },
   ];
@@ -174,34 +179,17 @@ const GetApplicationDetails = () => {
   if (!application) {
     return (
       <div className=" flex items-center justify-center">
-        <div className="relative max-w-sm w-full">
-          {/* Nexus Background Effects */}
-          <div className="fixed inset-0 overflow-hidden">
-            <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
-            <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
-            <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
-            <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
-            <motion.div
-              animate={{ top: ["-10%", "110%"] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
-            />
-          </div>
-
+        <div className="relative mt-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative overflow-hidden rounded-sm border border-gray-200 backdrop-blur-sm dark:border-white/10"
+            className="relative overflow-hidden "
           >
-            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
-
             <div className="relative p-8 text-center">
-              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
-
               <div className="relative flex justify-center mb-6">
                 <div className="relative">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
-                    <FileText className="h-10 w-10 text-white" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
+                    <FileText className="h-4 w-4 text-white" />
                   </div>
                   <div
                     className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50"
@@ -210,17 +198,17 @@ const GetApplicationDetails = () => {
                 </div>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
                 No Application Found
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-sm">
                 You have not submitted any scholarship application yet.
               </p>
 
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => router.push("/dashboard/apply")}
+                onClick={() => router.push("/dashboard/applicants")}
                 className="mt-6 inline-flex items-center px-6 py-2.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm text-sm font-medium hover:shadow-lg hover:shadow-[#00A3FF]/20 transition-all duration-300"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
@@ -241,7 +229,9 @@ const GetApplicationDetails = () => {
       case "personal":
         return <PersonalInfoTab data={app.personal} />;
       case "education":
-        return <EducationTab data={app.education} EducationLevel ={app?.level} />;
+        return (
+          <EducationTab data={app.education} EducationLevel={app?.level} />
+        );
       case "research":
         return <ResearchTab data={app.research} />;
       case "activities":
@@ -253,15 +243,17 @@ const GetApplicationDetails = () => {
       case "health":
         return <HealthTab health={app.health} />;
       case "financial":
+        return <FinancialTab financial={app.financial} />;
+      case "preferences":
+        return <PreferencesTab preferences={app.preferences} />;
+      case "hobbies":
+        return <HobbiesTab hobbies={app.hobbies} />;
+      case "distinction":
         return (
-          <FinancialTab financial={app.financial} studyType={app.studyType} />
-        );
-      case "goals":
-        return (
-          <GoalsTab
-            goals={app.goals}
-            preferences={app.preferences}
+          <DistinctionTab
             distinction={app.distinction}
+            studyType={app.studyType}
+            goals={app.goals}
           />
         );
       case "documents":
@@ -345,25 +337,6 @@ const GetApplicationDetails = () => {
                       </p>
                     </div>
                   </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                    onClick={() => window.print()}
-                  >
-                    <Printer className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                  >
-                    <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
                 </div>
               </div>
 
@@ -470,15 +443,6 @@ const GetApplicationDetails = () => {
                       )}
                     </AnimatePresence>
                   </div>
-
-                  {/* Email Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                  >
-                    <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
                 </div>
               </div>
 

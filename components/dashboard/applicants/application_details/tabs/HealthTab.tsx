@@ -3,12 +3,35 @@ import { Heart, Stethoscope, Pill } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HealthTabProps {
-  health: Application["health"];
+  health?: Application["health"] | null;
 }
 
 const HealthTab = ({ health }: HealthTabProps) => {
-  const specialDiseases = health.specialDiseases?.trim() || "No";
-  const disabilityNeeds = health.disabilityNeeds?.trim() || "No";
+  const specialDiseases = health?.specialDiseases?.trim();
+  const disabilityNeeds = health?.disabilityNeeds?.trim();
+  const hasAnyHealthInfo = Boolean(specialDiseases || disabilityNeeds);
+
+  if (!hasAnyHealthInfo) {
+    return (
+      <div className="w-full">
+        <div className="px-6 sm:px-8 py-12 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                <Heart className="h-8 w-8 text-gray-400 dark:text-gray-600" />
+              </div>
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            No Health Information
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            The applicant has not added any health details yet.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -54,7 +77,7 @@ const HealthTab = ({ health }: HealthTabProps) => {
                     Special Diseases
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {specialDiseases}
+                    {specialDiseases || "No"}
                   </p>
                 </div>
               </div>
@@ -72,7 +95,7 @@ const HealthTab = ({ health }: HealthTabProps) => {
                     Disability Needs
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {disabilityNeeds}
+                    {disabilityNeeds || "No"}
                   </p>
                 </div>
               </div>
