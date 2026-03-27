@@ -181,34 +181,19 @@ const GetApplicationDetails = () => {
   if (!application) {
     return (
       <div className=" flex items-center justify-center">
-        <div className="relative max-w-sm w-full">
-          {/* Nexus Background Effects */}
-          <div className="fixed inset-0 overflow-hidden">
-            <div className="absolute -left-1/4 top-0 h-125 w-125 rounded-full bg-[#00A3FF]/5 blur-[120px] dark:hidden" />
-            <div className="absolute -right-1/4 bottom-0 h-125 w-125 rounded-full bg-[#7000FF]/5 blur-[120px] dark:hidden" />
-            <div className="absolute -left-1/4 top-0 hidden h-125 w-125 rounded-full bg-[#00A3FF]/10 blur-[120px] dark:block" />
-            <div className="absolute -right-1/4 bottom-0 hidden h-125 w-125 rounded-full bg-[#7000FF]/10 blur-[120px] dark:block" />
-            <motion.div
-              animate={{ top: ["-10%", "110%"] }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#00A3FF]/30 to-transparent dark:via-[#00A3FF]/50"
-            />
-          </div>
-
+        <div className="relative mt-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative overflow-hidden rounded-sm border border-gray-200 backdrop-blur-sm dark:border-white/10"
+            className="relative overflow-hidden "
           >
-            <div className="absolute inset-0 rounded-sm bg-linear-to-r from-[#00A3FF]/0 via-[#00A3FF]/10 to-[#7000FF]/0 opacity-0 transition-opacity duration-1000 hover:opacity-100 dark:via-[#00A3FF]/20" />
 
             <div className="relative p-8 text-center">
-              <div className="absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-[#00A3FF] to-transparent dark:via-[#00A3FF]" />
 
               <div className="relative flex justify-center mb-6">
                 <div className="relative">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
-                    <FileText className="h-10 w-10 text-white" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
+                    <FileText className="h-4 w-4 text-white" />
                   </div>
                   <div
                     className="absolute inset-0 -z-10 animate-pulse rounded-sm bg-[#00A3FF]/30 blur-xl dark:bg-[#00A3FF]/50"
@@ -217,10 +202,10 @@ const GetApplicationDetails = () => {
                 </div>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
                 No Application Found
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-sm">
                 You have not submitted any scholarship application yet.
               </p>
 

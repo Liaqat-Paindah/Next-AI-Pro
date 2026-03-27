@@ -17,13 +17,8 @@ interface DocumentsTabProps {
   files?: Application["files"];
 }
 
-const DocumentsTab = ({ supportingDocuments, files }: DocumentsTabProps) => {
-  const safeSupportingDocuments: Partial<Application["supportingDocuments"]> =
-    supportingDocuments ?? {};
+const DocumentsTab = ({ files }: DocumentsTabProps) => {
   const safeFiles: Partial<Application["files"]> = files ?? {};
-
-  console.log("the documents is", files);
-  console.log("supportingDocuments flags", safeSupportingDocuments);
 
   const baseURL = process.env.NEXT_PUBLIC_FILE_URL;
   if (!baseURL) {
@@ -247,7 +242,6 @@ const DocumentCard = ({
   const fullUrl = fileUrl
     ? `${process.env.NEXT_PUBLIC_FILE_URL}/${fileUrl}`
     : null;
-
 
   return (
     <motion.div
