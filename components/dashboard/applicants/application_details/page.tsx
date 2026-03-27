@@ -18,7 +18,6 @@ import {
   Calendar,
   Award,
   Briefcase,
-  AlertCircle,
   Download,
   ChevronDown,
   Clock,
@@ -69,20 +68,24 @@ class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      const standardErrorType = this.state.error?.name || "ApplicationDataError";
+
       return (
-        <div className="relative overflow-hidden rounded-sm border border-red-500/20 bg-linear-to-br from-red-500/10 to-red-600/5 p-6 backdrop-blur-sm dark:from-red-500/20 dark:to-red-600/10">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
-          <div className="relative flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-red-500/20 dark:bg-red-500/30">
-              <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-300" />
-            </div>
-            <div>
-              <p className="font-medium text-red-400 dark:text-red-300">
-                System Alert
-              </p>
-              <p className="text-sm text-red-400/80 dark:text-red-300/70">
-                No application details are available at the moment
-              </p>
+        <div className="flex min-h-[60vh] items-center justify-center p-4">
+          <div className="relative w-full max-w-md overflow-hidden rounded-sm border border-gray-200 bg-white/70 p-6 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
+            <div className="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10" />
+            <div className="relative flex items-center space-x-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/10">
+                <FileText className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-800 dark:text-gray-100">
+                  {standardErrorType}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Unable to display application details due to incomplete data.
+                </p>
+              </div>
             </div>
           </div>
         </div>
