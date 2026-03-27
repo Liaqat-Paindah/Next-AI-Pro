@@ -3,10 +3,18 @@ import { DollarSign, Plane, GraduationCap, Banknote } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface FinancialTabProps {
-  financial: Application["financial"];
+  financial?: Application["financial"] | null;
 }
 
 const FinancialTab = ({ financial }: FinancialTabProps) => {
+  const familyIncome = financial?.familyIncome;
+  const canPayTuition = financial?.canPayTuition?.trim();
+  const canPayTravel = financial?.canPayTravel?.trim();
+  const hasAnyFinancialInfo =
+    typeof familyIncome === "number" ||
+    canPayTuition === "Yes" ||
+    canPayTravel === "Yes";
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -15,6 +23,28 @@ const FinancialTab = ({ financial }: FinancialTabProps) => {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  if (!hasAnyFinancialInfo) {
+    return (
+      <div className="w-full">
+        <div className="px-6 sm:px-8 py-12 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="flex h-16 w-16 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                <DollarSign className="h-8 w-8 text-gray-400 dark:text-gray-600" />
+              </div>
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            No Financial Information
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            The applicant has not added any financial details yet.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -50,7 +80,7 @@ const FinancialTab = ({ financial }: FinancialTabProps) => {
             {/* Left Column - Financial Capacity */}
             <div className="space-y-4">
               {/* Family Income */}
-              {financial.familyIncome && (
+              {typeof familyIncome === "number" && (
                 <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
                     <Banknote className="h-4 w-4 text-[#00A3FF]" />
@@ -60,61 +90,49 @@ const FinancialTab = ({ financial }: FinancialTabProps) => {
                       Family Income
                     </p>
                     <p className="mt-1 text-sm text-gray-900 dark:text-white font-semibold">
-                      {formatCurrency(financial.familyIncome)}
+                      {formatCurrency(familyIncome)}
                     </p>
                   </div>
                 </div>
               )}
 
               {/* Can Pay Tuition */}
-              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                  <GraduationCap className="h-4 w-4 text-[#00A3FF]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
-                    Tuition Payment Capability
-                  </p>
-                  <div className="mt-1">
-                    <span
-                      className={`inline-flex items-center rounded-sm px-2 py-1 text-xs font-medium ${
-                        financial.canPayTuition === "Yes"
-                          ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                          : financial.canPayTuition === "No"
-                            ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
-                            : "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-400"
-                      }`}
-                    >
-                      {financial.canPayTuition || "Not specified"}
-                    </span>
+              {canPayTuition === "Yes" && (
+                <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                    <GraduationCap className="h-4 w-4 text-[#00A3FF]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                      Tuition Payment Capability
+                    </p>
+                    <div className="mt-1">
+                      <span className="inline-flex items-center rounded-sm px-2 py-1 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">
+                        {canPayTuition}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Can Pay Travel */}
-              <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                  <Plane className="h-4 w-4 text-[#00A3FF]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
-                    Travel Payment Capability
-                  </p>
-                  <div className="mt-1">
-                    <span
-                      className={`inline-flex items-center rounded-sm px-2 py-1 text-xs font-medium ${
-                        financial.canPayTravel === "Yes"
-                          ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                          : financial.canPayTravel === "No"
-                            ? "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"
-                            : "bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-400"
-                      }`}
-                    >
-                      {financial.canPayTravel || "Not specified"}
-                    </span>
+              {canPayTravel === "Yes" && (
+                <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                    <Plane className="h-4 w-4 text-[#00A3FF]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                      Travel Payment Capability
+                    </p>
+                    <div className="mt-1">
+                      <span className="inline-flex items-center rounded-sm px-2 py-1 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">
+                        {canPayTravel}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

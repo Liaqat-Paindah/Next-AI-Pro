@@ -68,7 +68,8 @@ class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      const standardErrorType = this.state.error?.name || "ApplicationDataError";
+      const standardErrorType =
+        this.state.error?.name || "ApplicationDataError";
 
       return (
         <div className="flex min-h-[60vh] items-center justify-center p-4">
@@ -187,9 +188,7 @@ const GetApplicationDetails = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="relative overflow-hidden "
           >
-
             <div className="relative p-8 text-center">
-
               <div className="relative flex justify-center mb-6">
                 <div className="relative">
                   <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-linear-to-br from-[#00A3FF] to-[#7000FF]">
@@ -212,7 +211,7 @@ const GetApplicationDetails = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => router.push("/dashboard/apply")}
+                onClick={() => router.push("/dashboard/applicants")}
                 className="mt-6 inline-flex items-center px-6 py-2.5 bg-linear-to-r from-[#00A3FF] to-[#7000FF] text-white rounded-sm text-sm font-medium hover:shadow-lg hover:shadow-[#00A3FF]/20 transition-all duration-300"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
@@ -233,7 +232,9 @@ const GetApplicationDetails = () => {
       case "personal":
         return <PersonalInfoTab data={app.personal} />;
       case "education":
-        return <EducationTab data={app.education} EducationLevel ={app?.level} />;
+        return (
+          <EducationTab data={app.education} EducationLevel={app?.level} />
+        );
       case "research":
         return <ResearchTab data={app.research} />;
       case "activities":
