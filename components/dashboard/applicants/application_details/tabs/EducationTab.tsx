@@ -351,7 +351,7 @@ const EducationTab = ({ data, EducationLevel }: EducationTabProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 tracking-wider">
-                          Gap Explanation
+                          Official Duration of the Bachelor Program
                         </p>
                         <p className="text-sm text-gray-900 dark:text-white leading-relaxed">
                           {edu.educationGapExplanation}

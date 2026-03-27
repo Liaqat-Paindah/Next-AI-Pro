@@ -22,9 +22,6 @@ import {
   ChevronDown,
   Clock,
   FileDown,
-  Printer,
-  Mail,
-  Share2,
   Sparkles,
 } from "lucide-react";
 import Loading from "@/app/loading";
@@ -341,25 +338,6 @@ const GetApplicationDetails = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Quick Actions */}
-                <div className="flex items-center gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                    onClick={() => window.print()}
-                  >
-                    <Printer className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                  >
-                    <Share2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
-                </div>
               </div>
 
               {/* Tab Navigation with Nexus styling */}
@@ -465,15 +443,6 @@ const GetApplicationDetails = () => {
                       )}
                     </AnimatePresence>
                   </div>
-
-                  {/* Email Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="p-2 rounded-sm border border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
-                  >
-                    <Mail className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
                 </div>
               </div>
 
