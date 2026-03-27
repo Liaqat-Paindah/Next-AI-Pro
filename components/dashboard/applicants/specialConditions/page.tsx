@@ -317,12 +317,12 @@ export default function SpecialConditions() {
     const payload = {
       specialDisease:
         data.hasSpecialDisease === "Yes"
-          ? data.specialDiseaseDescription || ""
-          : "",
+          ? data.specialDiseaseDescription?.trim() || "No"
+          : "No",
       physicalDisability:
         data.hasPhysicalDisability === "Yes"
-          ? data.physicalDisabilityDescription || ""
-          : "",
+          ? data.physicalDisabilityDescription?.trim() || "No"
+          : "No",
       userId: UserSession?.user?._id as string,
     };
 

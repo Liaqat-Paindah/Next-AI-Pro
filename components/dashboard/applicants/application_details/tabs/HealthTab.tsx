@@ -7,6 +7,9 @@ interface HealthTabProps {
 }
 
 const HealthTab = ({ health }: HealthTabProps) => {
+  const specialDiseases = health.specialDiseases?.trim() || "No";
+  const disabilityNeeds = health.disabilityNeeds?.trim() || "No";
+
   return (
     <div className="w-full">
       {/* Header Section with Professional Spacing */}
@@ -51,7 +54,7 @@ const HealthTab = ({ health }: HealthTabProps) => {
                     Special Diseases
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {health.specialDiseases || "None"}
+                    {specialDiseases}
                   </p>
                 </div>
               </div>
@@ -69,7 +72,7 @@ const HealthTab = ({ health }: HealthTabProps) => {
                     Disability Needs
                   </p>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {health.disabilityNeeds || "None"}
+                    {disabilityNeeds}
                   </p>
                 </div>
               </div>
