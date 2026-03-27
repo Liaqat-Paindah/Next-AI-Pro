@@ -39,10 +39,12 @@ import SkillsTab from "@/components/dashboard/applicants/application_details/tab
 import LanguagesTab from "@/components/dashboard/applicants/application_details/tabs/LanguagesTab";
 import HealthTab from "@/components/dashboard/applicants/application_details/tabs/HealthTab";
 import FinancialTab from "@/components/dashboard/applicants/application_details/tabs/FinancialTab";
-import GoalsTab from "@/components/dashboard/applicants/application_details/tabs/GoalsTab";
 import DocumentsTab from "@/components/dashboard/applicants/application_details/tabs/DocumentsTab";
 import ContactTab from "@/components/dashboard/applicants/application_details/tabs/ContactTab";
 import ActivitiesTab from "@/components/dashboard/applicants/application_details/tabs/ActivitiesTab";
+import HobbiesTab from "@/components/dashboard/applicants/application_details/tabs/HobbiesTab";
+import PreferencesTab from "@/components/dashboard/applicants/application_details/tabs/PreferencesTab";
+import DistinctionTab from "@/components/dashboard/applicants/application_details/tabs/DistinctionTab";
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -162,7 +164,9 @@ const GetApplicationDetails = () => {
     { id: "languages", label: "Languages", icon: Languages },
     { id: "health", label: "Health", icon: Heart },
     { id: "financial", label: "Financial", icon: DollarSign },
-    { id: "goals", label: "Goals", icon: Target },
+    { id: "preferences", label: "Preferences", icon: Target },
+    { id: "hobbies", label: "Hobbies", icon: Heart },
+    { id: "distinction", label: "Plan & Goals", icon: Award },
     { id: "documents", label: "Documents", icon: FileText },
     { id: "contact", label: "Contact", icon: Phone },
   ];
@@ -253,15 +257,17 @@ const GetApplicationDetails = () => {
       case "health":
         return <HealthTab health={app.health} />;
       case "financial":
+        return <FinancialTab financial={app.financial} />;
+      case "preferences":
+        return <PreferencesTab preferences={app.preferences} />;
+      case "hobbies":
+        return <HobbiesTab hobbies={app.hobbies} />;
+      case "distinction":
         return (
-          <FinancialTab financial={app.financial} studyType={app.studyType} />
-        );
-      case "goals":
-        return (
-          <GoalsTab
-            goals={app.goals}
-            preferences={app.preferences}
+          <DistinctionTab
             distinction={app.distinction}
+            studyType={app.studyType}
+            goals={app.goals}
           />
         );
       case "documents":
