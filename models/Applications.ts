@@ -5,6 +5,11 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
     userId: { type: String }, // Link to user account
     /** Highest education level selected on the education step (form discriminator) */
     level: { type: String },
+    /** Master/Bachelor/PHD path: whether applicant has Associate (14th grade) */
+    hasAssociate14thDegree: {
+      type: String,
+      enum: ["yes", "no"],
+    },
     status: {
       type: String,
       enum: ["draft", "submitted", "under_review", "approved", "rejected"],
@@ -186,7 +191,6 @@ const ScholarshipApplicationSchema = new mongoose.Schema(
       ],
     },
 
-    // models/Applications.ts (or wherever your model is defined)
     skills: {
       steps: { type: String, default: "false" },
       computerSkills: {

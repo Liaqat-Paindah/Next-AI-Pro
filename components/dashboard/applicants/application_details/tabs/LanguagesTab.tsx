@@ -23,10 +23,10 @@ const LanguagesTab = ({ data }: LanguagesTabProps) => {
 
   // Check if there's any language data to display
   const hasAnyLanguage =
-    data.nativeLanguage ||
-    data.english?.level ||
-    data.foreignLanguage?.language ||
-    data.localLanguage?.language;
+    data?.nativeLanguage?.language ||
+    data?.english?.level ||
+    data?.foreignLanguage?.language ||
+    data?.localLanguage?.language;
 
   if (!hasAnyLanguage) {
     return (
@@ -81,92 +81,43 @@ const LanguagesTab = ({ data }: LanguagesTabProps) => {
         <div className="px-6 sm:px-8 py-8">
           {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-            {/* Left Column - Native & Local Languages */}
+            {/* Left Column - Native, Local & Foreign Languages */}
             <div className="space-y-4">
               {/* Native Language */}
-              {data.nativeLanguage && (
+              {data?.nativeLanguage?.language && (
                 <LanguageItem
                   icon={<Globe className="h-4 w-4 text-[#00A3FF]" />}
                   label="Native Language"
-                  value={data.nativeLanguage}
+                  language={data.nativeLanguage.language}
+                  level={data.nativeLanguage.level}
                 />
               )}
 
               {/* Local Language */}
-              {data.localLanguage?.language && (
+              {data?.localLanguage?.language && (
                 <LanguageItem
                   icon={<MapPin className="h-4 w-4 text-[#00A3FF]" />}
                   label="Local Language"
-                  value={data.localLanguage.language}
+                  language={data.localLanguage.language}
+                  level={data.localLanguage.level}
                 />
               )}
 
               {/* Foreign Language */}
-              {data.foreignLanguage?.language && (
-                <LanguageItem
-                  icon={<Flag className="h-4 w-4 text-[#00A3FF]" />}
-                  label="Foreign Language"
-                  value={data.foreignLanguage.language}
+              {data?.foreignLanguage?.language && (
+                <ForeignLanguageItem
+                  language={data.foreignLanguage.language}
+                  level={data.foreignLanguage.level}
+                  documentType={data.foreignLanguage.documentType}
+                  certificateUrl={data.foreignLanguage.certificateUrl}
                 />
               )}
             </div>
 
             {/* Right Column - English Proficiency */}
             <div className="space-y-4">
-              {data.english && (
-                <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                    <BookOpen className="h-4 w-4 text-[#00A3FF]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
-                      English Proficiency
-                    </p>
-
-                    {/* English Level */}
-                    {data.english.level ? (
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="inline-flex items-center rounded-sm bg-[#00A3FF]/10 px-2 py-1 text-xs font-medium text-[#00A3FF] dark:bg-[#00A3FF]/20">
-                          {data.english.level}
-                        </span>
-                      </div>
-                    ) : (
-                      <p className="mt-1 text-sm text-gray-400 dark:text-gray-500 italic">
-                        Not specified
-                      </p>
-                    )}
-
-                    {/* English Test */}
-                    {data.english.test && data.english.test !== "None" && (
-                      <div className="mt-3 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Award className="h-3 w-3 text-[#00A3FF]" />
-                          <p className="text-xs text-gray-600 dark:text-gray-400">
-                            {data.english.test}
-                            {data.english.score && (
-                              <span className="ml-1 font-medium text-gray-900 dark:text-white">
-                                : {data.english.score}
-                              </span>
-                            )}
-                          </p>
-                        </div>
-
-                        {/* Certificate */}
-                        {data.english.certificateUrl && (
-                          <div className="mt-2">
-                            <FileAttachmentItem
-                              icon={
-                                <FileText className="h-4 w-4 text-[#00A3FF]" />
-                              }
-                              name="English Certificate"
-                              fileName={data.english.certificateUrl}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
+              {data?.english && (
+                <EnglishProficiencyItem english={data.english} />
               )}
             </div>
           </div>
@@ -181,15 +132,17 @@ const LanguagesTab = ({ data }: LanguagesTabProps) => {
   );
 };
 
-// Language Item Component
+// Language Item Component for Native and Local Languages
 const LanguageItem = ({
   icon,
   label,
-  value,
+  language,
+  level,
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string;
+  language: string;
+  level?: string;
 }) => {
   return (
     <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
@@ -200,7 +153,135 @@ const LanguageItem = ({
         <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
           {label}
         </p>
-        <p className="mt-1 text-sm text-gray-900 dark:text-white">{value}</p>
+        <p className="mt-1 text-sm text-gray-900 dark:text-white">{language}</p>
+        {level && (
+          <div className="mt-2">
+            <span className="inline-flex items-center rounded-sm bg-[#00A3FF]/10 px-2 py-1 text-xs font-medium text-[#00A3FF] dark:bg-[#00A3FF]/20">
+              {level}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Foreign Language Item Component
+const ForeignLanguageItem = ({
+  language,
+  level,
+  documentType,
+  certificateUrl,
+}: {
+  language: string;
+  level?: string;
+  documentType?: string;
+  certificateUrl?: string;
+}) => {
+
+  return (
+    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+        <Flag className="h-4 w-4 text-[#00A3FF]" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+          Foreign Language
+        </p>
+        <p className="mt-1 text-sm text-gray-900 dark:text-white">{language}</p>
+        
+        {level && (
+          <div className="mt-2">
+            <span className="inline-flex items-center rounded-sm bg-[#00A3FF]/10 px-2 py-1 text-xs font-medium text-[#00A3FF] dark:bg-[#00A3FF]/20">
+              {level}
+            </span>
+          </div>
+        )}
+
+        {documentType && documentType !== "Other" && (
+          <div className="mt-2 flex items-center gap-2">
+            <Award className="h-3 w-3 text-[#00A3FF]" />
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Document: {documentType}
+            </p>
+          </div>
+        )}
+
+        {certificateUrl && (
+          <div className="mt-3">
+            <FileAttachmentItem
+              icon={<FileText className="h-4 w-4 text-[#00A3FF]" />}
+              name="Foreign Language Certificate"
+              fileName={certificateUrl}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// English Proficiency Component
+const EnglishProficiencyItem = ({
+  english,
+}: {
+  english: {
+    level?: string;
+    test?: string;
+    score?: string;
+    certificateUrl?: string;
+  };
+}) => {
+  return (
+    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+        <BookOpen className="h-4 w-4 text-[#00A3FF]" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+          English Proficiency
+        </p>
+
+        {/* English Level */}
+        {english.level ? (
+          <div className="mt-2">
+            <span className="inline-flex items-center rounded-sm bg-[#00A3FF]/10 px-2 py-1 text-xs font-medium text-[#00A3FF] dark:bg-[#00A3FF]/20">
+              {english.level}
+            </span>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm text-gray-400 dark:text-gray-500 italic">
+            Level not specified
+          </p>
+        )}
+
+        {/* English Test */}
+        {english.test && english.test !== "None" && (
+          <div className="mt-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Award className="h-3 w-3 text-[#00A3FF]" />
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {english.test}
+                {english.score && (
+                  <span className="ml-1 font-medium text-gray-900 dark:text-white">
+                    : {english.score}
+                  </span>
+                )}
+              </p>
+            </div>
+
+            {/* Certificate */}
+            {english.certificateUrl && (
+              <div className="mt-2">
+                <FileAttachmentItem
+                  icon={<FileText className="h-4 w-4 text-[#00A3FF]" />}
+                  name="English Certificate"
+                  fileName={english.certificateUrl}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

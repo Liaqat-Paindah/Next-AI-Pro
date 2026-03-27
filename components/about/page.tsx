@@ -310,7 +310,7 @@ const InfoCard = ({
         <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1.5">
           {title}
         </h3>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+        <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-400 leading-relaxed">
           {description}
         </p>
       </div>
@@ -356,7 +356,7 @@ const GoalCard = ({
             <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-0.5">
               {title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-800 dark:text-gray-400 leading-relaxed">
               {description}
             </p>
           </div>
@@ -437,7 +437,7 @@ export default function AyandahaDigitalAbout() {
             <motion.p
               custom={2}
               variants={textVariants}
-              className="text-sm sm:text-base text-justify text-gray-600 dark:text-gray-300 leading-relaxed"
+              className="text-sm sm:text-base text-justify text-gray-800 dark:text-gray-300 leading-relaxed"
             >
               Ayandaha began in early 2018 as a research initiative to develop
               Afghanistan`s first comprehensive educational consulting book. The
@@ -448,7 +448,7 @@ export default function AyandahaDigitalAbout() {
             <motion.p
               custom={3}
               variants={textVariants}
-              className="text-sm sm:text-base text-justify text-gray-600 dark:text-gray-300 leading-relaxed"
+              className="text-sm sm:text-base text-justify text-gray-800 dark:text-gray-300 leading-relaxed"
             >
               The resulting publication—Ayandaha—became Afghanistan`s first
               professional educational consulting book, providing thorough
@@ -458,7 +458,7 @@ export default function AyandahaDigitalAbout() {
             <motion.p
               custom={4}
               variants={textVariants}
-              className="text-sm sm:text-base text-justify text-gray-600 dark:text-gray-300 leading-relaxed"
+              className="text-sm sm:text-base text-justify text-gray-800 dark:text-gray-300 leading-relaxed"
             >
               This initiative laid the foundation for professional educational
               consulting in Afghanistan. Today (2026), Ayandaha has evolved into
@@ -504,7 +504,7 @@ export default function AyandahaDigitalAbout() {
             <motion.p
               custom={1}
               variants={textVariants}
-              className="text-sm sm:text-base text-center text-gray-600 dark:text-gray-400 max-w-6xl mx-auto mb-6"
+              className="text-sm sm:text-base text-center text-gray-800 dark:text-gray-400 max-w-6xl mx-auto mb-6"
             >
               Supporting students in making informed academic decisions and
               accessing international education opportunities
@@ -529,7 +529,7 @@ export default function AyandahaDigitalAbout() {
               <motion.p
                 custom={2}
                 variants={textVariants}
-                className="text-sm sm:text-base text-justify text-gray-600 dark:text-gray-300 leading-relaxed"
+                className="text-sm sm:text-base text-justify text-gray-800 dark:text-gray-300 leading-relaxed"
               >
                 In todays rapidly evolving world, choosing future-ready career
                 paths is essential. We provide professional guidance to help
@@ -538,7 +538,7 @@ export default function AyandahaDigitalAbout() {
               <motion.p
                 custom={3}
                 variants={textVariants}
-                className="text-sm sm:text-base text-justify text-gray-600 dark:text-gray-300 leading-relaxed"
+                className="text-sm sm:text-base text-justify text-gray-800 dark:text-gray-300 leading-relaxed"
               >
                 Our core priority is helping students pursue education abroad
                 through scholarships. We have developed a comprehensive

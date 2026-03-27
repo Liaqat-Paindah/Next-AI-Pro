@@ -22,16 +22,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const updateData: Record<string, string> = {};
+    const normalizedSpecialDisease = specialDisease?.trim() || "No";
+    const normalizedPhysicalDisability = physicalDisability?.trim() || "No";
 
-    // Map form fields to schema paths
-    if (specialDisease) {
-      updateData["health.specialDiseases"] = specialDisease;
-    }
-
-    if (physicalDisability) {
-      updateData["health.disabilityNeeds"] = physicalDisability;
-    }
+    const updateData: Record<string, string> = {
+      "health.specialDiseases": normalizedSpecialDisease,
+      "health.disabilityNeeds": normalizedPhysicalDisability,
+    };
 
     const application = await Applications.findOneAndUpdate(
       { userId },

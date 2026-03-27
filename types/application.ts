@@ -14,9 +14,7 @@ export const personalInfoSchema = z.object({
   fatherName: z.string().min(1, "Father name is required"),
   mother_name: z.string().min(1, "Mother name is required"),
   gender: z.string().min(1, "gender is required"),
-  children: z
-    .string()
-    .optional().nullable(),
+  children: z.string().optional().nullable(),
   siblings: z.string().min(1, "Number of Sibilings is required"),
   dependents: z.string().min(1, "Number of Dependents is required"),
   maritalStatus: z.string().min(1, "Marital Status is required"),
@@ -46,7 +44,7 @@ const requiredGpaSchema = z.preprocess(
   sanitizeNumericInput,
   z
     .number({ message: "Average marks are required" })
-    .min(50, "Average Marks must be between 0 and 100")
+    .min(0, "Average Marks must be between 0 and 100")
     .max(100, "Average Marks must be between 0 and 100"),
 );
 
@@ -355,7 +353,13 @@ export interface FileUploadProps {
 
 export interface EducationFormDataField {
   userId: string;
-  level: "PHD" | "Master" | "Bachelor" | "HighSchool" | "Associate" | "MiddleSchool";
+  level:
+    | "PHD"
+    | "Master"
+    | "Bachelor"
+    | "HighSchool"
+    | "Associate"
+    | "MiddleSchool";
   hasAssociate14thDegree?: "yes" | "no";
   primarySchool?: Associate14thOptionalRecord | K12SchoolRecord;
   associate14thEducation?: K12SchoolRecord;
@@ -365,6 +369,16 @@ export interface EducationFormDataField {
   bachelorEducation?: BachelorEducation[];
   highSchoolEducation?: HighSchoolEducation[];
 }
+
+export type EducationStepKey =
+  | "phd"
+  | "master"
+  | "bachelor"
+  | "associate-question"
+  | "associate"
+  | "highschool"
+  | "primary-school"
+  | "secondary-school";
 
 // Articales
 

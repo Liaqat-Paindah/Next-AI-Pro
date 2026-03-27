@@ -1,12 +1,13 @@
 export interface Education {
-  level: string;
   fieldOfStudy?: string;
   institutionName?: string;
   gpa?: number;
   academicRank?: string;
   startDate?: Date;
+  level: string;
   graduationDate?: Date;
   educationGapExplanation?: string;
+  currentlyStudying: boolean;
   thesisTopic?: string;
   thesisFileUrl?: string;
   diplomaFileUrl?: string;
@@ -56,6 +57,7 @@ export interface Address {
 export interface Application {
   _id: string;
   userId: string;
+  level:string;
   status: "draft" | "submitted" | "under_review" | "approved" | "rejected";
   stage: string;
   personal: {
@@ -65,6 +67,10 @@ export interface Application {
     firstName: string;
     lastName: string;
     fatherName: string;
+    mother_name: string;
+    siblings: string;
+    dependents: string;
+    children: string;
     birthDate: Date;
     nationality: string;
     nationalId: string;
@@ -79,6 +85,7 @@ export interface Application {
     hasProjects: boolean;
     hasConferences: boolean;
     hasLabs: boolean;
+    currentlyStudying: boolean;
     hasResearchSkills: boolean;
     hasAcademicAwards: boolean;
     articles: Article[];
@@ -88,29 +95,64 @@ export interface Application {
     academicAwards: AcademicAward[];
     researchSkills: ResearchSkill[];
   };
-  skills: {
-    steps: string;
-    computerSkills: { hasSkill: boolean; fileUrl?: string };
-    communicationSkills: boolean;
-    mediaContentCreation: { hasSkill: boolean; youtubeLink?: string };
-    teamworkSkills: boolean;
-    leadershipSkills: boolean;
-    problemSolving: boolean;
-    timeManagement: boolean;
-    presentationSkills: boolean;
+skills: {
+  steps?: string;
+  computerSkills: {
+    hasSkill: boolean;
+    fileUrl?: string;
   };
-  languages: {
-    nativeLanguage?: string;
-    english: {
-      level?: string;
-      test?: string;
-      score?: string;
-      certificateUrl?: string;
-    };
-    foreignLanguage?: { language: string };
-    localLanguage?: { language: string };
+  communicationSkills: {
+    hasSkill: boolean;
+    fileUrl?: string;
   };
-  activities: Array<{ type: string; fileUrl?: string }>;
+  mediaContentCreation: {
+    hasSkill: boolean;
+    youtubeLink?: string;
+  };
+  teamworkSkills: {
+    hasSkill: boolean;
+    fileUrl?: string;
+  };
+  leadershipSkills: {
+    hasSkill: boolean;
+    fileUrl?: string;
+  };
+  problemSolving: {
+    hasSkill: boolean;
+    fileUrl?: string;
+  };
+  timeManagement: {
+    hasSkill: boolean;
+    fileUrl?: string;
+  };
+  presentationSkills: {
+    hasSkill: boolean;
+    fileUrl?: string;
+  };
+};
+languages: {
+  nativeLanguage?: {
+    language: string;
+    level?: string;
+  };
+  english?: {
+    level?: "Basic" | "Intermediate" | "Advanced" | "Fluent";
+    test?: "None" | "IELTS" | "TOEFL" | "Duolingo";
+    score?: string;
+    certificateUrl?: string;
+  };
+  foreignLanguage?: {
+    language: string;
+    level?: "Basic" | "Intermediate" | "Advanced" | "Fluent";
+    documentType?: "Certificate" | "Diploma" | "Transcript" | "Other";
+    certificateUrl?: string;
+  };
+  localLanguage?: {
+    language: string;
+    level?: "Basic" | "Intermediate" | "Advanced" | "Fluent";
+  };
+};
+  activities: Array<{ type: string; fileUrl?: string | null }>;
   health: {
     specialDiseases?: string;
     disabilityNeeds?: string;

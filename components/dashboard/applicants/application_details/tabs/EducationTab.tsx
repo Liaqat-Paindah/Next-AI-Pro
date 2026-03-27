@@ -12,16 +12,17 @@ import {
   FileCheck,
   BookMarked,
   Award,
-  FileX,
   AlertCircle,
+  Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface EducationTabProps {
   data: Education[];
+  EducationLevel: string;
 }
 
-const EducationTab = ({ data }: EducationTabProps) => {
+const EducationTab = ({ data, EducationLevel }: EducationTabProps) => {
   const formatDate = (date: Date | string) => {
     if (!date) return null;
     return new Date(date).toLocaleDateString("en-US", {
@@ -51,14 +52,14 @@ const EducationTab = ({ data }: EducationTabProps) => {
               Education History
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Academic background and qualifications
+              Highest Education Level: {EducationLevel}
             </p>
           </div>
         </div>
       </div>
 
       {/* Education Items */}
-      <div className="divide-y divide-gray-200 dark:divide-white/10">
+      <div className="divide-y divide-gray-200 dark:border-white/10">
         {data.map((edu, index) => (
           <motion.div
             key={index}
@@ -113,12 +114,21 @@ const EducationTab = ({ data }: EducationTabProps) => {
                 </div>
 
                 {/* Status Badge */}
-                {edu.graduationDate &&
-                  new Date(edu.graduationDate) <= new Date() && (
-                    <div className="rounded-sm bg-green-50 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
-                      Completed
-                    </div>
-                  )}
+                {edu.currentlyStudying ? (
+                  <div className="rounded-sm bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">
+                    Currently Studying
+                  </div>
+                ) : edu.graduationDate &&
+                  new Date(edu.graduationDate) <= new Date() ? (
+                  <div className="rounded-sm bg-green-50 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+                    Completed
+                  </div>
+                ) : edu.graduationDate &&
+                  new Date(edu.graduationDate) > new Date() ? (
+                  <div className="rounded-sm bg-yellow-50 px-3 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400">
+                    In Progress
+                  </div>
+                ) : null}
               </div>
 
               {/* Two Column Layout */}
@@ -126,111 +136,76 @@ const EducationTab = ({ data }: EducationTabProps) => {
                 {/* Left Column - Basic Information */}
                 <div className="space-y-4">
                   {/* Level */}
-                  <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                      <BookOpen className="h-4 w-4 text-[#00A3FF]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 ">
-                        Level
-                      </p>
-                      <p className="mt-1 text-sm text-gray-900 dark:text-white ">
-                        {edu.level ? (
-                          edu.level
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                        ) : (
-                          <span className="italic text-gray-400 dark:text-gray-500">
-                            Not provided
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Field of Study */}
-                  <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                      <BookMarked className="h-4 w-4 text-[#00A3FF]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 ">
-                        Field of Study
-                      </p>
-                      <p className="mt-1 text-sm text-gray-900 dark:text-white ">
-                        {edu.fieldOfStudy ? (
-                          edu.fieldOfStudy
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                        ) : (
-                          <span className="italic text-gray-400 dark:text-gray-500">
-                            Not provided
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Institution */}
-                  <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                      <Building2 className="h-4 w-4 text-[#00A3FF]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                        Institution
-                      </p>
-                      <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                        {edu.institutionName ? (
-                          edu.institutionName
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() +
-                                word.slice(1).toLowerCase(),
-                            )
-                            .join(" ")
-                        ) : (
-                          <span className="italic text-gray-400 dark:text-gray-500">
-                            Not provided
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Dates - Now in 50-50 two column layout */}
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex items-start gap-3">
+                  {edu.level && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                        <Calendar className="h-4 w-4 text-[#00A3FF]" />
+                        <BookOpen className="h-4 w-4 text-[#00A3FF]" />
                       </div>
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                          Start
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Level
                         </p>
                         <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                          {edu.startDate ? (
-                            formatDate(edu.startDate)
-                          ) : (
-                            <span className="italic text-gray-400 dark:text-gray-500 text-xs">
-                              N/A
-                            </span>
-                          )}
+                          {edu.level
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")}
                         </p>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Field of Study */}
+                  {edu.fieldOfStudy && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <BookMarked className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Field of Study
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {edu.fieldOfStudy
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Institution */}
+                  {edu.institutionName && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <Building2 className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Institution
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {edu.institutionName
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* GPA */}
                   {edu.gpa && (
@@ -238,12 +213,29 @@ const EducationTab = ({ data }: EducationTabProps) => {
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
                         <Star className="h-4 w-4 text-[#00A3FF]" />
                       </div>
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                            Average Marks(GPA)
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          GPA / Average Marks
                         </p>
                         <p className="mt-1 text-sm text-gray-900 dark:text-white">
                           {edu.gpa}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Currently Studying */}
+                  {edu.currentlyStudying && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <Clock className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Status
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          Currently Enrolled
                         </p>
                       </div>
                     </div>
@@ -258,8 +250,8 @@ const EducationTab = ({ data }: EducationTabProps) => {
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
                         <Trophy className="h-4 w-4 text-[#00A3FF]" />
                       </div>
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 ">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
                           Academic Rank
                         </p>
                         <p className="mt-1 text-sm text-gray-900 dark:text-white">
@@ -276,97 +268,89 @@ const EducationTab = ({ data }: EducationTabProps) => {
                     </div>
                   )}
 
-                  {/* High School Specific Fields */}
-                  {edu.level?.toLowerCase() === "high school" ? (
-                    <>
-                      {edu.finalExamYear && (
-                        <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                            <Award className="h-4 w-4 text-[#00A3FF]" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                              Final Exam Year
-                            </p>
-                            <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                              {edu.finalExamYear}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                      {edu.finalExamScore && (
-                        <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                            <Award className="h-4 w-4 text-[#00A3FF]" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 ">
-                              Final Exam Score
-                            </p>
-                            <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                              {edu.finalExamScore}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {edu.thesisTopic && (
-                        <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                            <ScrollText className="h-4 w-4 text-[#00A3FF]" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 ">
-                              Thesis Topic
-                            </p>
-                            <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                              {edu.thesisTopic
-                                .split(" ")
-                                .map(
-                                  (word) =>
-                                    word.charAt(0).toUpperCase() +
-                                    word.slice(1).toLowerCase(),
-                                )
-                                .join(" ")}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
-                    <div className="flex items-start gap-3">
+                  {/* Final Exam Year (High School) */}
+                  {edu.finalExamYear && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                        <CalendarCheck className="h-4 w-4 text-[#00A3FF]" />
+                        <Award className="h-4 w-4 text-[#00A3FF]" />
                       </div>
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400  tracking-wider">
-                          Graduated
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Final Exam Year
                         </p>
                         <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                          {edu.graduationDate ? (
-                            formatDate(edu.graduationDate)
-                          ) : (
-                            <span className="italic text-gray-400 dark:text-gray-500 text-xs">
-                              N/A
-                            </span>
-                          )}
+                          {edu.finalExamYear}
                         </p>
                       </div>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Education Gap Explanation - Fixed to display properly */}
+                  {/* Final Exam Score (High School) */}
+                  {edu.finalExamScore && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <Award className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Final Exam Score
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {edu.finalExamScore}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Thesis Topic */}
+                  {edu.thesisTopic && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <ScrollText className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Thesis Topic
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {edu.thesisTopic
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() +
+                                word.slice(1).toLowerCase(),
+                            )
+                            .join(" ")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Graduation Date */}
+                  {edu.graduationDate && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
+                        <CalendarCheck className="h-4 w-4 text-[#00A3FF]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Graduation Date
+                        </p>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {formatDate(edu.graduationDate)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Education Gap Explanation */}
                   {edu.educationGapExplanation && (
                     <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
                         <AlertCircle className="h-4 w-4 text-[#00A3FF]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 tracking-wider">
                           Gap Explanation
                         </p>
                         <p className="text-sm text-gray-900 dark:text-white leading-relaxed">
@@ -376,33 +360,19 @@ const EducationTab = ({ data }: EducationTabProps) => {
                     </div>
                   )}
 
-                  {/* Major Subjects */}
-                  {edu.majorSubjects && edu.majorSubjects.length > 0 && (
+                  {/* Start Date */}
+                  {edu.startDate && (
                     <div className="flex items-start gap-3 pb-4 border-b border-gray-200 dark:border-white/10">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-gray-100 dark:bg-white/5">
-                        <BookMarked className="h-4 w-4 text-[#00A3FF]" />
+                        <Calendar className="h-4 w-4 text-[#00A3FF]" />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400  mb-2">
-                          Major Subjects
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 tracking-wider">
+                          Start Date
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {edu.majorSubjects.map((subject, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-flex items-center rounded-sm bg-linear-to-r from-[#00A3FF]/10 to-[#7000FF]/10 px-3 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 ring-1 ring-inset ring-[#00A3FF]/20 dark:ring-[#7000FF]/30"
-                            >
-                              {subject
-                                .split(" ")
-                                .map(
-                                  (word) =>
-                                    word.charAt(0).toUpperCase() +
-                                    word.slice(1).toLowerCase(),
-                                )
-                                .join(" ")}
-                            </span>
-                          ))}
-                        </div>
+                        <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                          {formatDate(edu.startDate)}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -410,67 +380,54 @@ const EducationTab = ({ data }: EducationTabProps) => {
               </div>
 
               {/* Documents Section */}
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText className="h-4 w-4 text-[#00A3FF]" />
-                  <h5 className="text-sm font-medium text-gray-900 dark:text-white">
-                    Attached Documents
-                  </h5>
+              {(edu.diplomaFileUrl ||
+                edu.transcriptFileUrl ||
+                edu.thesisFileUrl) && (
+                <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileText className="h-4 w-4 text-[#00A3FF]" />
+                    <h5 className="text-sm font-medium text-gray-900 dark:text-white">
+                      Attached Documents
+                    </h5>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Diploma */}
+                    {(edu.diplomaFileUrl || edu.diplomaFileUrl) && (
+                      <FileAttachmentItem
+                        icon={<FileText className="h-4 w-4 text-[#00A3FF]" />}
+                        name="Diploma"
+                        fileName={
+                          edu.diplomaFileUrl || edu.diplomaFileUrl || ""
+                        }
+                        isUrl
+                      />
+                    )}
+
+                    {/* Transcript */}
+                    {(edu.transcriptFileUrl || edu.transcriptFileUrl) && (
+                      <FileAttachmentItem
+                        icon={<FileCheck className="h-4 w-4 text-[#00A3FF]" />}
+                        name="Transcript"
+                        fileName={
+                          edu.transcriptFileUrl || edu.transcriptFileUrl || ""
+                        }
+                        isUrl
+                      />
+                    )}
+
+                    {/* Thesis */}
+                    {(edu.thesisFileUrl || edu.thesisFileUrl) && (
+                      <FileAttachmentItem
+                        icon={<ScrollText className="h-4 w-4 text-[#00A3FF]" />}
+                        name="Thesis"
+                        fileName={edu.thesisFileUrl || edu.thesisFileUrl || ""}
+                        isUrl
+                      />
+                    )}
+                  </div>
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Diploma */}
-                  {edu.diplomaFileUrl ? (
-                    <FileAttachmentItem
-                      icon={<FileText className="h-4 w-4 text-[#00A3FF]" />}
-                      name="Diploma"
-                      fileName={`${baseURL}/${edu.diplomaFileUrl}`}
-                      isUrl
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 italic py-3 px-4 bg-gray-50 dark:bg-white/5 rounded-sm border border-gray-200 dark:border-white/10">
-                      <FileX className="h-4 w-4 shrink-0" />
-                      <span className="truncate">No diploma provided</span>
-                    </div>
-                  )}
-
-                  {/* Transcript */}
-                  {edu.transcriptFileUrl ? (
-                    <FileAttachmentItem
-                      icon={<FileCheck className="h-4 w-4 text-[#00A3FF]" />}
-                      name="Transcript"
-                      fileName={`${baseURL}/${edu.transcriptFileUrl}`}
-                      isUrl
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 italic py-3 px-4 bg-gray-50 dark:bg-white/5 rounded-sm border border-gray-200 dark:border-white/10">
-                      <FileX className="h-4 w-4 shrink-0" />
-                      <span className="truncate">No transcript provided</span>
-                    </div>
-                  )}
-
-                  {/* Thesis (if applicable) */}
-                  {edu.level?.toLowerCase() !== "high school" && (
-                    <>
-                      {edu.thesisFileUrl ? (
-                        <FileAttachmentItem
-                          icon={
-                            <ScrollText className="h-4 w-4 text-[#00A3FF]" />
-                          }
-                          name="Thesis"
-                          fileName={edu.thesisFileUrl}
-                          isUrl
-                        />
-                      ) : (
-                        <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 italic py-3 px-4 bg-gray-50 dark:bg-white/5 rounded-sm border border-gray-200 dark:border-white/10">
-                          <FileX className="h-4 w-4 shrink-0" />
-                          <span className="truncate">No thesis provided</span>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Subtle Hover Effect */}
@@ -489,7 +446,6 @@ const FileAttachmentItem = ({
   icon,
   name,
   fileName,
-  isUrl = false,
 }: {
   icon: React.ReactNode;
   name: string;
@@ -497,6 +453,7 @@ const FileAttachmentItem = ({
   isUrl?: boolean;
 }) => {
   const displayName = fileName.split("/").pop() || fileName;
+  const fullUrl = `${process.env.NEXT_PUBLIC_FILE_URL}/${fileName}`;
 
   return (
     <div className="group relative overflow-hidden rounded-sm border border-gray-200 dark:border-white/10 bg-white dark:bg-black/20 transition-all duration-300 hover:border-[#00A3FF]/30 hover:shadow-lg hover:shadow-[#00A3FF]/5">
@@ -517,10 +474,10 @@ const FileAttachmentItem = ({
 
         <div className="ml-4 shrink-0">
           <a
-            href={isUrl ? fileName : "#"}
+            href={fullUrl}
             className="inline-flex items-center gap-1 rounded-sm bg-linear-to-r from-[#00A3FF] to-[#7000FF] px-3 py-1.5 text-xs font-medium text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#00A3FF]/25"
-            target={isUrl ? "_blank" : undefined}
-            rel={isUrl ? "noopener noreferrer" : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             View
             <svg
