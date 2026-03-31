@@ -4,7 +4,7 @@ import User from "@/models/User";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await ConnectDB();
@@ -13,7 +13,7 @@ export async function GET(
     if (!id) {
       return NextResponse.json(
         { message: "User ID is required", success: false },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,7 +22,7 @@ export async function GET(
     if (!user) {
       return NextResponse.json(
         { message: "User not found", success: false },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -32,7 +32,7 @@ export async function GET(
         data: user,
         message: "User retrieved successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     const message =
@@ -43,35 +43,43 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await ConnectDB();
     const { id } = await params;
     const body = await req.json();
 
+    // Remove sensitive fields that shouldn't be updated
+    const { ...updateData } = body;
+
     if (!id) {
       return NextResponse.json(
         { message: "User ID is required", success: false },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Remove sensitive fields that shouldn't be updated
-    const { email, password, ...updateData } = body;
+    // Get current user to check if phone is changing
+    const currentUser = await User.findById(id);
+    if (!currentUser) {
+      return NextResponse.json(
+        { message: "User not found", success: false },
+        { status: 404 },
+      );
+    }
+
+    // If phone is the same, don't update it to avoid unique constraint issues
+    const finalUpdateData = { ...updateData };
+    if (updateData.phone && updateData.phone === currentUser.phone) {
+      delete finalUpdateData.phone;
+    }
 
     const user = await User.findByIdAndUpdate(
       id,
-      { $set: updateData },
-      { new: true, runValidators: true }
+      { $set: finalUpdateData },
+      { new: true },
     ).select("-password");
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not found", success: false },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json(
       {
@@ -79,9 +87,11 @@ export async function PUT(
         data: user,
         message: "User updated successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
+    console.error("User update error:", error);
+
     const message =
       error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json({ success: false, message }, { status: 500 });
@@ -90,7 +100,7 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await ConnectDB();
@@ -99,7 +109,7 @@ export async function DELETE(
     if (!id) {
       return NextResponse.json(
         { message: "User ID is required", success: false },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -108,7 +118,7 @@ export async function DELETE(
     if (!user) {
       return NextResponse.json(
         { message: "User not found", success: false },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -117,7 +127,7 @@ export async function DELETE(
         success: true,
         message: "User deleted successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     const message =

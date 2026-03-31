@@ -29,6 +29,7 @@ import Loading from "@/app/loading";
 import { saveFile } from "@/lib/file_upload";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Image from "next/image";
 
 interface UserInfoProps {
@@ -104,8 +105,10 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       });
       setIsEditing(false);
       refetch(); // Refetch to get updated data
+      toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Failed to update user:", error);
+      toast.error("Failed to update profile");
     }
   };
 
@@ -129,7 +132,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("New passwords do not match");
+      toast.error("New passwords do not match");
       return;
     }
 
@@ -147,10 +150,10 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
         confirmPassword: "",
       });
       setShowPasswordSection(false);
-      alert("Password changed successfully");
+      toast.success("Password changed successfully");
     } catch (error) {
       console.error("Failed to change password:", error);
-      alert("Failed to change password. Please check your current password.");
+      toast.error("Failed to change password. Please check your current password.");
     }
   };
 
@@ -164,9 +167,10 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       });
       setAvatarFile(null);
       refetch();
+      toast.success("Avatar updated successfully");
     } catch (error) {
       console.error("Failed to upload avatar:", error);
-      alert("Failed to upload avatar");
+      toast.error("Failed to upload avatar");
     } finally {
       setUploadingAvatar(false);
     }
@@ -183,12 +187,12 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
 
     try {
       await deleteUserMutation.mutateAsync(userId);
-      alert("Account deleted successfully");
+      toast.success("Account deleted successfully");
       // Redirect to home or login page
       router.push("/");
     } catch (error) {
       console.error("Failed to delete account:", error);
-      alert("Failed to delete account");
+      toast.error("Failed to delete account");
     }
   };
 

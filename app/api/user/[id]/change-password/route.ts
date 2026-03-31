@@ -55,7 +55,10 @@ export async function PUT(
     );
     if (!isCurrentPasswordValid) {
       return NextResponse.json(
-        { message: "Current password is incorrect", success: false },
+        {
+          message: "Failed to change password. Please check your current password and try again.",
+          success: false
+        },
         { status: 400 },
       );
     }
