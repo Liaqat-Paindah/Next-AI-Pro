@@ -96,14 +96,14 @@ const AyandahaHome: React.FC<AyandahaHomeProps> = ({
               className="text-lg md:text-2xl lg:text-3xl font-bold tracking-tight"
             >
               <span className="bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Ayandaha - Your Gateway to Global Education
+                Ayandaha — Your Gateway to Global Education
               </span>
             </motion.h1>
 
             {/* Description */}
             <motion.p
               variants={itemVariants}
-              className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400  font-light px-2 sm:px-4 max-w-4xl mx-auto text-justify"
+              className="text-xs sm:text-sm md:text-base text-gray-900 dark:text-gray-400  font-light px-2 sm:px-4 max-w-4xl mx-auto text-justify"
             >
               Ayandaha is the first professional educational consulting company
               in Afghanistan, dedicated to guiding students in two key areas:
@@ -182,7 +182,7 @@ const AyandahaHome: React.FC<AyandahaHomeProps> = ({
                       <h3 className="text-md font-semibold text-gray-900 dark:text-white mb-2">
                         {value.title}
                       </h3>
-                      <p className="text-gray-600 text-sm dark:text-gray-300">
+                      <p className="text-gray-900 text-sm dark:text-gray-300">
                         {value.description}
                       </p>
                     </div>

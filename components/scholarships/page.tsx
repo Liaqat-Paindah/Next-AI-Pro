@@ -172,7 +172,7 @@ export default function NexusScholarships() {
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
                 No Scholarships Available
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-400">
                 Check back later for new opportunities.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function NexusScholarships() {
           <motion.p
             custom={2}
             variants={textVariants}
-            className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-light px-2 sm:px-4"
+            className="text-xs sm:text-sm md:text-base text-gray-900 dark:text-gray-400 max-w-2xl mx-auto font-light px-2 sm:px-4"
           >
             Access fully funded opportunities at world-renowned universities and
             transform your educational future with our digital platform.
@@ -263,7 +263,7 @@ export default function NexusScholarships() {
                 )}
 
                 {/* Description */}
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 line-clamp-2">
+                <p className="text-xs text-gray-900 dark:text-gray-400 mb-2 sm:mb-3 line-clamp-2">
                   {scholarship.description}
                 </p>
 
@@ -276,19 +276,19 @@ export default function NexusScholarships() {
 
                 {/* Meta Info Grid - Responsive */}
                 <div className="grid grid-cols-2 gap-1 sm:gap-1.5 mb-2 sm:mb-3">
-                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-900 dark:text-gray-400">
                     <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
                     <span className="truncate text-xs">
                       {scholarship.country}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm text-gray-900 dark:text-gray-400">
                     <CalendarDays className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
                     <span className="truncate text-xs">
                       {new Date(scholarship.deadline).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm col-span-2 text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-1 text-xs p-1 sm:p-1.5 bg-gray-50 dark:bg-gray-900/50 rounded-sm col-span-2 text-gray-900 dark:text-gray-400">
                     <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-400 shrink-0" />
                     <span className="text-xs">
                       {daysRemaining(scholarship.deadline)} days remaining
