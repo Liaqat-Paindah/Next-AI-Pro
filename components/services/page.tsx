@@ -193,6 +193,21 @@ interface ServiceCardProps {
   index: number;
 }
 
+const renderFeatureText = (feature: string) => {
+  const [featureTitle, ...featureDetails] = feature.split(":");
+
+  if (featureDetails.length === 0) {
+    return feature;
+  }
+
+  return (
+    <>
+      <span className="font-bold text-[#6ABAE1]">{featureTitle}:</span>{" "}
+      {featureDetails.join(":").trim()}
+    </>
+  );
+};
+
 const ServiceCard = ({
   icon,
   title,
@@ -310,7 +325,9 @@ const ServiceCard = ({
                         {i + 1}
                       </span>
                     </div>
-                    <span className="leading-relaxed flex-1">{feature}</span>
+                    <span className="leading-relaxed flex-1">
+                      {renderFeatureText(feature)}
+                    </span>
                   </motion.div>
                 ))}
               </div>
@@ -366,13 +383,13 @@ const services = [
     descriptionDetailed:
       "Our second core service focuses on supporting students in securing international scholarships. Scholarships are widely regarded as the most valuable pathway to studying abroad, as they provide financial support—an especially important advantage for many of our students. We are committed to helping an increasing number of students access these life-changing opportunities each year. To achieve this, we have designed an innovative and structured system called the 'Scholarship Attainment Framework.' This framework is specifically developed to maximize applicants' chances of success. A key feature of our approach is early preparation. We engage applicants well before scholarship announcements, guiding them through a structured preparation process. This is essential, as international scholarships often have demanding requirements that cannot be met overnight—they require time, planning, and consistent effort. Our framework enables students to gradually build their profiles under the guidance of our expert advisors.",
     features: [
-      "1. Information Submission: At this stage, applicants provide all necessary personal, academic, and professional information required for evaluation and application",
-      "2. Eligibility Assessment: At this stage, we assess each applicant's profile against international scholarship criteria and provide clear feedback.",
-      "3. Eligibility Alignment: At this stage, we guide applicants on how to meet and align with scholarship requirements and standards.",
-      "4. Competitive Enhancement: At this stage, we help applicants strengthen their profiles to meet high competitive standards, significantly improving their chances of success",
-      "5. Application Customization: At this stage, we tailor each application to align with the specific goals and values of each scholarship program.",
-      "6. Application Submission: At this stage, we professionally submit applications in accordance with best practices and established guidelines",
-      "7. Post-Submission Follow-Up: At this stage, through strategic and proactive communication, we work to increase applicants' visibility and positively influence selection outcomes.",
+      "Information Submission: At this stage, applicants provide all necessary personal, academic, and professional information required for evaluation and application",
+      "Eligibility Assessment: At this stage, we assess each applicant's profile against international scholarship criteria and provide clear feedback.",
+      "Eligibility Alignment: At this stage, we guide applicants on how to meet and align with scholarship requirements and standards.",
+      "Competitive Enhancement: At this stage, we help applicants strengthen their profiles to meet high competitive standards, significantly improving their chances of success",
+      "Application Customization: At this stage, we tailor each application to align with the specific goals and values of each scholarship program.",
+      "Application Submission: At this stage, we professionally submit applications in accordance with best practices and established guidelines",
+      "Post-Submission Follow-Up: At this stage, through strategic and proactive communication, we work to increase applicants' visibility and positively influence selection outcomes.",
     ],
     highlights: [
       "First structured framework for scholarship success",
