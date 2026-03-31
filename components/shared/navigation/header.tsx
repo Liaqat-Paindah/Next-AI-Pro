@@ -16,7 +16,7 @@ const Header = () => {
 
   const [sticky, setSticky] = useState(false);
   const handleStickyNavbar = useCallback(() => {
-    setSticky(window.scrollY >= 40); // Reduced threshold
+    setSticky(window.scrollY > 0); // sticky starts as soon as the user scrolls
   }, []);
 
   useEffect(() => {
@@ -43,11 +43,13 @@ const Header = () => {
     <>
       <header
         className={`
-          fixed top-0 left-0 w-full z-[9999] transition-all duration-500 border-b border-gray-200 dark:border-gray-700
+          fixed top-0 left-0 w-full z-9999 transition-all duration-300 py-3 md:py-4 lg:py-5
+          border-b border-gray-200 dark:border-[#6ABAE1]/20
+          bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
           ${
             sticky
-              ? "py-1.5 md:py-2 bg-white/90 backdrop-blur-xl border-b border-[#D8F0F4]/20 dark:bg-gray-900 dark:border-[#6ABAE1]/20"
-              : "py-2 md:py-3 lg:py-4 bg-transparent"
+              ? "dark:border-[#6ABAE1] shadow-md"
+              : "shadow-none"
           }
         `}
       >
@@ -63,17 +65,17 @@ const Header = () => {
                 <Image
                   src="/logo.png"
                   alt="logo"
-                  width={120} // Reduced from 160
-                  height={34} // Reduced proportionally
-                  className="h-auto w-auto max-h-7 md:max-h-9 lg:max-h-11 relative z-10 dark:hidden"
+                  width={160}
+                  height={46}
+                  className="h-auto w-auto max-h-12 md:max-h-14 lg:max-h-16 relative z-10 dark:hidden"
                   priority
                 />
                 <Image
                   src="/logo-dark.png"
                   alt="logo"
-                  width={120}
-                  height={34}
-                  className="hidden h-auto w-auto max-h-7 md:max-h-9 lg:max-h-11 relative z-10 dark:block"
+                  width={160}
+                  height={46}
+                  className="hidden h-auto w-auto max-h-12 md:max-h-14 lg:max-h-16 relative z-10 dark:block"
                   priority
                 />
               </Link>
@@ -211,7 +213,7 @@ const Header = () => {
                   <span className="relative z-10">
                     Start Your Scholarship Journey
                   </span>
-                  <div className="absolute inset-0 bg-linear-to-r from-[#6ABAE1]/0 via-[#6ABAE1]/10 to-[#6ABAE1]/0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                  <div className="absolute inset-0 bg-linear-to-r from-[#6ABAE1]/0 via-[#6ABAE1]/10 to-[#6ABAE1]/0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                 </Link>
               </div>
 
@@ -259,7 +261,7 @@ const Header = () => {
   `}
           >
             <div className="relative bg-white dark:bg-gray-900 rounded-sm shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-gray-800/30" />
+              <div className="absolute inset-0 bg-linear-to-b from-blue-50/50 to-transparent dark:from-gray-800/30" />
               <div className="relative p-3 max-h-[calc(100vh-80px)] overflow-y-auto">
                 <nav>
                   <ul className="space-y-0.5">
@@ -381,13 +383,7 @@ const Header = () => {
       )}
 
       {/* Dynamic Spacer - Smaller */}
-      <div
-        className={`transition-all duration-500 ${
-          sticky
-            ? "h-[52px] md:h-[60px] lg:h-[68px]"
-            : "h-[56px] md:h-[68px] lg:h-[76px]"
-        }`}
-      />
+      <div className="h-16 md:h-18 lg:h-20" />
     </>
   );
 };
