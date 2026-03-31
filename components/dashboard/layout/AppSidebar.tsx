@@ -33,7 +33,7 @@ const mainNavItems: NavItem[] = [
   {
     icon: <Settings className="w-5 h-5" />,
     name: "Settings",
-    path: "/settings",
+    path: "/dashboard/settings",
   },
 ];
 
