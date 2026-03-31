@@ -76,7 +76,7 @@ const Icons = {
 const digitalSlides: Slide[] = [
   {
     id: 'slide-1',
-    imgSrc: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop',
+    imgSrc: '/slider/slider-2.jpeg',
     imgAlt: 'Modern digital education platform interface with holographic elements',
     title: 'Your Academic Future Starts Here',
     description: 'Smart platform for university applications and scholarships, with precision guidance and full support.',
@@ -92,7 +92,7 @@ const digitalSlides: Slide[] = [
   },
   {
     id: 'slide-2',
-    imgSrc: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop',
+    imgSrc: '/slider/slider-1.jpeg',
     imgAlt: 'Digital transformation in education with futuristic interface',
     title: 'From Zero to Admission',
     description: 'Smart system guides you through every step, from university selection to visa application.',
@@ -108,7 +108,7 @@ const digitalSlides: Slide[] = [
   },
   {
     id: 'slide-3',
-    imgSrc: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=2074&auto=format&fit=crop',
+    imgSrc: '/slider/slider-3.jpeg',
     imgAlt: 'Digital dashboard showing scholarship opportunities',
     title: 'Exclusive Scholarships',
     description: 'Search through 5000+ active scholarships with smart filters and find your perfect match.',
