@@ -10,11 +10,25 @@ interface UserDetails {
   last_name?: string;
   email?: string;
   image?: string | null;
+  avatar?: string | null;
 }
+
+const buildFileUrl = (filePath?: string | null) => {
+  if (!filePath) return null;
+  if (/^https?:\/\//i.test(filePath)) return filePath;
+
+  const baseUrl = process.env.NEXT_PUBLIC_FILE_URL;
+  if (!baseUrl) return filePath.startsWith("/") ? filePath : `/${filePath}`;
+
+  const safeBase = baseUrl.replace(/\/+$/, "");
+  const safePath = filePath.replace(/^\/+/, "");
+  return `${safeBase}/${safePath}`;
+};
 
 export default function UserDropdown() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Handle click outside
@@ -59,6 +73,7 @@ export default function UserDropdown() {
   }
 
   const user = session.user as UserDetails;
+  const avatarUrl = buildFileUrl(user.avatar || user.image || null);
   const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
   const displayName = fullName || user.email || "User";
   const initials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
@@ -74,13 +89,15 @@ export default function UserDropdown() {
       >
         {/* Avatar */}
         <div className="relative w-8 h-8 overflow-hidden rounded-full bg-linear-to-br from-[#387ea0] to-[#6ABAE1]">
-          {user.image ? (
+          {avatarUrl && !avatarError ? (
             <Image
-              src={user.image}
+              src={avatarUrl}
               alt={displayName}
               fill
+              unoptimized
               className="object-cover"
               sizes="32px"
+              onError={() => setAvatarError(true)}
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full text-sm font-medium text-white">
@@ -142,13 +159,15 @@ export default function UserDropdown() {
         <div className="p-4 bg-linear-to-br from-gray-50 to-gray-100  dark:from-gray-800/50 dark:to-gray-800">
           <div className="flex items-center gap-3">
             <div className="relative  w-12 h-12 overflow-hidden rounded-full bg-linear-to-br from-[#03396C] to-[#6ABAE1]">
-              {user.image ? (
+              {avatarUrl && !avatarError ? (
                 <Image
-                  src={user.image}
+                  src={avatarUrl}
                   alt={displayName}
                   fill
+                  unoptimized
                   className="object-cover"
                   sizes="48px"
+                  onError={() => setAvatarError(true)}
                 />
               ) : (
                 <div className="flex items-center justify-center w-full h-full text-lg font-semibold text-white">
@@ -173,29 +192,7 @@ export default function UserDropdown() {
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
-              href="/profile"
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-sm transition-colors duration-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-              <svg
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 4C8.68629 4 6 6.68629 6 10C6 11.8393 6.79375 13.5064 8.07129 14.6562C9.25684 15.7257 10.5547 16.5 12 16.5C13.4453 16.5 14.7432 15.7257 15.9287 14.6562C17.2063 13.5064 18 11.8393 18 10C18 6.68629 15.3137 4 12 4ZM12 15C10.8885 15 9.825 14.3857 8.81445 13.4688C7.74219 12.4951 7 11.1328 7 10C7 7.23858 9.23858 5 12 5C14.7614 5 17 7.23858 17 10C17 11.1328 16.2578 12.4951 15.1855 13.4688C14.175 14.3857 13.1115 15 12 15ZM5 20C5 18.8954 5.89543 18 7 18H17C18.1046 18 19 18.8954 19 20V21H20V20C20 18.3431 18.6569 17 17 17H7C5.34315 17 4 18.3431 4 20V21H5V20Z"
-                  fill="currentColor"
-                />
-              </svg>
-              <span>Profile</span>
-            </DropdownItem>
-          </li>
-          
-          <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              href="/settings"
+              href="/dashboard/settings"
               className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-sm transition-colors duration-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               <svg
