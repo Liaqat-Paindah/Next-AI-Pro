@@ -329,14 +329,14 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       <div className="px-4 sm:px-6 py-5 sm:py-6 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center gap-4">
           <div className="relative">
-            {avatarUrl}
             {avatarUrl && !avatarError ? (
               <Image
                 src={avatarUrl}
                 alt="Avatar"
                 width={80}
                 height={80}
-                className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full border-2 border-gray-200 dark:border-white/10"
+                unoptimized
+                className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full border-2 border-gray-200 dark:border-white/10 object-cover"
                 onError={() => setAvatarError(true)}
               />
             ) : (

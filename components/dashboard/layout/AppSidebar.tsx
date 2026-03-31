@@ -7,7 +7,6 @@ import { useSidebar } from "@/components/providers/SidebarContext";
 import {
   LayoutDashboard,
   Settings,
-  LogOut,
   FileText,
   ChevronRight,
 } from "lucide-react";
@@ -37,13 +36,7 @@ const mainNavItems: NavItem[] = [
   },
 ];
 
-const bottomNavItems: NavItem[] = [
-  {
-    icon: <LogOut className="w-5 h-5" />,
-    name: "Logout",
-    path: "/logout",
-  },
-];
+
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -310,9 +303,7 @@ const AppSidebar: React.FC = () => {
             {renderNavItems(mainNavItems)}
           </div>
 
-          <div className="py-4 px-3 border-t border-gray-200/80 dark:border-white/5 bg-linear-to-t from-[#00A3FF]/5 to-transparent dark:from-[#7000FF]/10">
-            {renderNavItems(bottomNavItems)}
-          </div>
+       
         </div>
       </aside>
     </>

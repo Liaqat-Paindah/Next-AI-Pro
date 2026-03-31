@@ -3,7 +3,7 @@ import { ConnectDB } from "@/lib/config";
 import { saveFile } from "@/lib/file_upload";
 import User from "@/models/User";
 
-const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
+const MAX_AVATAR_SIZE = 10 * 1024 * 1024;
 
 const errorResponse = (
   message: string,
@@ -55,7 +55,7 @@ export async function POST(
     }
 
     if (avatar.size > MAX_AVATAR_SIZE) {
-      return errorResponse("Avatar file size must be less than 5MB", 400, {
+      return errorResponse("Avatar file size must be less than 10MB", 400, {
         code: "AVATAR_TOO_LARGE",
         field: "avatar",
       });
