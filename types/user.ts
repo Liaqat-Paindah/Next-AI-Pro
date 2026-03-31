@@ -5,9 +5,16 @@ export interface User {
   email: string;
   phone: string;
   role: "user" | "admin";
-  avatar?: string;
+  avatar?: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  message: string;
+  code?: string;
+  field?: string;
 }
 
 export interface UserResponse {
@@ -41,5 +48,11 @@ export interface ChangePasswordResponse {
 
 export interface DeleteUserResponse {
   success: boolean;
+  message: string;
+}
+
+export interface UploadAvatarResponse {
+  success: boolean;
+  data: User;
   message: string;
 }

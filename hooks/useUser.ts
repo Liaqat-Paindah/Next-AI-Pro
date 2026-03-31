@@ -1,24 +1,47 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { UpdateUserData, UserResponse, UpdateUserResponse } from "@/types/user";
+import {
+  UpdateUserData,
+  UserResponse,
+  UpdateUserResponse,
+  ChangePasswordResponse,
+  DeleteUserResponse,
+  UploadAvatarResponse,
+  ApiErrorResponse,
+} from "@/types/user";
 
 export interface ChangePasswordData {
   currentPassword: string;
   newPassword: string;
 }
 
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError<ApiErrorResponse>(error)) {
+    return error.response?.data?.message || fallback;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 export const UseGetUser = (id: string) => {
   return useQuery({
     queryKey: ["UseGetUser", id],
     queryFn: async () => {
-      console.log("the user id is", id);
-      const response = await axios.get<UserResponse>(`/api/user/${id}`);
+      try {
+        const response = await axios.get<UserResponse>(`/api/user/${id}`);
 
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Failed to fetch user");
+        if (!response.data || !response.data.success) {
+          throw new Error(response.data?.message || "Failed to fetch user");
+        }
+
+        return response.data.data;
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error, "Failed to fetch user"));
       }
-
-      return response.data.data;
     },
     staleTime: 0,
     enabled: !!id,
@@ -38,16 +61,20 @@ export const UseUpdateUser = () => {
       id: string;
       userData: UpdateUserData;
     }) => {
-      const response = await axios.put<UpdateUserResponse>(
-        `/api/user/${id}`,
-        userData,
-      );
+      try {
+        const response = await axios.put<UpdateUserResponse>(
+          `/api/user/${id}`,
+          userData,
+        );
 
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Failed to update user");
+        if (!response.data || !response.data.success) {
+          throw new Error(response.data?.message || "Failed to update user");
+        }
+
+        return response.data.data;
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error, "Failed to update user"));
       }
-
-      return response.data.data;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["UseGetUser", variables.id] });
@@ -61,13 +88,17 @@ export const UseDeleteUser = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await axios.delete(`/api/user/${id}`);
+      try {
+        const response = await axios.delete<DeleteUserResponse>(`/api/user/${id}`);
 
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Failed to delete user");
+        if (!response.data || !response.data.success) {
+          throw new Error(response.data?.message || "Failed to delete user");
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error, "Failed to delete user"));
       }
-
-      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["UseGetUser"] });
@@ -85,13 +116,56 @@ export const UseChangePassword = () => {
       id: string;
       passwordData: ChangePasswordData;
     }) => {
-      const response = await axios.put(`/api/user/${id}/change-password`, passwordData);
+      try {
+        const response = await axios.put<ChangePasswordResponse>(
+          `/api/user/${id}/change-password`,
+          passwordData,
+        );
 
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Failed to change password");
+        if (!response.data || !response.data.success) {
+          throw new Error(response.data?.message || "Failed to change password");
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error(
+          getApiErrorMessage(error, "Failed to change password"),
+        );
       }
+    },
+  });
+};
 
-      return response.data;
+export const UseUploadAvatar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, file }: { id: string; file: File }) => {
+      try {
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        const response = await axios.post<UploadAvatarResponse>(
+          `/api/user/${id}/avatar`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+
+        if (!response.data || !response.data.success) {
+          throw new Error(response.data?.message || "Failed to upload avatar");
+        }
+
+        return response.data.data;
+      } catch (error) {
+        throw new Error(getApiErrorMessage(error, "Failed to upload avatar"));
+      }
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["UseGetUser", variables.id] });
     },
   });
 };

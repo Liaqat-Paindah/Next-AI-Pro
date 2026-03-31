@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   User,
@@ -24,9 +24,9 @@ import {
   UseUpdateUser,
   UseDeleteUser,
   UseChangePassword,
+  UseUploadAvatar,
 } from "@/hooks/useUser";
 import Loading from "@/app/loading";
-import { saveFile } from "@/lib/file_upload";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const userId = session?.user?._id;
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,14 +57,33 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
   });
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [, setAvatarFile] = useState<File | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const { data: user, isLoading, error, refetch } = UseGetUser(userId || "");
-  console.log("the user is:", user);
   const updateUserMutation = UseUpdateUser();
   const deleteUserMutation = UseDeleteUser();
   const changePasswordMutation = UseChangePassword();
+  const uploadAvatarMutation = UseUploadAvatar();
+
+  const getErrorMessage = (error: unknown, fallback: string) => {
+    return error instanceof Error ? error.message : fallback;
+  };
+
+  const buildFileUrl = (filePath?: string | null) => {
+    if (!filePath) return null;
+    if (/^https?:\/\//i.test(filePath)) return filePath;
+
+    const baseUrl = process.env.NEXT_PUBLIC_FILE_URL;
+    if (!baseUrl) {
+      return filePath.startsWith("/") ? filePath : `/${filePath}`;
+    }
+
+    const safeBase = baseUrl.replace(/\/+$/, "");
+    const safePath = filePath.replace(/^\/+/, "");
+    return `${safeBase}/${safePath}`;
+  };
+
+  const avatarUrl = buildFileUrl(user?.avatar);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -77,7 +97,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       setFormData({
         first_name: user.first_name,
         last_name: user.last_name,
-        phone: user.phone,
+        phone: user.phone || "",
       });
     }
   }, [user]);
@@ -108,7 +128,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Failed to update user:", error);
-      toast.error("Failed to update profile");
+      toast.error(getErrorMessage(error, "Failed to update profile"));
     }
   };
 
@@ -117,7 +137,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       setFormData({
         first_name: user.first_name,
         last_name: user.last_name,
-        phone: user.phone,
+        phone: user.phone || "",
       });
     }
     setIsEditing(false);
@@ -153,24 +173,27 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       toast.success("Password changed successfully");
     } catch (error) {
       console.error("Failed to change password:", error);
-      toast.error("Failed to change password. Please check your current password.");
+      toast.error(
+        getErrorMessage(
+          error,
+          "Failed to change password. Please check your current password.",
+        ),
+      );
     }
   };
 
   const handleAvatarUpload = async (file: File) => {
     setUploadingAvatar(true);
     try {
-      const avatarUrl = await saveFile(file, "avatars");
-      await updateUserMutation.mutateAsync({
+      await uploadAvatarMutation.mutateAsync({
         id: userId,
-        userData: { avatar: avatarUrl },
+        file,
       });
-      setAvatarFile(null);
       refetch();
       toast.success("Avatar updated successfully");
     } catch (error) {
       console.error("Failed to upload avatar:", error);
-      toast.error("Failed to upload avatar");
+      toast.error(getErrorMessage(error, "Failed to upload avatar"));
     } finally {
       setUploadingAvatar(false);
     }
@@ -192,7 +215,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       router.push("/");
     } catch (error) {
       console.error("Failed to delete account:", error);
-      toast.error("Failed to delete account");
+      toast.error(getErrorMessage(error, "Failed to delete account"));
     }
   };
 
@@ -303,10 +326,12 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       <div className="px-4 sm:px-6 py-5 sm:py-6 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center gap-4">
           <div className="relative">
-            {user?.avatar ? (
+            {avatarUrl ? (
               <Image
-                src={user.avatar}
+                src={avatarUrl}
                 alt="Avatar"
+                width={80}
+                height={80}
                 className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full border-2 border-gray-200 dark:border-white/10"
               />
             ) : (
@@ -318,9 +343,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
             )}
             {isEditable && (
               <button
-                onClick={() =>
-                  document.getElementById("avatar-upload")?.click()
-                }
+                onClick={() => avatarInputRef.current?.click()}
                 className="absolute -bottom-1 -right-1 p-1 sm:p-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow"
                 disabled={uploadingAvatar}
               >
@@ -328,6 +351,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
               </button>
             )}
             <input
+              ref={avatarInputRef}
               id="avatar-upload"
               type="file"
               accept="image/*"
@@ -335,6 +359,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
                 const file = e.target.files?.[0];
                 if (file) {
                   handleAvatarUpload(file);
+                  e.target.value = "";
                 }
               }}
               className="hidden"
