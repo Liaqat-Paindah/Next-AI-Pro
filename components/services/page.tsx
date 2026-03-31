@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, useInView } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight, Mail, Phone } from "lucide-react";
 
 const Icons = {
   Globe: ({ className = "w-4 h-4" }) => (
@@ -439,9 +441,9 @@ export default function Services() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   // Active contact links - update with your actual details
-  const whatsappNumber = "+93700000000"; // Replace with actual WhatsApp number
-  const emailAddress = "info@pathways.edu.af"; // Replace with actual email
-  const registrationLink = "/register"; // Replace with actual registration path or URL
+  const whatsappNumber = "+93796493189"; // Replace with actual WhatsApp number
+  const emailAddress = "ayandaha2026@gmail.com"; // Replace with actual email
+  const registrationLink = "/auth/register"; // Replace with actual registration path or URL
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
@@ -617,26 +619,35 @@ export default function Services() {
                   {/* Contact Options */}
                   <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {/* WhatsApp Link */}
-                    <a
-                      href={`https://wa.me/+93796493189`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 hover:text-[#6ABAE1] transition-colors duration-200 group"
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <Icons.WhatsApp className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-green-500 group-hover:scale-110 transition-transform" />
-                      <span className="hidden xs:inline">WhatsApp</span>
-                      <span className="xs:hidden">WhatsApp</span>
-                    </a>
-                    <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
-                    {/* Email Link */}
-                    <a
-                      href={`mailto:ayandaha2026@gmail.com`}
-                      className="flex items-center gap-1.5 hover:text-[#6ABAE1] transition-colors duration-200 group"
+                      <Link
+                        href={`https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 px-8 py-3 text-sm rounded-sm bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-sm hover:shadow-sm transition-all duration-300"
+                      >
+                        <Phone className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                        <span>Chat on WhatsApp</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </motion.div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <Icons.Mail className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-gray-500 group-hover:text-[#6ABAE1] transition-colors" />
-                      <span className="hidden xs:inline">Email</span>
-                      <span className="xs:hidden">Mail</span>
-                    </a>
+                      <Link
+                        href={`mailto:${emailAddress}`}
+                        className="group flex items-center justify-center gap-3 px-8 py-3 rounded-sm bg-linear-to-r from-blue-500 to-cyan-600 text-white text-sm shadow-sm hover:shadow-sm transition-all duration-300"
+                      >
+                        <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span>Send an Email</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </motion.div>
                   </div>
                 </div>
 
