@@ -58,6 +58,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   const { data: user, isLoading, error, refetch } = UseGetUser(userId || "");
   const updateUserMutation = UseUpdateUser();
@@ -99,6 +100,7 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
         last_name: user.last_name,
         phone: user.phone || "",
       });
+      setAvatarError(false); // Reset avatar error when user data loads
     }
   }, [user]);
 
@@ -124,10 +126,9 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
         userData: formData,
       });
       setIsEditing(false);
-      refetch(); // Refetch to get updated data
+      refetch(); 
       toast.success("Profile updated successfully");
     } catch (error) {
-      console.error("Failed to update user:", error);
       toast.error(getErrorMessage(error, "Failed to update profile"));
     }
   };
@@ -172,7 +173,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       setShowPasswordSection(false);
       toast.success("Password changed successfully");
     } catch (error) {
-      console.error("Failed to change password:", error);
       toast.error(
         getErrorMessage(
           error,
@@ -183,16 +183,20 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
   };
 
   const handleAvatarUpload = async (file: File) => {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Avatar file size must be less than 10MB");
+      return;
+    }
     setUploadingAvatar(true);
     try {
       await uploadAvatarMutation.mutateAsync({
         id: userId,
         file,
       });
+      setAvatarError(false); 
       refetch();
       toast.success("Avatar updated successfully");
     } catch (error) {
-      console.error("Failed to upload avatar:", error);
       toast.error(getErrorMessage(error, "Failed to upload avatar"));
     } finally {
       setUploadingAvatar(false);
@@ -214,7 +218,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       // Redirect to home or login page
       router.push("/");
     } catch (error) {
-      console.error("Failed to delete account:", error);
       toast.error(getErrorMessage(error, "Failed to delete account"));
     }
   };
@@ -326,13 +329,15 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
       <div className="px-4 sm:px-6 py-5 sm:py-6 border-b border-gray-200 dark:border-white/10">
         <div className="flex items-center gap-4">
           <div className="relative">
-            {avatarUrl ? (
+            {avatarUrl}
+            {avatarUrl && !avatarError ? (
               <Image
                 src={avatarUrl}
                 alt="Avatar"
                 width={80}
                 height={80}
                 className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full border-2 border-gray-200 dark:border-white/10"
+                onError={() => setAvatarError(true)}
               />
             ) : (
               <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-linear-to-br from-[#00A3FF] to-[#7000FF]">

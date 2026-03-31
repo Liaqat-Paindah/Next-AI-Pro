@@ -158,6 +158,7 @@ export async function PUT(
       id,
       { $set: finalUpdateData },
       { new: true, runValidators: true },
+      
     ).select("-password");
 
     if (!user) {

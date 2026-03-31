@@ -61,11 +61,11 @@ export async function POST(
       });
     }
 
-    const avatarPath = await saveFile(avatar, `avatars/${id}`);
+    const avatarPath = await saveFile(avatar, `profile`);
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { $set: { avatar: avatarPath } },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     ).select("-password");
 
     if (!updatedUser) {
@@ -76,7 +76,7 @@ export async function POST(
       {
         success: true,
         data: updatedUser,
-        message: "Avatar updated successfully",
+        message: "Profile updated successfully",
       },
       { status: 200 },
     );
