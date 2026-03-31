@@ -14,15 +14,12 @@ import {
   Camera,
   UserCircle,
   Lock,
-  Trash2,
   Eye,
   EyeOff,
-  AlertTriangle,
 } from "lucide-react";
 import {
   UseGetUser,
   UseUpdateUser,
-  UseDeleteUser,
   UseChangePassword,
   UseUploadAvatar,
 } from "@/hooks/useUser";
@@ -49,7 +46,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
     phone: "",
   });
   const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [showDeleteSection, setShowDeleteSection] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -62,7 +58,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
 
   const { data: user, isLoading, error, refetch } = UseGetUser(userId || "");
   const updateUserMutation = UseUpdateUser();
-  const deleteUserMutation = UseDeleteUser();
   const changePasswordMutation = UseChangePassword();
   const uploadAvatarMutation = UseUploadAvatar();
 
@@ -203,24 +198,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (
-      !confirm(
-        "Are you sure you want to delete your account? This action cannot be undone.",
-      )
-    ) {
-      return;
-    }
-
-    try {
-      await deleteUserMutation.mutateAsync(userId);
-      toast.success("Account deleted successfully");
-      // Redirect to home or login page
-      router.push("/");
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to delete account"));
-    }
-  };
 
   const formatDate = (date?: string) => {
     if (!date) return "N/A";
@@ -603,73 +580,6 @@ const UserInfo = ({ isEditable = true }: UserInfoProps) => {
                 <X className="w-4 h-4" />
                 Cancel
               </button>
-            </div>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Delete Account Section */}
-      <div className="px-4 sm:px-6 py-5 sm:py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-sm bg-red-100 dark:bg-red-900/20">
-              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                Delete Account
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                Permanently delete your account and all associated data
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowDeleteSection(!showDeleteSection)}
-            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-sm hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200"
-          >
-            {showDeleteSection ? "Cancel" : "Delete Account"}
-          </button>
-        </div>
-
-        {showDeleteSection && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-sm"
-          >
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
-              <div className="flex-1">
-                <h4 className="text-sm font-semibold text-red-800 dark:text-red-200">
-                  Warning: This action cannot be undone
-                </h4>
-                <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Deleting your account will permanently remove all your data,
-                  including applications, scholarships, and profile information.
-                  This action is irreversible.
-                </p>
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={handleDeleteAccount}
-                    disabled={deleteUserMutation.isPending}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    {deleteUserMutation.isPending
-                      ? "Deleting..."
-                      : "Delete Account"}
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteSection(false)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-white/5 rounded-sm hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-200"
-                  >
-                    <X className="w-4 h-4" />
-                    Cancel
-                  </button>
-                </div>
-              </div>
             </div>
           </motion.div>
         )}
