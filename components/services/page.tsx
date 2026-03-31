@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, useInView } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight, Mail, Phone } from "lucide-react";
 
 const Icons = {
   Globe: ({ className = "w-4 h-4" }) => (
@@ -193,6 +195,21 @@ interface ServiceCardProps {
   index: number;
 }
 
+const renderFeatureText = (feature: string) => {
+  const [featureTitle, ...featureDetails] = feature.split(":");
+
+  if (featureDetails.length === 0) {
+    return feature;
+  }
+
+  return (
+    <>
+      <span className="font-bold text-[#6ABAE1]">{featureTitle}:</span>{" "}
+      {featureDetails.join(":").trim()}
+    </>
+  );
+};
+
 const ServiceCard = ({
   icon,
   title,
@@ -310,7 +327,9 @@ const ServiceCard = ({
                         {i + 1}
                       </span>
                     </div>
-                    <span className="leading-relaxed flex-1">{feature}</span>
+                    <span className="leading-relaxed flex-1">
+                      {renderFeatureText(feature)}
+                    </span>
                   </motion.div>
                 ))}
               </div>
@@ -366,13 +385,13 @@ const services = [
     descriptionDetailed:
       "Our second core service focuses on supporting students in securing international scholarships. Scholarships are widely regarded as the most valuable pathway to studying abroad, as they provide financial support—an especially important advantage for many of our students. We are committed to helping an increasing number of students access these life-changing opportunities each year. To achieve this, we have designed an innovative and structured system called the 'Scholarship Attainment Framework.' This framework is specifically developed to maximize applicants' chances of success. A key feature of our approach is early preparation. We engage applicants well before scholarship announcements, guiding them through a structured preparation process. This is essential, as international scholarships often have demanding requirements that cannot be met overnight—they require time, planning, and consistent effort. Our framework enables students to gradually build their profiles under the guidance of our expert advisors.",
     features: [
-      "1. Information Submission: At this stage, applicants provide all necessary personal, academic, and professional information required for evaluation and application",
-      "2. Eligibility Assessment: At this stage, we assess each applicant's profile against international scholarship criteria and provide clear feedback.",
-      "3. Eligibility Alignment: At this stage, we guide applicants on how to meet and align with scholarship requirements and standards.",
-      "4. Competitive Enhancement: At this stage, we help applicants strengthen their profiles to meet high competitive standards, significantly improving their chances of success",
-      "5. Application Customization: At this stage, we tailor each application to align with the specific goals and values of each scholarship program.",
-      "6. Application Submission: At this stage, we professionally submit applications in accordance with best practices and established guidelines",
-      "7. Post-Submission Follow-Up: At this stage, through strategic and proactive communication, we work to increase applicants' visibility and positively influence selection outcomes.",
+      "Information Submission: At this stage, applicants provide all necessary personal, academic, and professional information required for evaluation and application",
+      "Eligibility Assessment: At this stage, we assess each applicant's profile against international scholarship criteria and provide clear feedback.",
+      "Eligibility Alignment: At this stage, we guide applicants on how to meet and align with scholarship requirements and standards.",
+      "Competitive Enhancement: At this stage, we help applicants strengthen their profiles to meet high competitive standards, significantly improving their chances of success",
+      "Application Customization: At this stage, we tailor each application to align with the specific goals and values of each scholarship program.",
+      "Application Submission: At this stage, we professionally submit applications in accordance with best practices and established guidelines",
+      "Post-Submission Follow-Up: At this stage, through strategic and proactive communication, we work to increase applicants' visibility and positively influence selection outcomes.",
     ],
     highlights: [
       "First structured framework for scholarship success",
@@ -422,9 +441,9 @@ export default function Services() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   // Active contact links - update with your actual details
-  const whatsappNumber = "+93700000000"; // Replace with actual WhatsApp number
-  const emailAddress = "info@pathways.edu.af"; // Replace with actual email
-  const registrationLink = "/register"; // Replace with actual registration path or URL
+  const whatsappNumber = "+93796493189"; // Replace with actual WhatsApp number
+  const emailAddress = "ayandaha2026@gmail.com"; // Replace with actual email
+  const registrationLink = "/auth/register"; // Replace with actual registration path or URL
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
@@ -600,26 +619,35 @@ export default function Services() {
                   {/* Contact Options */}
                   <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {/* WhatsApp Link */}
-                    <a
-                      href={`https://wa.me/+93796493189`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 hover:text-[#6ABAE1] transition-colors duration-200 group"
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <Icons.WhatsApp className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-green-500 group-hover:scale-110 transition-transform" />
-                      <span className="hidden xs:inline">WhatsApp</span>
-                      <span className="xs:hidden">WhatsApp</span>
-                    </a>
-                    <span className="w-px h-3 bg-gray-300 dark:bg-gray-600" />
-                    {/* Email Link */}
-                    <a
-                      href={`mailto:ayandaha2026@gmail.com`}
-                      className="flex items-center gap-1.5 hover:text-[#6ABAE1] transition-colors duration-200 group"
+                      <Link
+                        href={`https://wa.me/${whatsappNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 px-8 py-3 text-sm rounded-sm bg-linear-to-r from-green-500 to-emerald-600 text-white shadow-sm hover:shadow-sm transition-all duration-300"
+                      >
+                        <Phone className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                        <span>Chat on WhatsApp</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </motion.div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <Icons.Mail className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-gray-500 group-hover:text-[#6ABAE1] transition-colors" />
-                      <span className="hidden xs:inline">Email</span>
-                      <span className="xs:hidden">Mail</span>
-                    </a>
+                      <Link
+                        href={`mailto:${emailAddress}`}
+                        className="group flex items-center justify-center gap-3 px-8 py-3 rounded-sm bg-linear-to-r from-blue-500 to-cyan-600 text-white text-sm shadow-sm hover:shadow-sm transition-all duration-300"
+                      >
+                        <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span>Send an Email</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    </motion.div>
                   </div>
                 </div>
 

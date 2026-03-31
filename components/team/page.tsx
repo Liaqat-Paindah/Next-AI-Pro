@@ -560,7 +560,7 @@ export default function AyandahaDigitalTeam() {
             ))}
           </motion.div>
 
-          {/* Team Grid */}
+          {/* Team Grid 
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -578,7 +578,7 @@ export default function AyandahaDigitalTeam() {
                 index={index}
               />
             ))}
-          </motion.div>
+          </motion.div> */}
 
           {/* Bottom Decorative Element */}
           <motion.div

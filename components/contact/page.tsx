@@ -446,7 +446,7 @@ export default function AyandahaDigitalContact() {
               variants={textVariants}
               className="text-xl sm:text-2xl md:text-3xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-3 o"
             >
-              Let is Start Your{" "}
+              Let`s Start Your{" "}
               <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00A3FF] to-[#7000FF]">
                  Journey
               </span>
@@ -473,15 +473,15 @@ export default function AyandahaDigitalContact() {
               index={0}
               icon={<Icons.Mail className="w-5 h-5" />}
               title="EMAIL"
-              content="info@ayandaha.com"
-              link="mailto:info@ayandaha.com"
+              content="ayandaha2026@gmail.com"
+              link="mailto:ayandaha2026@gmail.com"
             />
             <ContactInfoCard
               index={1}
               icon={<Icons.Phone className="w-5 h-5" />}
               title="PHONE"
-              content="+93(0) 700-000-000"
-              link="tel:+93(0) 700-000-000"
+              content="+93(0) 796-493-189"
+              link="tel:+93796493189"
             />
             <ContactInfoCard
               index={2}
