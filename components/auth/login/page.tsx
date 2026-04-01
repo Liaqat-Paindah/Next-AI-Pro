@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { z } from "zod";
@@ -65,7 +65,11 @@ export default function LoginForm() {
           setIsPending(false);
           setSubmitting(false);
         } else if (result?.ok) {
-          router.push("/dashboard");
+          const session = await getSession();
+          const destination =
+            session?.user?.role === "admin" ? "/admin" : "/dashboard";
+
+          router.push(destination);
           router.refresh();
         }
       } catch (error) {
